@@ -388,6 +388,11 @@ void Container::setEditMode (bool shouldEdit)
     for (auto& child : children)
         child->setEditMode (shouldEdit);
 
+    if (shouldEdit && ! isRoot ())
+        containerBox.addMouseListener (this, false);
+    else
+        containerBox.removeMouseListener (this);
+
     GuiItem::setEditMode (shouldEdit);
 }
 

@@ -510,5 +510,8 @@ void GuiItem::itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSou
         magicBuilder.draggedItemOnto (node, configNode);
 }
 
-
+bool GuiItem::isRoot() const
+{
+    return configNode == magicBuilder.getGuiRootNode();
+}
 }

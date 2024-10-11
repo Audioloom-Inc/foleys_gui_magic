@@ -184,6 +184,8 @@ public:
 
     MagicGUIBuilder& magicBuilder;
 
+    bool isRoot () const;
+    
 protected:
 
     juce::ValueTree configNode;

@@ -178,6 +178,8 @@ LayoutType Container::getLayoutMode() const
 
 void Container::resized()
 {
+    GuiItem::resized();
+
     updateLayout();
 }
 

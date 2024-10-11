@@ -185,18 +185,26 @@ void Container::resized()
 
 void Container::updateLayout()
 {
+    
+    
     if (children.empty())
+    {
+        viewport.setVisible (false);
         return;
+    }
+
+    viewport.setVisible (true);
 
     viewport.setBackgroundColour (decorator.getBackgroundColour());
 
     if (layout != LayoutType::Tabbed)
         tabbedButtons.reset();
 
-    viewport.setBounds (getClientBounds());
+    auto clientBounds = getClientBounds();
+
+    viewport.setBounds (clientBounds);
     viewport.setScrollBarsShown (scrollMode == ScrollMode::ScrollVertical || scrollMode == ScrollMode::ScrollBoth,
                                  scrollMode == ScrollMode::ScrollHorizontal || scrollMode == ScrollMode::ScrollBoth);
-    auto clientBounds = viewport.getLocalBounds();
 
     if (layout == LayoutType::FlexBox)
     {

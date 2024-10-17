@@ -79,7 +79,7 @@ std::unique_ptr<GuiItem> MagicGUIBuilder::createGuiItem (const juce::ValueTree& 
 {
     if (node.getType() == IDs::view)
     {
-        auto item = (node == getGuiRootNode()) ? std::make_unique<RootItem> (*this, node) : std::make_unique<Container> (*this, node);
+        auto item = (node == getGuiRootNode()) ? createRootItem (node) : createContainer (node);
         item->updateInternal();
         item->createSubComponents();
         return item;
@@ -245,6 +245,16 @@ juce::StringArray MagicGUIBuilder::getFactoryNames() const
         names.add (f.first.toString());
 
     return names;
+}
+
+std::unique_ptr<GuiItem> MagicGUIBuilder::createRootItem (const juce::ValueTree& node)
+{
+    return std::make_unique<RootItem> (*this, node);
+}
+
+std::unique_ptr<GuiItem> MagicGUIBuilder::createContainer (const juce::ValueTree& node)
+{
+    return std::make_unique<Container> (*this, node);
 }
 
 void MagicGUIBuilder::registerLookAndFeel (juce::String name, std::unique_ptr<juce::LookAndFeel> lookAndFeel)

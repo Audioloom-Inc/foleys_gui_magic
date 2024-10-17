@@ -177,6 +177,13 @@ public:
      */
     juce::StringArray getFactoryNames() const;
 
+    /**
+     creates a new root item. You can override this mtethod to create your own root item.
+     */
+    virtual std::unique_ptr<GuiItem> createRootItem (const juce::ValueTree& node);
+
+    /** */
+    virtual std::unique_ptr<GuiItem> createContainer (const juce::ValueTree& node);
 
     std::function<void (juce::ComboBox&)> createChoicesMenuLambda (juce::StringArray choices) const;
     std::function<void (juce::ComboBox&)> createParameterMenuLambda() const;

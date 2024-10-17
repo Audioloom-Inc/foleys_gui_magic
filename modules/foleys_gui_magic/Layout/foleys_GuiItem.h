@@ -123,7 +123,16 @@ public:
 
     virtual bool isContainer() const { return false; }
 
+    /**
+     Called whenever a GuiItem is initialized or the child order changed
+     */
     virtual void createSubComponents() {}
+
+    /** */
+    virtual void addSubComponent (juce::ValueTree nodeAdded) {}
+
+    /** */
+    virtual void removeSubComponent (juce::ValueTree nodeRemoved, int index) {}
 
     /**
      This will trigger a recalculation of the children layout regardless of resized
@@ -185,6 +194,8 @@ public:
     MagicGUIBuilder& magicBuilder;
 
     bool isRoot () const;
+    
+    juce::ValueTree getNode () const;
     
 protected:
 

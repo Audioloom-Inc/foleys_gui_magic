@@ -310,16 +310,16 @@ void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const 
     }
 }
 
-void GuiItem::valueTreeChildAdded (juce::ValueTree& treeThatChanged, juce::ValueTree&)
+void GuiItem::valueTreeChildAdded (juce::ValueTree& treeThatChanged, juce::ValueTree& childAdded)
 {
     if (treeThatChanged == configNode)
-        createSubComponents();
+        addSubComponent (childAdded);
 }
 
-void GuiItem::valueTreeChildRemoved (juce::ValueTree& treeThatChanged, juce::ValueTree&, int)
+void GuiItem::valueTreeChildRemoved (juce::ValueTree& treeThatChanged, juce::ValueTree& childRemoved, int index)
 {
     if (treeThatChanged == configNode)
-        createSubComponents();
+        removeSubComponent (childRemoved, index);
 }
 
 void GuiItem::valueTreeChildOrderChanged (juce::ValueTree& treeThatChanged, int, int)
@@ -514,4 +514,10 @@ bool GuiItem::isRoot() const
 {
     return configNode == magicBuilder.getGuiRootNode();
 }
+
+juce::ValueTree GuiItem::getNode() const
+{
+    return configNode;
 }
+
+}  // namespace foleys

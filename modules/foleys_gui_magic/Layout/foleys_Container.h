@@ -102,6 +102,8 @@ public:
     bool isContainer() const override { return true; }
 
     void createSubComponents() override;
+    void addSubComponent (juce::ValueTree newNode) override;
+    void removeSubComponent (juce::ValueTree nodeRemoved, int index) override;
 
     /**
      This will trigger a recalculation of the children layout regardless of resized

@@ -130,6 +130,44 @@ void Container::createSubComponents()
     updateContinuousRedraw();
 }
 
+void Container::addSubComponent (juce::ValueTree newNode) 
+{
+    if (auto index = configNode.indexOf (newNode); index >= 0)
+    {
+        if (auto childItem = magicBuilder.createGuiItem (newNode))
+        {
+            containerBox.addAndMakeVisible (childItem.get ());
+            childItem->createSubComponents ();
+            children.insert (children.begin() + index, std::move (childItem));
+            
+            updateLayout();
+            updateContinuousRedraw();
+        }
+    }
+    else
+    {
+        // the node is not a child of this container!
+        jassertfalse;
+    }
+}
+
+void Container::removeSubComponent (juce::ValueTree nodeRemoved, int index) 
+{
+    for (auto i = children.size (); --i >= 0;)
+    {
+        if (children[i]->getNode () == nodeRemoved)
+        {
+            // index mismatch! The node is not at the expected position
+            jassert (index == i);
+
+            children.erase (children.begin() + i);
+            updateLayout();
+            updateContinuousRedraw();
+            return;
+        }
+    }
+}
+
 GuiItem* Container::findGuiItemWithId (const juce::String& name)
 {
     if (configNode.getProperty (IDs::id, juce::String()).toString() == name)

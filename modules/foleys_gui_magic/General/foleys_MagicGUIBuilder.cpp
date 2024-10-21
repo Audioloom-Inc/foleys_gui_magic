@@ -42,6 +42,7 @@
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
 #include "../Editor/foleys_ToolBox.h"
+#include "../Editor/foleys_StylePropertyComponent.h"
 #endif
 
 namespace foleys
@@ -299,6 +300,11 @@ juce::StringArray MagicGUIBuilder::getColourNames (juce::Identifier type)
         return item->getColourNames();
 
     return {};
+}
+
+StylePropertyComponent * MagicGUIBuilder::createStylePropertyComponent(SettableProperty property, juce::ValueTree node)
+{
+    return StylePropertyComponent::createComponent (*this, property, node);
 }
 
 std::function<void (juce::ComboBox&)> MagicGUIBuilder::createChoicesMenuLambda (juce::StringArray choices) const

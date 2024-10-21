@@ -46,6 +46,8 @@ namespace foleys
     class ToolBox;
 #endif
 
+    class StylePropertyComponent;
+
 /**
  The MagicGUIBuilder is responsible to recreate the GUI from a single ValueTree.
  You can add your own factories to the builder to allow additional components.
@@ -184,6 +186,9 @@ public:
 
     /** */
     virtual std::unique_ptr<GuiItem> createContainer (const juce::ValueTree& node);
+
+    /**  */
+    virtual StylePropertyComponent * createStylePropertyComponent (SettableProperty property, juce::ValueTree node);
 
     std::function<void (juce::ComboBox&)> createChoicesMenuLambda (juce::StringArray choices) const;
     std::function<void (juce::ComboBox&)> createParameterMenuLambda() const;

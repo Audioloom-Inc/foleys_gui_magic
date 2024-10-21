@@ -312,7 +312,7 @@ void PropertiesEditor::addTypeProperties (juce::Identifier type, juce::Array<juc
     {
         for (auto& p : item->getSettableProperties())
         {
-            if (auto* component = StylePropertyComponent::createComponent (builder, p, styleItem))
+            if (auto* component = builder.createStylePropertyComponent (p, styleItem))
                 array.add (component);
         }
 

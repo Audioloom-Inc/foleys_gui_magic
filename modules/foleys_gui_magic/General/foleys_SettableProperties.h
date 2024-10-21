@@ -51,6 +51,8 @@ struct SettableProperty
         Toggle,         /*< Show a toggle for bool properties */
         Choice,         /*< Shows choices provided */
         Gradient,       /*< Show a bespoke gradient editor */
+
+        File,           /** custom styles */
     };
 
     const juce::ValueTree  node;

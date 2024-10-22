@@ -53,8 +53,9 @@ enum class LayoutType;
  */
 class GuiItem   : public juce::Component,
                   public juce::Value::Listener,
-                  private juce::ValueTree::Listener,
-                  public juce::DragAndDropTarget
+                  public juce::ValueTree::Listener,
+                  public juce::DragAndDropTarget,
+                  public juce::AsyncUpdater
 {
 public:
     GuiItem (MagicGUIBuilder& builder, juce::ValueTree node);
@@ -207,6 +208,17 @@ protected:
 
     std::vector<std::pair<juce::String, int>> colourTranslation;
 
+    void valueChanged (juce::Value& source) override;
+
+    void valueTreePropertyChanged (juce::ValueTree&, const juce::Identifier&) override;
+
+    void valueTreeChildAdded (juce::ValueTree&, juce::ValueTree&) override;
+
+    void valueTreeChildRemoved (juce::ValueTree&, juce::ValueTree&, int) override;
+
+    void valueTreeChildOrderChanged (juce::ValueTree&, int, int) override;
+
+    void valueTreeParentChanged (juce::ValueTree&) override;
 private:
 
     class BorderDragger : public juce::ResizableBorderComponent
@@ -239,18 +251,6 @@ private:
     std::unique_ptr<BorderDragger>          borderDragger;
     std::unique_ptr<juce::ComponentDragger> componentDragger;
 
-    void valueChanged (juce::Value& source) override;
-
-    void valueTreePropertyChanged (juce::ValueTree&, const juce::Identifier&) override;
-
-    void valueTreeChildAdded (juce::ValueTree&, juce::ValueTree&) override;
-
-    void valueTreeChildRemoved (juce::ValueTree&, juce::ValueTree&, int) override;
-
-    void valueTreeChildOrderChanged (juce::ValueTree&, int, int) override;
-
-    void valueTreeParentChanged (juce::ValueTree&) override;
-
     /**
      This will get the necessary information from the stylesheet, using inheritance
      of nodes if needed, to set specific properties for the wrapped component.
@@ -270,7 +270,8 @@ private:
 
     void configurePosition (const juce::var& v, Position& p, double d);
     void savePosition ();
-
+    void handleAsyncUpdate () override;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiItem)
 };
 

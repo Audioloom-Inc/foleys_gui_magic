@@ -288,7 +288,7 @@ void GuiItem::valueChanged (juce::Value& source)
         setVisible (visibility.getValue());
 }
 
-void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const juce::Identifier&)
+void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const juce::Identifier& property)
 {
     if (treeThatChanged == configNode)
     {
@@ -406,11 +406,11 @@ void GuiItem::setDraggable (bool selected)
         };
         borderDragger->onDragging = [&]
         {
-            savePosition();
+            triggerAsyncUpdate ();
         };
         borderDragger->onDragEnd = [&]
         {
-            savePosition();
+            triggerAsyncUpdate ();
         };
 
         borderDragger->setBounds (getLocalBounds());
@@ -453,6 +453,11 @@ void GuiItem::savePosition ()
     configNode.setProperty (IDs::posHeight, ph, undo);
 }
 
+void GuiItem::handleAsyncUpdate ()
+{
+    savePosition ();
+}
+
 void GuiItem::mouseDown (const juce::MouseEvent& event)
 {
     if (componentDragger)
@@ -467,7 +472,7 @@ void GuiItem::mouseDrag (const juce::MouseEvent& event)
     if (componentDragger)
     {
         componentDragger->dragComponent (this, event, nullptr);
-        savePosition();
+        triggerAsyncUpdate ();
     }
     else if (event.mouseWasDraggedSinceMouseDown())
     {

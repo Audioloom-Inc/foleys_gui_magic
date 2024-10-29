@@ -166,7 +166,7 @@ void MagicGUIBuilder::updateComponents()
     root = createGuiItem (getGuiRootNode());
     parent->addAndMakeVisible (root.get());
 
-    root->setBounds (parent->getLocalBounds());
+    parent->setBounds (root->getLocalBounds ());
 
     if (root.get() != nullptr)
         root->setEditMode (editMode);

@@ -138,7 +138,8 @@ void StylePropertyComponent::mouseDoubleClick (const juce::MouseEvent&)
 {
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     if (inheritedFrom.isValid())
-        builder.getMagicToolBox().setNodeToEdit (inheritedFrom);
+        if (auto toolBox = builder.getMagicToolBox())
+            toolBox->setNodeToEdit (inheritedFrom);
 #endif
 }
 

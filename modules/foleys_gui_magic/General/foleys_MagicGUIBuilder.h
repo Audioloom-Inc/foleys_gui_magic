@@ -43,7 +43,7 @@
 namespace foleys
 {
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
-    class ToolBox;
+    class ToolBoxBase;
 #endif
 
     class StylePropertyComponent;
@@ -227,8 +227,9 @@ public:
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     void attachToolboxToWindow (juce::Component& window);
+    void setToolbox (ToolBoxBase * toolbox, bool ownsToolbox = false);
 
-    ToolBox& getMagicToolBox();
+    ToolBoxBase* getMagicToolBox();
 #endif
 
     class Listener
@@ -278,7 +279,8 @@ private:
     juce::ValueTree              selectedNode;
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
-    std::unique_ptr<ToolBox> magicToolBox;
+    std::unique_ptr<ToolBoxBase> magicToolBox;
+    bool ownsToolbox{ true };
 #endif
 
     JUCE_DECLARE_WEAK_REFERENCEABLE (MagicGUIBuilder)

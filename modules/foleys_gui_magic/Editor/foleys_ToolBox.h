@@ -43,12 +43,28 @@ namespace foleys
 {
 
 class MagicGUIBuilder;
+class ToolBoxBase : public juce::Component
+{
+public:
+    enum ColourIds {
+        backgroundColourId         = 0x90000001,
+        outlineColourId            = 0x90000002,
+        textColourId               = 0x90000003,
+        disabledTextColourId       = 0x90000004,
+        removeButtonColourId       = 0x90000005,
+        selectedBackgroundColourId = 0x90000006
+    };
+
+    virtual ~ToolBoxBase () = default;
+    virtual void setNodeToEdit (juce::ValueTree node) = 0;
+    virtual void stateWasReloaded () = 0;
+};
 
 /**
  The Toolbox defines a floating window, that allows live editing of the currently loaded GUI.
  */
 class ToolBox
-  : public juce::Component
+  : public ToolBoxBase
   , public juce::DragAndDropContainer
   , public juce::KeyListener
   , private juce::MultiTimer
@@ -85,11 +101,11 @@ public:
     void timerCallback (int timer) override;
 
     void setSelectedNode (const juce::ValueTree& node);
-    void setNodeToEdit (juce::ValueTree node);
+    void setNodeToEdit (juce::ValueTree node) override;
 
     void setToolboxPosition (PositionOption position);
 
-    void stateWasReloaded();
+    void stateWasReloaded() override;
 
     bool keyPressed (const juce::KeyPress& key) override;
     bool keyPressed (const juce::KeyPress& key, juce::Component* originalComponent) override;

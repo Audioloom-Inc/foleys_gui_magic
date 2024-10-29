@@ -53,6 +53,7 @@ struct SettableProperty
         Gradient,       /*< Show a bespoke gradient editor */
 
         File,           /** custom styles */
+        Asset
     };
 
     const juce::ValueTree  node;
@@ -60,6 +61,7 @@ struct SettableProperty
     const PropertyType     type;
     const juce::var        defaultValue;
     const std::function<void(juce::ComboBox&)> menuCreationLambda;
+    const juce::StringArray allowedFileExtensions;
 };
 
 } // namespace foleys

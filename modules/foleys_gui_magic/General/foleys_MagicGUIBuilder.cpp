@@ -304,7 +304,12 @@ juce::StringArray MagicGUIBuilder::getColourNames (juce::Identifier type)
 
 StylePropertyComponent * MagicGUIBuilder::createStylePropertyComponent(SettableProperty property, juce::ValueTree node)
 {
+#if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     return StylePropertyComponent::createComponent (*this, property, node);
+#else
+    jassertfalse;
+    return nullptr;
+#endif
 }
 
 std::function<void (juce::ComboBox&)> MagicGUIBuilder::createChoicesMenuLambda (juce::StringArray choices) const

@@ -434,23 +434,36 @@ void GuiItem::savePosition ()
         return static_cast<GuiItem*> (nullptr);
     };
 
+    auto* undo = &magicBuilder.getUndoManager();
     auto container = findContainer ();
 
+
     if (container == nullptr)
-        return;
+    {
+        // its the root node
 
-    auto parent = container->getClientBounds();
+        auto pw = juce::String (getWidth());
+        auto ph = juce::String (getHeight());
+        
+        configNode.setProperty (IDs::posX, 0, undo);
+        configNode.setProperty (IDs::posY, 0, undo);
+        configNode.setProperty (IDs::posWidth, pw, undo);
+        configNode.setProperty (IDs::posHeight, ph, undo);
+    }
+    else
+    {
+        auto parent = container->getClientBounds();
 
-    auto px = posX.absolute ? juce::String (getX() - parent.getX()) : juce::String (100.0 * (getX() - parent.getX()) / parent.getWidth()) + "%";
-    auto py = posY.absolute ? juce::String (getY() - parent.getY()) : juce::String (100.0 * (getY() - parent.getY()) / parent.getHeight()) + "%";
-    auto pw = posWidth.absolute ? juce::String (getWidth()) : juce::String (100.0 * getWidth() / parent.getWidth()) + "%";
-    auto ph = posHeight.absolute ? juce::String (getHeight()) : juce::String (100.0 * getHeight() / parent.getHeight()) + "%";
+        auto px = posX.absolute ? juce::String (getX() - parent.getX()) : juce::String (100.0 * (getX() - parent.getX()) / parent.getWidth()) + "%";
+        auto py = posY.absolute ? juce::String (getY() - parent.getY()) : juce::String (100.0 * (getY() - parent.getY()) / parent.getHeight()) + "%";
+        auto pw = posWidth.absolute ? juce::String (getWidth()) : juce::String (100.0 * getWidth() / parent.getWidth()) + "%";
+        auto ph = posHeight.absolute ? juce::String (getHeight()) : juce::String (100.0 * getHeight() / parent.getHeight()) + "%";
 
-    auto* undo = &magicBuilder.getUndoManager();
-    configNode.setProperty (IDs::posX, px, undo);
-    configNode.setProperty (IDs::posY, py, undo);
-    configNode.setProperty (IDs::posWidth, pw, undo);
-    configNode.setProperty (IDs::posHeight, ph, undo);
+        configNode.setProperty (IDs::posX, px, undo);
+        configNode.setProperty (IDs::posY, py, undo);
+        configNode.setProperty (IDs::posWidth, pw, undo);
+        configNode.setProperty (IDs::posHeight, ph, undo);
+    }
 }
 
 void GuiItem::handleAsyncUpdate ()

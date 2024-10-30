@@ -55,6 +55,7 @@ public:
         selectedBackgroundColourId = 0x90000006
     };
 
+    ToolBoxBase();
     virtual ~ToolBoxBase () = default;
     virtual void setNodeToEdit (juce::ValueTree node) = 0;
     virtual void stateWasReloaded () = 0;

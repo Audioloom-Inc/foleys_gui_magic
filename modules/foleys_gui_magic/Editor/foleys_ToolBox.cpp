@@ -38,9 +38,21 @@ namespace foleys
 
 namespace IDs
 {
-static juce::String lastLocation { "lastLocation" };
+    static juce::String lastLocation { "lastLocation" };
 }
 
+ToolBoxBase::ToolBoxBase() 
+{
+    setColour (backgroundColourId, findColour (juce::ResizableWindow::backgroundColourId));
+    setColour (outlineColourId, juce::Colours::silver);
+    setColour (textColourId, juce::Colours::white);
+    setColour (disabledTextColourId, juce::Colours::grey);
+    setColour (removeButtonColourId, juce::Colours::darkred);
+    setColour (selectedBackgroundColourId, juce::Colours::darkorange);    
+}
+
+//==============================================================================
+//==============================================================================
 ToolBox::ToolBox (juce::Component* parentToUse, MagicGUIBuilder& builderToControl)
   : parent (parentToUse), builder (builderToControl), undo (builder.getUndoManager())
 {
@@ -51,13 +63,6 @@ ToolBox::ToolBox (juce::Component* parentToUse, MagicGUIBuilder& builderToContro
         setToolboxPosition (ToolBox::positionOptionFromString (properties->getValue ("position")));
         setAlwaysOnTop (properties->getValue ("alwaysOnTop") == "true");
     }
-
-    EditorColours::background         = findColour (juce::ResizableWindow::backgroundColourId);
-    EditorColours::outline            = juce::Colours::silver;
-    EditorColours::text               = juce::Colours::white;
-    EditorColours::disabledText       = juce::Colours::grey;
-    EditorColours::removeButton       = juce::Colours::darkred;
-    EditorColours::selectedBackground = juce::Colours::darkorange;
 
     setOpaque (true);
     setWantsKeyboardFocus (true);
@@ -107,7 +112,7 @@ ToolBox::ToolBox (juce::Component* parentToUse, MagicGUIBuilder& builderToContro
     undoButton.onClick = [&] { undo.undo(); };
 
     editSwitch.setClickingTogglesState (true);
-    editSwitch.setColour (juce::TextButton::buttonOnColourId, EditorColours::selectedBackground);
+    editSwitch.setColour (juce::TextButton::buttonOnColourId, findColour (ToolBoxBase::selectedBackgroundColourId, true));
     editSwitch.onStateChange = [&] { builder.setEditMode (editSwitch.getToggleState()); };
 
     addAndMakeVisible (treeEditor);
@@ -251,10 +256,10 @@ void ToolBox::stateWasReloaded()
 
 void ToolBox::paint (juce::Graphics& g)
 {
-    g.fillAll (EditorColours::background);
-    g.setColour (EditorColours::outline);
+    g.fillAll (findColour (ToolBoxBase::backgroundColourId, true));
+    g.setColour (findColour (ToolBoxBase::outlineColourId, true));
     g.drawRect (getLocalBounds().toFloat(), 2.0f);
-    g.setColour (EditorColours::text);
+    g.setColour (findColour (ToolBoxBase::textColourId, true));
     g.drawFittedText ("foleys GUI magic", getLocalBounds().withHeight (24), juce::Justification::centred, 1);
 }
 

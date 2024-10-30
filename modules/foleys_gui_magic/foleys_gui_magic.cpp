@@ -80,16 +80,6 @@
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
 
-namespace EditorColours
-{
-    static juce::Colour background;
-    static juce::Colour outline;
-    static juce::Colour text;
-    static juce::Colour disabledText;
-    static juce::Colour removeButton;
-    static juce::Colour selectedBackground;
-}
-
 #include "Editor/foleys_ToolBox.cpp"
 #include "Editor/foleys_GUITreeEditor.cpp"
 #include "Editor/foleys_PropertiesEditor.cpp"

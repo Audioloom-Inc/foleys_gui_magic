@@ -71,7 +71,6 @@ StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, j
 {
     addAndMakeVisible (remove);
 
-    remove.setColour (juce::TextButton::buttonColourId, EditorColours::removeButton);
     remove.setConnectedEdges (juce::TextButton::ConnectedOnLeft | juce::TextButton::ConnectedOnRight);
     remove.onClick = [&]
     {
@@ -118,11 +117,11 @@ void StylePropertyComponent::paint (juce::Graphics& g)
 {
     auto b = getLocalBounds().reduced (1).withWidth (getWidth() / 2);
 
-    g.fillAll (EditorColours::background);
-    g.setColour (EditorColours::outline);
+    g.fillAll (findColour (ToolBoxBase::backgroundColourId, true));
+    g.setColour (findColour (ToolBoxBase::outlineColourId, true));
     g.drawHorizontalLine (0, 0.0f, static_cast<float>(getRight()));
     g.drawHorizontalLine (getBottom() - 1, 0.0f, static_cast<float>(getRight()));
-    g.setColour (node == inheritedFrom ? EditorColours::text : EditorColours::disabledText);
+    g.setColour (node == inheritedFrom ? findColour (ToolBoxBase::textColourId, true) : findColour (ToolBoxBase::disabledTextColourId, true));
     g.drawFittedText (property.toString(), b, juce::Justification::left, 1);
 }
 
@@ -141,6 +140,11 @@ void StylePropertyComponent::mouseDoubleClick (const juce::MouseEvent&)
         if (auto toolBox = builder.getMagicToolBox())
             toolBox->setNodeToEdit (inheritedFrom);
 #endif
+}
+
+void StylePropertyComponent::lookAndFeelChanged()
+{
+    remove.setColour (juce::TextButton::buttonColourId, findColour (ToolBoxBase::removeButtonColourId, true));
 }
 
 void StylePropertyComponent::valueTreePropertyChanged (juce::ValueTree& tree, const juce::Identifier& changedProperty)

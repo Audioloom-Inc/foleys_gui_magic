@@ -50,9 +50,9 @@ GUITreeEditor::GUITreeEditor (MagicGUIBuilder& builderToEdit)
 
 void GUITreeEditor::paint (juce::Graphics& g)
 {
-    g.setColour (EditorColours::outline);
+    g.setColour (findColour (ToolBoxBase::outlineColourId, true));
     g.drawRect (getLocalBounds(), 1);
-    g.setColour (EditorColours::text);
+    g.setColour (findColour (ToolBoxBase::textColourId, true));
     g.drawFittedText (TRANS ("GUI tree"), 2, 2, getWidth() - 4, 20, juce::Justification::centred, 1);
 }
 
@@ -75,7 +75,7 @@ void GUITreeEditor::setValueTree (const juce::ValueTree& refTree)
     treeView.setRootItem (nullptr);
     if (tree.isValid())
     {
-        rootItem = std::make_unique<GUITreeEditor::GuiTreeItem> (builder, tree);
+        rootItem = std::make_unique<GUITreeEditor::GuiTreeItem> (*this, builder, tree);
         treeView.setRootItem (rootItem.get());
     }
 
@@ -143,8 +143,9 @@ void GUITreeEditor::valueTreeParentChanged (juce::ValueTree&)
 
 //==============================================================================
 
-GUITreeEditor::GuiTreeItem::GuiTreeItem (MagicGUIBuilder& builderToUse, juce::ValueTree& refValueTree)
-  : builder (builderToUse),
+GUITreeEditor::GuiTreeItem::GuiTreeItem (Component& owner, MagicGUIBuilder& builderToUse, juce::ValueTree& refValueTree)
+  : owner (owner),
+    builder (builderToUse),
     itemNode (refValueTree)
 {
 }
@@ -169,9 +170,9 @@ bool GUITreeEditor::GuiTreeItem::mightContainSubItems()
 void GUITreeEditor::GuiTreeItem::paintItem (juce::Graphics& g, int width, int height)
 {
     if (isSelected())
-        g.fillAll (EditorColours::selectedBackground.withAlpha (0.5f));
+        g.fillAll (owner.findColour (ToolBoxBase::selectedBackgroundColourId, true).withAlpha (0.5f));
 
-    g.setColour (EditorColours::text);
+    g.setColour (owner.findColour (ToolBoxBase::textColourId, true));
     g.setFont (height * 0.7f);
 
     juce::String name = itemNode.getType().toString();
@@ -190,7 +191,7 @@ void GUITreeEditor::GuiTreeItem::itemOpennessChanged (bool isNowOpen)
     if (isNowOpen && getNumSubItems() == 0)
     {
         for (auto child : itemNode)
-            addSubItem (new GuiTreeItem (builder, child));
+            addSubItem (new GuiTreeItem (owner, builder, child));
     }
 }
 

@@ -140,3 +140,20 @@
 #include "General/foleys_MagicGUIBuilder.h"
 #include "General/foleys_MagicPluginEditor.h"
 #include "General/foleys_MagicProcessor.h"
+
+#if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
+
+#include "Editor/foleys_ToolBox.h"
+#include "Editor/foleys_GUITreeEditor.h"
+#include "Editor/foleys_PropertiesEditor.h"
+#include "Editor/foleys_Palette.h"
+
+#include "Editor/foleys_MultiListPropertyComponent.h"
+#include "Editor/foleys_StylePropertyComponent.h"
+#include "Editor/foleys_StyleTextPropertyComponent.h"
+#include "Editor/foleys_StyleBoolPropertyComponent.h"
+#include "Editor/foleys_StyleColourPropertyComponent.h"
+#include "Editor/foleys_StyleGradientPropertyComponent.h"
+#include "Editor/foleys_StyleChoicePropertyComponent.h"
+
+#endif // FOLEYS_SHOW_GUI_EDITOR_PALLETTE

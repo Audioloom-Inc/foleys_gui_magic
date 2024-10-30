@@ -63,7 +63,7 @@ private:
     class GuiTreeItem : public juce::TreeViewItem
     {
     public:
-        GuiTreeItem (MagicGUIBuilder& builder, juce::ValueTree& refValueTree);
+        GuiTreeItem (Component& owner, MagicGUIBuilder& builder, juce::ValueTree& refValueTree);
 
         juce::String getUniqueName() const override;
 
@@ -81,6 +81,7 @@ private:
         juce::ValueTree& getTree () { return itemNode; }
 
     private:
+        Component& owner;
         MagicGUIBuilder& builder;
         juce::ValueTree  itemNode;
 

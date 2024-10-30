@@ -62,7 +62,7 @@ private:
     class PaletteListModel : public juce::ListBoxModel
     {
     public:
-        PaletteListModel() = default;
+        PaletteListModel(Component& owner) : owner (owner) {}
 
         void setFactoryNames (juce::StringArray names);
 
@@ -71,11 +71,13 @@ private:
         juce::var getDragSourceDescription (const juce::SparseSet<int> &rowsToDescribe) override;
 
     private:
+        Component& owner;
+        
         juce::StringArray factoryNames;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PaletteListModel)
     };
 
-    PaletteListModel        paletteModel;
+    PaletteListModel        paletteModel{ *this };
     juce::ListBox           paletteList { {}, &paletteModel };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Palette)

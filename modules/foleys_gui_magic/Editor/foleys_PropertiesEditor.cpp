@@ -452,7 +452,7 @@ void PropertiesEditor::updatePopupMenu()
 
 void PropertiesEditor::paint (juce::Graphics& g)
 {
-    g.setColour (EditorColours::outline);
+    g.setColour (findColour (ToolBoxBase::outlineColourId, true));
     g.drawRect (getLocalBounds(), 1);
 }
 

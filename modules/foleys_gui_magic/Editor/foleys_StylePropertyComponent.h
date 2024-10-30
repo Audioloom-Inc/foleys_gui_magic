@@ -65,6 +65,8 @@ protected:
     std::unique_ptr<juce::Component> editor;
     juce::TextButton    remove { "X" };
 
+    void lookAndFeelChanged () override;
+    
 private:
     void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged,
                                    const juce::Identifier& changedProperty) override;

@@ -59,6 +59,30 @@ juce::PopupMenu MagicProcessorState::createParameterMenu() const
     return menu;
 }
 
+juce::ValueTree MagicProcessorState::createDefaultGuiValueTree() const
+{
+    juce::ValueTree magic {IDs::magic, {},
+                           {juce::ValueTree { IDs::styles, {},
+                                              {DefaultGuiTrees::createDefaultStylesheet()}}}};
+
+    juce::ValueTree rootNode {IDs::view, {{ IDs::id, IDs::root }}};
+    
+    rootNode.setProperty (IDs::posWidth,  800, nullptr);
+    rootNode.setProperty (IDs::posHeight, 600, nullptr);
+
+    auto plotView = DefaultGuiTrees::createPlotView (*this);
+    
+    if (plotView.isValid())
+        rootNode.appendChild (plotView, nullptr);
+
+    auto params = DefaultGuiTrees::createProcessorGui (processor.getParameterTree());
+    rootNode.appendChild (params, nullptr);
+
+    magic.appendChild (rootNode, nullptr);
+
+    return magic;
+}
+
 void MagicProcessorState::addParametersToMenu (const juce::AudioProcessorParameterGroup& group, juce::PopupMenu& menu, int& index) const
 {
     for (const auto& node : group)

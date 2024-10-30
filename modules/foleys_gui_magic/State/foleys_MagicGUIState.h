@@ -116,9 +116,14 @@ public:
     /**
      Return a hierarchical menu of the AudioParameters
 
-     Implemented in MagicPluginState
+     Implemented in MagicProcessorState
      */
     virtual juce::PopupMenu createParameterMenu() const { return {}; }
+
+    /**
+     Override this method in your subclass to create a default GUI tree. Implemented in MagicProcessorState
+     */
+    virtual juce::ValueTree createDefaultGuiValueTree () const { return {}; }
 
     /**
      You can store a lambda that can be called from e.g. a TextButton.

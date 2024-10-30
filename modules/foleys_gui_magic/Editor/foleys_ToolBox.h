@@ -107,12 +107,13 @@ public:
         TabbedLayout
     };
 
-    void loadDialog();
-    void saveDialog();
+    virtual void loadDialog();
+    virtual void saveDialog();
 
-    void loadGUI (const juce::File& file);
-    bool saveGUI (const juce::File& file);
+    virtual void loadGUI (const juce::File& file);
+    virtual bool saveGUI (const juce::File& file);
 
+    
     /** updates the layout to use either tabs or a stretchable layout */
     void setLayout (const Layout& layout);
     Layout getLayout () const;

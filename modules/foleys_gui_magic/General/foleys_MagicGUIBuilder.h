@@ -107,7 +107,7 @@ public:
      If no div tree is found, createDefaultGUITree is called to give subclasses
      a chance to create a suitable default.
      */
-    void updateComponents();
+    virtual void updateComponents();
 
     /**
      Recalculates the layout of all components
@@ -161,7 +161,7 @@ public:
     /**
      This resets the GUI to show a single empty container
      */
-    void clearGUI();
+    virtual void clearGUI();
 
     /**
      This is used to display a dialog box. It is called by the GUI editor, but in future it might be reached
@@ -256,15 +256,15 @@ public:
 
     void draggedItemOnto (juce::ValueTree dropped, juce::ValueTree target, int index = -1);
 
-private:
+protected:
+    MagicGUIState& magicState;
+
     juce::UndoManager undo;
     Stylesheet        stylesheet { *this };
 
     //==============================================================================
 
     juce::Component::SafePointer<juce::Component> parent;
-
-    MagicGUIState& magicState;
 
     RadioButtonManager radioButtonManager;
 

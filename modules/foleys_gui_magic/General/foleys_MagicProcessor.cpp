@@ -66,22 +66,7 @@ void MagicProcessor::initialiseBuilder (MagicGUIBuilder& builder)
 
 juce::ValueTree MagicProcessor::createGuiValueTree()
 {
-    juce::ValueTree magic {IDs::magic, {},
-                           {juce::ValueTree { IDs::styles, {},
-                                              {DefaultGuiTrees::createDefaultStylesheet()}}}};
-
-    juce::ValueTree rootNode {IDs::view, {{ IDs::id, IDs::root }}};
-
-    auto plotView = DefaultGuiTrees::createPlotView (magicState);
-    if (plotView.isValid())
-        rootNode.appendChild (plotView, nullptr);
-
-    auto params = DefaultGuiTrees::createProcessorGui (getParameterTree());
-    rootNode.appendChild (params, nullptr);
-
-    magic.appendChild (rootNode, nullptr);
-
-    return magic;
+    return magicState.createDefaultGuiValueTree ();
 }
 
 juce::AudioProcessorEditor* MagicProcessor::createEditor()

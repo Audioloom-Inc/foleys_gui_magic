@@ -132,6 +132,10 @@ public:
      */
     int  getLastController() const;
 
+    /**
+     Creates a default value tree from current parameters
+     */
+    juce::ValueTree createDefaultGuiValueTree () const override;
 private:
 
     void addParametersToMenu (const juce::AudioProcessorParameterGroup& group, juce::PopupMenu& menu, int& index) const;

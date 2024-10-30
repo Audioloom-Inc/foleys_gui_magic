@@ -72,6 +72,18 @@ class ToolBox
   , private foleys::MagicGUIBuilder::Listener
 {
 public:
+
+    struct Properties
+    {
+        Properties (juce::Component* parent, bool asWindow)
+          : parent (parent), asWindow (asWindow)
+        {
+        }
+        
+        juce::WeakReference<juce::Component> parent;
+        bool asWindow;
+    };
+    
     /**
      Create a ToolBox floating window to edit the currently shown GUI.
      The window will float attached to the edited window.
@@ -79,7 +91,7 @@ public:
      @param parent is the window to attach to
      @param builder is the builder instance that manages the GUI
      */
-    ToolBox (juce::Component* parent, MagicGUIBuilder& builder);
+    ToolBox (const Properties& props, MagicGUIBuilder& builder);
     ~ToolBox() override;
 
     enum PositionOption

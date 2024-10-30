@@ -487,7 +487,7 @@ void MagicGUIBuilder::attachToolboxToWindow (juce::Component& window)
       {
           if (reference != nullptr)
           {
-              auto toolbox = new ToolBox (reference->getTopLevelComponent(), *this);
+              auto toolbox = new ToolBox (ToolBox::Properties (reference->getTopLevelComponent(), true), *this);
               toolbox->setToolboxPosition (ToolBox::PositionOption::right);
               setToolbox (toolbox, true);
           }

@@ -53,15 +53,18 @@ ToolBoxBase::ToolBoxBase()
 
 //==============================================================================
 //==============================================================================
-ToolBox::ToolBox (juce::Component* parentToUse, MagicGUIBuilder& builderToControl)
-  : parent (parentToUse), builder (builderToControl), undo (builder.getUndoManager())
+ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
+  : parent (props.parent.get ()), builder (builderToControl), undo (builder.getUndoManager())
 {
     appProperties.setStorageParameters (getApplicationPropertyStorage());
 
-    if (auto* properties = appProperties.getUserSettings())
+    if (props.asWindow)
     {
-        setToolboxPosition (ToolBox::positionOptionFromString (properties->getValue ("position")));
-        setAlwaysOnTop (properties->getValue ("alwaysOnTop") == "true");
+        if (auto* properties = appProperties.getUserSettings())
+        {
+            setToolboxPosition (ToolBox::positionOptionFromString (properties->getValue ("position")));
+            setAlwaysOnTop (properties->getValue ("alwaysOnTop") == "true");
+        }
     }
 
     setOpaque (true);
@@ -127,15 +130,16 @@ ToolBox::ToolBox (juce::Component* parentToUse, MagicGUIBuilder& builderToContro
     resizeManager.setItemLayout (3, 6, 6, 6);
     resizeManager.setItemLayout (4, 1, -1.0, -0.3);
 
-    addChildComponent (resizeCorner);
-    resizeCorner.setAlwaysOnTop (true);
-
-    setBounds (100, 100, 300, 700);
-    addToDesktop (getLookAndFeel().getMenuWindowFlags());
-
-    startTimer (Timers::WindowDrag, 100);
-
-    setVisible (true);
+    if (props.asWindow)
+    {
+        addChildComponent (resizeCorner);
+        resizeCorner.setAlwaysOnTop (true);
+        setBounds (100, 100, 300, 700);
+        addToDesktop (getLookAndFeel().getMenuWindowFlags());
+    
+        setVisible (true);
+        startTimer (Timers::WindowDrag, 100);
+    }
 
     stateWasReloaded();
 

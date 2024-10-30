@@ -101,11 +101,21 @@ public:
         detached
     };
 
+    enum Layout
+    {
+        StretchableLayout = 0,
+        TabbedLayout
+    };
+
     void loadDialog();
     void saveDialog();
 
     void loadGUI (const juce::File& file);
     bool saveGUI (const juce::File& file);
+
+    /** updates the layout to use either tabs or a stretchable layout */
+    void setLayout (const Layout& layout);
+    Layout getLayout () const;
 
     void paint (juce::Graphics& g) override;
 
@@ -157,6 +167,10 @@ private:
 
     PositionOption positionOption { left };
 
+    Layout layout { StretchableLayout };
+
+    juce::TabbedComponent tabs { juce::TabbedButtonBar::TabsAtTop };
+
     GUITreeEditor    treeEditor { builder };
     PropertiesEditor propertiesEditor { builder };
     Palette          palette { builder };
@@ -175,6 +189,8 @@ private:
 
     void mouseDown (const juce::MouseEvent& e) override;
     void mouseDrag (const juce::MouseEvent& e) override;
+
+    void updateLayout ();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ToolBox)
 };

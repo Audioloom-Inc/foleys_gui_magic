@@ -76,7 +76,10 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
     editSwitch.setConnectedEdges (juce::TextButton::ConnectedOnLeft | juce::TextButton::ConnectedOnRight);
 
     addAndMakeVisible (fileMenu);
-    addAndMakeVisible (viewMenu);
+    
+    if (props.asWindow)
+        addAndMakeVisible (viewMenu);
+    
     addAndMakeVisible (undoButton);
     addAndMakeVisible (editSwitch);
 
@@ -118,17 +121,7 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
     editSwitch.setColour (juce::TextButton::buttonOnColourId, findColour (ToolBoxBase::selectedBackgroundColourId, true));
     editSwitch.onStateChange = [&] { builder.setEditMode (editSwitch.getToggleState()); };
 
-    addAndMakeVisible (treeEditor);
-    addAndMakeVisible (resizer1);
-    addAndMakeVisible (propertiesEditor);
-    addAndMakeVisible (resizer3);
-    addAndMakeVisible (palette);
-
-    resizeManager.setItemLayout (0, 1, -1.0, -0.4);
-    resizeManager.setItemLayout (1, 6, 6, 6);
-    resizeManager.setItemLayout (2, 1, -1.0, -0.3);
-    resizeManager.setItemLayout (3, 6, 6, 6);
-    resizeManager.setItemLayout (4, 1, -1.0, -0.3);
+    updateLayout ();
 
     if (props.asWindow)
     {
@@ -171,6 +164,43 @@ void ToolBox::mouseDrag (const juce::MouseEvent& e)
 {
     if (positionOption == PositionOption::detached)
         componentDragger.dragComponent (this, e, nullptr);
+}
+
+void ToolBox::updateLayout ()
+{
+    auto updateComponent = [&](Component& comp, bool visible){
+        if (! visible)
+            removeChildComponent (&comp);
+        else    
+            addAndMakeVisible (&comp);
+    };
+
+    const bool isStretchable = layout == StretchableLayout;
+
+    updateComponent (treeEditor, isStretchable);
+    updateComponent (resizer1, isStretchable);
+    updateComponent (propertiesEditor, isStretchable);
+    updateComponent (resizer3, isStretchable);
+    updateComponent (palette, isStretchable);
+    
+    updateComponent (tabs, ! isStretchable);
+
+    if (isStretchable)
+    {
+        resizeManager.setItemLayout (0, 1, -1.0, -0.4);
+        resizeManager.setItemLayout (1, 6, 6, 6);
+        resizeManager.setItemLayout (2, 1, -1.0, -0.3);
+        resizeManager.setItemLayout (3, 6, 6, 6);
+        resizeManager.setItemLayout (4, 1, -1.0, -0.3);
+    }
+    else
+    {
+        tabs.addTab ("Hierarchy", juce::Colours::transparentBlack, &treeEditor, false);
+        tabs.addTab ("Inspector", juce::Colours::transparentBlack, &propertiesEditor, false);
+        tabs.addTab ("Palette", juce::Colours::transparentBlack, &palette, false);
+    }
+
+    resized ();
 }
 
 void ToolBox::loadDialog()
@@ -238,6 +268,17 @@ bool ToolBox::saveGUI (const juce::File& xmlFile)
     return false;
 }
 
+void ToolBox::setLayout(const Layout & layout)
+{
+    this->layout = layout;
+    updateLayout ();
+}
+
+ToolBox::Layout ToolBox::getLayout() const
+{
+    return layout;
+}
+
 void ToolBox::setSelectedNode (const juce::ValueTree& node)
 {
     treeEditor.setSelectedNode (node);
@@ -277,15 +318,25 @@ void ToolBox::resized()
     undoButton.setBounds (buttons.removeFromLeft (w));
     editSwitch.setBounds (buttons.removeFromLeft (w));
 
-    juce::Component* comps[] = { &treeEditor, &resizer1, &propertiesEditor, &resizer3, &palette };
 
-    resizeManager.layOutComponents (comps, 5, bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), true, true);
+    if (layout == StretchableLayout)
+    {
+        juce::Component* comps[] = { &treeEditor, &resizer1, &propertiesEditor, &resizer3, &palette };
+        resizeManager.layOutComponents (comps, 5, bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), true, true);
+    }
+    else
+    {
+        tabs.setBounds (bounds);
+    }
 
-    const int  resizeCornerSize { 20 };
-    const auto bottomRight { getLocalBounds().getBottomRight() };
+    if (resizeCorner.isVisible ())
+    {
+        const int  resizeCornerSize { 20 };
+        const auto bottomRight { getLocalBounds().getBottomRight() };
 
-    juce::Rectangle<int> resizeCornerArea { bottomRight.getX() - resizeCornerSize, bottomRight.getY() - resizeCornerSize, resizeCornerSize, resizeCornerSize };
-    resizeCorner.setBounds (resizeCornerArea);
+        juce::Rectangle<int> resizeCornerArea { bottomRight.getX() - resizeCornerSize, bottomRight.getY() - resizeCornerSize, resizeCornerSize, resizeCornerSize };
+        resizeCorner.setBounds (resizeCornerArea);
+    }
 }
 
 bool ToolBox::keyPressed (const juce::KeyPress& key, juce::Component*)

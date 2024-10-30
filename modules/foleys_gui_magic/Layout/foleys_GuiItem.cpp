@@ -534,7 +534,15 @@ void GuiItem::itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSou
 
     auto node = juce::ValueTree::fromXml (dragSourceDetails.description.toString());
     if (node.isValid())
+    {
+        const auto margin = (int) magicBuilder.getStylesheet ().getStyleProperty (IDs::margin, configNode, true);
+        const auto padding = (int) magicBuilder.getStylesheet ().getStyleProperty (IDs::padding, configNode, true);
+
+        node.setProperty (IDs::posX, dragSourceDetails.localPosition.x - margin - padding, nullptr);
+        node.setProperty (IDs::posY, dragSourceDetails.localPosition.y - margin - padding, nullptr);
+
         magicBuilder.draggedItemOnto (node, configNode);
+    }
 }
 
 bool GuiItem::isRoot() const

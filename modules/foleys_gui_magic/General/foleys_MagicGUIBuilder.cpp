@@ -473,7 +473,19 @@ void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree 
     if (target.getType() == IDs::view)
         target.addChild (dragged, index, &undo);
     else
+    {
+        // update position 
+        const auto posX = (int)dragged.getProperty (IDs::posX, 0);
+        const auto posY = (int)dragged.getProperty (IDs::posY, 0);
+
+        const auto targetX = (int)target.getProperty (IDs::posX, 0);
+        const auto targetY = (int)target.getProperty (IDs::posY, 0);
+
+        dragged.setProperty (IDs::posX, posX + targetX, &undo);
+        dragged.setProperty (IDs::posY, posY + targetY, &undo);
+
         targetParent.addChild (dragged, index, &undo);
+    }
 }
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE

@@ -141,7 +141,7 @@ public:
 
     void setLastLocation (juce::File file);
 
-private:
+protected:
     enum Timers : int
     {
         WindowDrag = 1,

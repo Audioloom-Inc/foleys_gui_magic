@@ -284,11 +284,19 @@ void ToolBox::setSelectedNode (const juce::ValueTree& node)
     treeEditor.setSelectedNode (node);
     propertiesEditor.setNodeToEdit (node);
     builder.setSelectedNode (node);
+
+    for (int i = tabs.getNumTabs (); --i >= 0;)
+        if (auto tab = dynamic_cast<ToolBoxContentBase*> (tabs.getTabContentComponent (i)))
+            tab->setSelectedNode (node);
 }
 
 void ToolBox::setNodeToEdit (juce::ValueTree node)
 {
     propertiesEditor.setNodeToEdit (node);
+    
+    for (int i = tabs.getNumTabs (); --i >= 0;)
+        if (auto tab = dynamic_cast<ToolBoxContentBase*> (tabs.getTabContentComponent (i)))
+            tab->setNodeToEdit (node);
 }
 
 void ToolBox::stateWasReloaded()

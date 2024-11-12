@@ -61,6 +61,15 @@ public:
     virtual void stateWasReloaded () = 0;
 };
 
+class ToolBoxContentBase
+{
+public:
+    virtual ~ToolBoxContentBase() = default;
+    
+    virtual void setNodeToEdit (juce::ValueTree node) = 0;
+    virtual void setSelectedNode (const juce::ValueTree& node) = 0;
+};
+
 /**
  The Toolbox defines a floating window, that allows live editing of the currently loaded GUI.
  */

@@ -54,11 +54,11 @@ ToolBoxBase::ToolBoxBase()
 //==============================================================================
 //==============================================================================
 ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
-  : parent (props.parent.get ()), builder (builderToControl), undo (builder.getUndoManager())
+  : parent (props.first.get ()), builder (builderToControl), undo (builder.getUndoManager())
 {
     appProperties.setStorageParameters (getApplicationPropertyStorage());
 
-    if (props.asWindow)
+    if (props.second)
     {
         if (auto* properties = appProperties.getUserSettings())
         {
@@ -77,7 +77,7 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
 
     addAndMakeVisible (fileMenu);
     
-    if (props.asWindow)
+    if (props.second)
         addAndMakeVisible (viewMenu);
     
     addAndMakeVisible (undoButton);
@@ -123,7 +123,7 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
 
     updateLayout ();
 
-    if (props.asWindow)
+    if (props.second)
     {
         addChildComponent (resizeCorner);
         resizeCorner.setAlwaysOnTop (true);

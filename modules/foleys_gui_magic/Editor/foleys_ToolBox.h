@@ -73,25 +73,17 @@ class ToolBox
 {
 public:
 
-    struct Properties
-    {
-        Properties (juce::Component* parent, bool asWindow)
-          : parent (parent), asWindow (asWindow)
-        {
-        }
-        
-        juce::WeakReference<juce::Component> parent;
-        bool asWindow;
-    };
-    
+    /** first: parent to use, second: run in window */
+    using Properties = std::pair<juce::WeakReference<juce::Component>, bool>;
+
     /**
      Create a ToolBox floating window to edit the currently shown GUI.
      The window will float attached to the edited window.
 
-     @param parent is the window to attach to
+     @param properties a pair with the window to attach to and a boolean to run toolbox in window
      @param builder is the builder instance that manages the GUI
      */
-    ToolBox (const Properties& props, MagicGUIBuilder& builder);
+    ToolBox (const Properties& properties, MagicGUIBuilder& builder);
     ~ToolBox() override;
 
     enum PositionOption
@@ -112,34 +104,22 @@ public:
 
     virtual void loadGUI (const juce::File& file);
     virtual bool saveGUI (const juce::File& file);
-
     
     /** updates the layout to use either tabs or a stretchable layout */
     void setLayout (const Layout& layout);
     Layout getLayout () const;
-
-    void paint (juce::Graphics& g) override;
-
-    void resized() override;
-
-    void timerCallback (int timer) override;
 
     void setSelectedNode (const juce::ValueTree& node);
     void setNodeToEdit (juce::ValueTree node) override;
 
     void setToolboxPosition (PositionOption position);
 
-    void stateWasReloaded() override;
-
     bool keyPressed (const juce::KeyPress& key) override;
     bool keyPressed (const juce::KeyPress& key, juce::Component* originalComponent) override;
 
     void selectedItem (const juce::ValueTree& node) override;
-    void guiItemDropped ([[maybe_unused]] const juce::ValueTree& node, [[maybe_unused]] juce::ValueTree& droppedOnto) override { }
 
     static juce::PropertiesFile::Options getApplicationPropertyStorage();
-
-    void setLastLocation (juce::File file);
 
 protected:
     enum Timers : int
@@ -188,10 +168,19 @@ protected:
     juce::ResizableCornerComponent resizeCorner { this, nullptr };
     juce::ComponentDragger         componentDragger;
 
+    void updateLayout ();
+
     void mouseDown (const juce::MouseEvent& e) override;
     void mouseDrag (const juce::MouseEvent& e) override;
 
-    void updateLayout ();
+    void stateWasReloaded() override;
+    void setLastLocation (juce::File file);
+
+    void paint (juce::Graphics& g) override;
+    void resized() override;
+    void timerCallback (int timer) override;
+
+    void guiItemDropped ([[maybe_unused]] const juce::ValueTree& node, [[maybe_unused]] juce::ValueTree& droppedOnto) override { }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ToolBox)
 };

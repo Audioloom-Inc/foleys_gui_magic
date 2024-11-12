@@ -161,7 +161,7 @@ public:
      Returns the bounds of the wrapped Component. This is the GuiItems bounds
      reduced by margin, padding and the caption, if one was set.
      */
-    juce::Rectangle<int> getClientBounds() const;
+    virtual juce::Rectangle<int> getClientBounds() const;
 
     juce::String getTabCaption (const juce::String& defaultName) const;
     juce::Colour getTabColour() const;

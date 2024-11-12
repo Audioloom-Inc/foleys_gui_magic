@@ -367,6 +367,14 @@ GuiItem* GuiItem::findGuiItem (const juce::ValueTree& node)
     return nullptr;
 }
 
+GuiItem* GuiItem::findGuiItemWithProperty (const juce::Identifier& property, const juce::var& value)
+{
+    if (configNode.getProperty (property) == value)
+        return this;
+
+    return nullptr;
+}
+
 void GuiItem::paintOverChildren (juce::Graphics& g)
 {
     if (magicBuilder.isEditModeOn() && magicBuilder.getSelectedNode() == configNode)

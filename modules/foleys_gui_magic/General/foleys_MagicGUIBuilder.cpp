@@ -228,6 +228,22 @@ GuiItem* MagicGUIBuilder::findGuiItem (const juce::ValueTree& node)
     return nullptr;
 }
 
+GuiItem* MagicGUIBuilder::findGuiItemWithProperty (const juce::Identifier& property, const juce::var& value)
+{
+    if (root)
+        return root->findGuiItemWithProperty (property, value);
+
+    return nullptr;
+}
+
+juce::ValueTree MagicGUIBuilder::findNodeWithProperty (const juce::Identifier& property, const juce::var& value)
+{
+    if (auto item = findGuiItemWithProperty (property, value))
+        return item->getNode ();
+
+    return {};
+}
+
 void MagicGUIBuilder::registerFactory (juce::Identifier type, std::unique_ptr<GuiItem> (*factory) (MagicGUIBuilder& builder, const juce::ValueTree&))
 {
     if (factories.find (type) != factories.cend())

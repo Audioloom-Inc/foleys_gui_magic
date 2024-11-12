@@ -192,6 +192,18 @@ GuiItem* Container::findGuiItem (const juce::ValueTree& node)
     return nullptr;
 }
 
+GuiItem* Container::findGuiItemWithProperty (const juce::Identifier& property, const juce::var& value)
+{
+    if (configNode.getProperty (property) == value)
+        return this;
+
+    for (auto& child : children)
+        if (auto* item = child->findGuiItemWithProperty (property, value))
+            return item;
+
+    return nullptr;
+}
+
 void Container::setLayoutMode (LayoutType layoutToUse)
 {
     layout = layoutToUse;

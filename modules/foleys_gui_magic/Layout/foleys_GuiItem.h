@@ -179,6 +179,11 @@ public:
     virtual GuiItem* findGuiItem (const juce::ValueTree& node);
 
     /**
+     Seeks recursively for a GuiItem with a certain property
+     */
+    virtual GuiItem* findGuiItemWithProperty (const juce::Identifier& property, const juce::var& value);
+
+    /**
      This method sets the GUI in edit mode, that allows to drag the components around.
      */
     virtual void setEditMode (bool shouldEdit);

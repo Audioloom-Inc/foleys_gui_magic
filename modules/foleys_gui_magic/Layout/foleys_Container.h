@@ -130,6 +130,11 @@ public:
     GuiItem* findGuiItem (const juce::ValueTree& node) override;
 
     /**
+     Seeks recursively for a GuiItem
+     */
+    GuiItem* findGuiItemWithProperty (const juce::Identifier& property, const juce::var& value) override;
+
+    /**
      This switches this node and all it's descendents in the edit
      mode, which means, the components don't react, but instead you
      can move them around.

@@ -91,7 +91,7 @@ void GUITreeEditor::updateTree()
 
 void GUITreeEditor::setSelectedNode (const juce::ValueTree& node)
 {
-    if (rootItem.get() == nullptr || node.isAChildOf (tree) == false)
+    if (rootItem.get() == nullptr || (node != tree && node.isAChildOf (tree) == false))
         return;
 
     std::stack<int> path;

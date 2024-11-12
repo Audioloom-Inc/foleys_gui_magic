@@ -457,7 +457,7 @@ void MagicGUIBuilder::setSelectedNode (const juce::ValueTree& node)
 
         listeners.call ([node] (Listener& l) { l.selectedItem (node); });
 
-        if (auto* item = findGuiItem (selectedNode))
+        if (auto* item = findGuiItem (selectedNode); item && ! item->isRoot ())
             item->setDraggable (true);
 
         if (parent != nullptr)

@@ -255,6 +255,11 @@ void MagicGUIBuilder::registerFactory (juce::Identifier type, std::unique_ptr<Gu
     }
 
     factories[type] = factory;
+    
+    auto temp = factory (*this, juce::ValueTree (type));
+    jassert (temp);
+
+    defaultProperties[type] = temp->getSettableProperties();
 }
 
 juce::StringArray MagicGUIBuilder::getFactoryNames() const
@@ -295,7 +300,15 @@ void MagicGUIBuilder::registerJUCELookAndFeels()
 
 juce::var MagicGUIBuilder::getStyleProperty (const juce::Identifier& name, const juce::ValueTree& node) const
 {
-    return stylesheet.getStyleProperty (name, node);
+    if (auto value = stylesheet.getStyleProperty (name, node); ! value.isVoid ())
+        return value;
+
+    if (auto defaults = defaultProperties.find (node.getType()); defaults != defaultProperties.end ())
+        for (auto property : defaults->second)
+            if (property.name == name)
+                return property.defaultValue;
+
+    return {};
 }
 
 void MagicGUIBuilder::removeStyleClassReferences (juce::ValueTree tree, const juce::String& name)

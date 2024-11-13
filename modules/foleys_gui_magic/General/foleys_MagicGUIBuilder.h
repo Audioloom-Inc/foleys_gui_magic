@@ -284,7 +284,8 @@ protected:
     std::unique_ptr<juce::Component> overlayDialog;
 
     std::map<juce::Identifier, std::unique_ptr<GuiItem> (*) (MagicGUIBuilder& builder, const juce::ValueTree&)> factories;
-
+    std::map<juce::Identifier, std::vector<SettableProperty>> defaultProperties;
+    
     juce::ListenerList<Listener> listeners;
     bool                         editMode = false;
     juce::ValueTree              selectedNode;

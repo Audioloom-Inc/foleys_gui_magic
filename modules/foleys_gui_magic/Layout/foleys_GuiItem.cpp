@@ -214,7 +214,7 @@ void GuiItem::configurePosition (const juce::var& v, Position& p, double d)
 {
     if (v.isVoid())
     {
-        p.absolute = false;
+        p.absolute = magicBuilder.getPropertyDefaultValue (IDs::display) == IDs::contents;
         p.value = d;
     }
     else

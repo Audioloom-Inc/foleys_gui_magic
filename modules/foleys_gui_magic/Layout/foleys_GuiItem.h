@@ -232,6 +232,8 @@ protected:
     void valueTreeChildOrderChanged (juce::ValueTree&, int, int) override;
 
     void valueTreeParentChanged (juce::ValueTree&) override;
+
+    void savePosition ();
 private:
 
     class BorderDragger : public juce::ResizableBorderComponent
@@ -282,7 +284,7 @@ private:
     Position posX, posY, posWidth, posHeight;
 
     void configurePosition (const juce::var& v, Position& p, double d);
-    void savePosition ();
+
     void handleAsyncUpdate () override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiItem)

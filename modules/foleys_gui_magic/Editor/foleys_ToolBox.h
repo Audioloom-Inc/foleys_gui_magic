@@ -68,6 +68,7 @@ public:
     
     virtual void setNodeToEdit (juce::ValueTree node) = 0;
     virtual void setSelectedNode (const juce::ValueTree& node) = 0;
+    virtual void guiCreated () {}
 };
 
 /**
@@ -190,6 +191,7 @@ protected:
     void timerCallback (int timer) override;
 
     void guiItemDropped ([[maybe_unused]] const juce::ValueTree& node, [[maybe_unused]] juce::ValueTree& droppedOnto) override { }
+    void guiCreated () override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ToolBox)
 };

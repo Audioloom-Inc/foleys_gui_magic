@@ -412,6 +412,13 @@ void ToolBox::timerCallback (int timer)
         saveGUI (autoSaveFile);
 }
 
+void ToolBox::guiCreated() 
+{
+    for (int i = tabs.getNumTabs (); --i >= 0;)
+        if (auto tab = dynamic_cast<ToolBoxContentBase*> (tabs.getTabContentComponent (i)))
+            tab->guiCreated ();
+}
+
 void ToolBox::setToolboxPosition (PositionOption position)
 {
     positionOption        = position;

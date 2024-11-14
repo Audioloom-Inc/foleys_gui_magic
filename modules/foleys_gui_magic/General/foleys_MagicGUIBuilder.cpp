@@ -175,6 +175,8 @@ void MagicGUIBuilder::updateComponents()
 
     if (root.get() != nullptr)
         root->setEditMode (editMode);
+
+    listeners.call ([&] (Listener& l) { l.guiCreated(); });
 }
 
 void MagicGUIBuilder::updateLayout (juce::Rectangle<int> bounds)

@@ -143,12 +143,12 @@ void StyleColourPropertyComponent::refresh()
 
 void StyleColourPropertyComponent::setColourDisplay (juce::Colour colour)
 {
-    if (colour.isTransparent())
-    {
-        editor->setColour (juce::Label::backgroundColourId, findColour (ToolBoxBase::backgroundColourId, true));
-        editor->setColour (juce::Label::textColourId, findColour (ToolBoxBase::textColourId, true));
-    }
-    else
+    // if (colour.isTransparent())
+    // {
+    //     editor->setColour (juce::Label::backgroundColourId, findColour (ToolBoxBase::backgroundColourId, true));
+    //     editor->setColour (juce::Label::textColourId, findColour (ToolBoxBase::textColourId, true));
+    // }
+    // else
     {
         editor->setColour (juce::Label::backgroundColourId, colour);
         editor->setColour (juce::Label::textColourId, colour.contrasting());

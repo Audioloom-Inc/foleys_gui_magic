@@ -104,6 +104,8 @@ private:
     juce::Component::SafePointer<ColourPanel> colourPanel;
     juce::TextButton variables {"V"};
 
+    bool blockTextChange{ false };
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StyleColourPropertyComponent)
 };
 

@@ -51,10 +51,13 @@ StyleColourPropertyComponent::StyleColourPropertyComponent (MagicGUIBuilder& bui
     label->getTextValue().addListener (this);
     label->onTextChange = [&]
     {
-        if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
-            node.setProperty (property, l->getText(), &builder.getUndoManager());
+        if (! blockTextChange)
+        {
+            if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
+                node.setProperty (property, l->getText(), &builder.getUndoManager());
 
-        refresh();
+            refresh();
+        }
     };
 
     variables.onClick = [&]
@@ -128,7 +131,9 @@ void StyleColourPropertyComponent::refresh()
             if (value.isVoid())
                 getLookAndFeelColourFallback();
 
-            label->getTextValue().referTo (label->getTextValue());
+            juce::ScopedValueSetter<bool> setter (blockTextChange, true);
+
+            label->getTextValue().referTo ({});
             label->setText (value.toString(), juce::dontSendNotification);
         }
     }

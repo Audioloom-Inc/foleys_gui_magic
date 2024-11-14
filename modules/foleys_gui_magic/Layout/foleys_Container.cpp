@@ -454,6 +454,12 @@ void Container::setEditMode (bool shouldEdit)
     GuiItem::setEditMode (shouldEdit);
 }
 
+void Container::init()
+{
+    for (auto& child : children)
+        child->init ();
+}
+
 //==============================================================================
 
 Container::Scroller::Scroller (Container& ownerToUse)

@@ -141,6 +141,9 @@ public:
      */
     void setEditMode (bool shouldEdit) override;
 
+    /** */
+    void init () override;
+
 private:
     class Scroller : public juce::Viewport
     {

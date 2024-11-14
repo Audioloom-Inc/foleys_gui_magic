@@ -290,6 +290,15 @@ void GuiItem::valueChanged (juce::Value& source)
 
 void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const juce::Identifier& property)
 {
+    // replace ongoing calls to updateInternal with single calls – WIP
+    if (property == foleys::IDs::styleClass)
+        init ();
+    else
+        propertyChanged (property);
+
+
+
+    // ongoing calls here ...
     if (treeThatChanged == configNode)
     {
         if (auto* parent = findParentComponentOfClass<GuiItem>())
@@ -396,6 +405,14 @@ void GuiItem::setEditMode (bool shouldEdit)
 
     if (auto* component = getWrappedComponent())
         component->setInterceptsMouseClicks (!shouldEdit, !shouldEdit);
+}
+
+void GuiItem::init()
+{
+    auto properties = getSettableProperties ();
+
+    for (auto p : properties)
+        propertyChanged (p.name);
 }
 
 void GuiItem::setDraggable (bool selected)

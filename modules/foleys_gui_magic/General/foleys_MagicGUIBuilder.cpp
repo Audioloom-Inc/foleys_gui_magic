@@ -94,6 +94,7 @@ std::unique_ptr<GuiItem> MagicGUIBuilder::createGuiItem (const juce::ValueTree& 
     if (factory != factories.end())
     {
         auto item = factory->second (*this, node);
+        item->init ();
         item->updateInternal();
         return item;
     }

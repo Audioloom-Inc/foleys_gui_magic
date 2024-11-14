@@ -188,6 +188,14 @@ public:
      */
     virtual void setEditMode (bool shouldEdit);
 
+    /**  
+    */
+    virtual void init ();
+
+    /**
+     */
+    virtual void propertyChanged (const juce::Identifier& property) {}
+
     void setDraggable (bool selected);
 
     void mouseDown (const juce::MouseEvent& event) override;

@@ -360,7 +360,7 @@ bool ToolBox::keyPressed (const juce::KeyPress& key)
         if (selected.isValid())
         {
             auto p = selected.getParent();
-            if (p.isValid())
+            if (p.isValid() && p.getType () != IDs::magic)
                 p.removeChild (selected, &undo);
         }
 

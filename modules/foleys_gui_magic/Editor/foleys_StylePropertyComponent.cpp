@@ -117,11 +117,11 @@ void StylePropertyComponent::paint (juce::Graphics& g)
 {
     auto b = getLocalBounds().reduced (1).withWidth (getWidth() / 2);
 
-    g.fillAll (findColour (ToolBoxBase::backgroundColourId, true));
-    g.setColour (findColour (ToolBoxBase::outlineColourId, true));
+    g.fillAll (findColour (ToolBox::backgroundColourId, true));
+    g.setColour (findColour (ToolBox::outlineColourId, true));
     g.drawHorizontalLine (0, 0.0f, static_cast<float>(getRight()));
     g.drawHorizontalLine (getBottom() - 1, 0.0f, static_cast<float>(getRight()));
-    g.setColour (node == inheritedFrom ? findColour (ToolBoxBase::textColourId, true) : findColour (ToolBoxBase::disabledTextColourId, true));
+    g.setColour (node == inheritedFrom ? findColour (ToolBox::textColourId, true) : findColour (ToolBox::disabledTextColourId, true));
     g.drawFittedText (property.toString(), b, juce::Justification::left, 1);
 }
 
@@ -138,13 +138,18 @@ void StylePropertyComponent::mouseDoubleClick (const juce::MouseEvent&)
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     if (inheritedFrom.isValid())
         if (auto toolBox = builder.getMagicToolBox())
-            toolBox->setNodeToEdit (inheritedFrom);
+            toolBox->setSelectedNode (inheritedFrom);
 #endif
+}
+
+juce::ValueTree StylePropertyComponent::getInheritedFrom() const
+{
+    return inheritedFrom;
 }
 
 void StylePropertyComponent::lookAndFeelChanged()
 {
-    remove.setColour (juce::TextButton::buttonColourId, findColour (ToolBoxBase::removeButtonColourId, true));
+    remove.setColour (juce::TextButton::buttonColourId, findColour (ToolBox::removeButtonColourId, true));
 }
 
 void StylePropertyComponent::valueTreePropertyChanged (juce::ValueTree& tree, const juce::Identifier& changedProperty)

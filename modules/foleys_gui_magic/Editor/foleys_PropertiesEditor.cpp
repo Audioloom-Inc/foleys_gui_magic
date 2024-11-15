@@ -69,7 +69,7 @@ PropertiesEditor::PropertiesEditor (MagicGUIBuilder& builderToEdit)
 
         auto& stylesheet = builder.getStylesheet();
         stylesheet.addPaletteEntry (name, juce::Colours::silver, true);
-        setNodeToEdit (stylesheet.getCurrentPalette());
+        setSelectedNode (stylesheet.getCurrentPalette());
     };
 
     nodeSelect.onChange = [&]()
@@ -81,22 +81,22 @@ PropertiesEditor::PropertiesEditor (MagicGUIBuilder& builderToEdit)
         if (index >= ComboIDs::PaletteEdit)
         {
             auto node = style.getChildWithName (IDs::palettes).getChild (index - ComboIDs::PaletteEdit);
-            setNodeToEdit (node);
+            setSelectedNode (node);
         }
         else if (index >= ComboIDs::ClassEdit)
         {
             auto node = style.getChildWithName (IDs::classes).getChild (index - ComboIDs::ClassEdit);
-            setNodeToEdit (node);
+            setSelectedNode (node);
         }
         else if (index >= ComboIDs::NodeEdit)
         {
             auto node = style.getChildWithName (IDs::nodes).getChild (index - ComboIDs::NodeEdit);
-            setNodeToEdit (node);
+            setSelectedNode (node);
         }
         else if (index >= ComboIDs::TypeEdit)
         {
             auto node = style.getChildWithName (IDs::types).getChild (index - ComboIDs::TypeEdit);
-            setNodeToEdit (node);
+            setSelectedNode (node);
         }
 
     };
@@ -110,7 +110,7 @@ void PropertiesEditor::setStyle (juce::ValueTree styleToEdit)
     style.addListener (this);
 }
 
-void PropertiesEditor::setNodeToEdit (juce::ValueTree node)
+void PropertiesEditor::setSelectedNode (juce::ValueTree node)
 {
     const auto openness = properties.getOpennessState();
 
@@ -452,7 +452,7 @@ void PropertiesEditor::updatePopupMenu()
 
 void PropertiesEditor::paint (juce::Graphics& g)
 {
-    g.setColour (findColour (ToolBoxBase::outlineColourId, true));
+    g.setColour (findColour (ToolBox::outlineColourId, true));
     g.drawRect (getLocalBounds(), 1);
 }
 
@@ -485,7 +485,7 @@ void PropertiesEditor::valueTreeChildRemoved (juce::ValueTree&,
                                               int)
 {
     if (childWhichHasBeenRemoved == styleItem)
-        setNodeToEdit ({});
+        setSelectedNode ({});
 }
 
 

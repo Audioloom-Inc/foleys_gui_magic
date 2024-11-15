@@ -49,7 +49,7 @@ Palette::Palette (MagicGUIBuilder& builderToUse)
 
 void Palette::paint (juce::Graphics& g)
 {
-    g.fillAll (findColour (ToolBoxBase::backgroundColourId, true));
+    g.fillAll (findColour (ToolBox::backgroundColourId, true));
 }
 
 void Palette::resized()
@@ -80,21 +80,21 @@ void Palette::PaletteListModel::paintListBoxItem (int rowNumber, juce::Graphics 
     auto b = juce::Rectangle<int> (1, 1, width - 2, height - 2).toFloat();
 
     const auto r = b.getHeight() / 2.0f;
-    g.fillAll (owner.findColour (ToolBoxBase::backgroundColourId, true));
+    g.fillAll (owner.findColour (ToolBox::backgroundColourId, true));
 
     if (rowIsSelected)
     {
-        g.setColour (owner.findColour (ToolBoxBase::selectedBackgroundColourId, true).withAlpha (0.5f));
+        g.setColour (owner.findColour (ToolBox::selectedBackgroundColourId, true).withAlpha (0.5f));
         g.fillRoundedRectangle (b, r);
     }
 
-    g.setColour (owner.findColour (ToolBoxBase::outlineColourId, true));
+    g.setColour (owner.findColour (ToolBox::outlineColourId, true));
     g.drawRoundedRectangle (b, r, 1);
 
     const auto box = juce::Rectangle<int> (juce::roundToInt (r), 0, juce::roundToInt (width - 2 * r), height);
-    g.setColour (owner.findColour (ToolBoxBase::textColourId, true));
+    g.setColour (owner.findColour (ToolBox::textColourId, true));
     g.drawFittedText (factoryNames [rowNumber], box, juce::Justification::left, 1);
-    g.setColour (owner.findColour (ToolBoxBase::disabledTextColourId, true));
+    g.setColour (owner.findColour (ToolBox::disabledTextColourId, true));
     g.drawFittedText (TRANS ("drag me"), box, juce::Justification::right, 1);
 }
 

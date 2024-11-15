@@ -50,6 +50,7 @@ public:
     void resized() override;
 
     void mouseDoubleClick (const juce::MouseEvent& event) override;
+    juce::ValueTree getInheritedFrom () const;
 
     static StylePropertyComponent* createComponent (MagicGUIBuilder& builder, SettableProperty& property, juce::ValueTree& node);
 

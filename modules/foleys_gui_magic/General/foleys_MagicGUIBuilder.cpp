@@ -154,11 +154,6 @@ void MagicGUIBuilder::createGUI (juce::Component& parentToUse)
     parent = &parentToUse;
 
     updateComponents();
-
-#if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
-    if (magicToolBox.get() != nullptr)
-        magicToolBox->stateWasReloaded();
-#endif
 }
 
 void MagicGUIBuilder::updateComponents()
@@ -176,7 +171,7 @@ void MagicGUIBuilder::updateComponents()
     if (root.get() != nullptr)
         root->setEditMode (editMode);
 
-    listeners.call ([&] (Listener& l) { l.guiCreated(); });
+    listeners.call ([&] (Listener& l) { l.stateWasReloaded(); });
 }
 
 void MagicGUIBuilder::updateLayout (juce::Rectangle<int> bounds)
@@ -540,7 +535,7 @@ void MagicGUIBuilder::attachToolboxToWindow (juce::Component& window)
       });
 }
 
-void MagicGUIBuilder::setToolbox (ToolBoxBase* toolbox, bool ownsToolbox) 
+void MagicGUIBuilder::setToolbox (ToolBox* toolbox, bool ownsToolbox) 
 {
     if (! this->ownsToolbox)
         magicToolBox.release();
@@ -549,7 +544,7 @@ void MagicGUIBuilder::setToolbox (ToolBoxBase* toolbox, bool ownsToolbox)
     this->ownsToolbox = ownsToolbox;
 }
 
-ToolBoxBase* MagicGUIBuilder::getMagicToolBox()
+ToolBox* MagicGUIBuilder::getMagicToolBox()
 {
     // The magicToolBox should always be present!
     // This method wouldn't be included, if

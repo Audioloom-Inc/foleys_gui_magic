@@ -43,39 +43,21 @@ namespace foleys
 {
 
 class MagicGUIBuilder;
-class ToolBoxBase : public juce::Component
-{
-public:
-    enum ColourIds {
-        backgroundColourId         = 0x90000001,
-        outlineColourId            = 0x90000002,
-        textColourId               = 0x90000003,
-        disabledTextColourId       = 0x90000004,
-        removeButtonColourId       = 0x90000005,
-        selectedBackgroundColourId = 0x90000006
-    };
-
-    ToolBoxBase();
-    virtual ~ToolBoxBase () = default;
-    virtual void setNodeToEdit (juce::ValueTree node) = 0;
-    virtual void stateWasReloaded () = 0;
-};
 
 class ToolBoxContentBase
 {
 public:
     virtual ~ToolBoxContentBase() = default;
     
-    virtual void setNodeToEdit (juce::ValueTree node) = 0;
     virtual void setSelectedNode (const juce::ValueTree& node) = 0;
-    virtual void guiCreated () {}
+    virtual void stateWasReloaded () {}
 };
 
 /**
  The Toolbox defines a floating window, that allows live editing of the currently loaded GUI.
  */
 class ToolBox
-  : public ToolBoxBase
+  : public juce::Component
   , public juce::DragAndDropContainer
   , public juce::KeyListener
   , private juce::MultiTimer
@@ -109,6 +91,15 @@ public:
         TabbedLayout
     };
 
+    enum ColourIds {
+        backgroundColourId         = 0x90000001,
+        outlineColourId            = 0x90000002,
+        textColourId               = 0x90000003,
+        disabledTextColourId       = 0x90000004,
+        removeButtonColourId       = 0x90000005,
+        selectedBackgroundColourId = 0x90000006
+    };
+
     virtual void loadDialog();
     virtual void saveDialog();
 
@@ -120,7 +111,7 @@ public:
     Layout getLayout () const;
 
     void setSelectedNode (const juce::ValueTree& node);
-    void setNodeToEdit (juce::ValueTree node) override;
+    void setNodeToEdit (juce::ValueTree node);
 
     void setToolboxPosition (PositionOption position);
 
@@ -184,7 +175,6 @@ protected:
     void mouseDown (const juce::MouseEvent& e) override;
     void mouseDrag (const juce::MouseEvent& e) override;
 
-    void stateWasReloaded() override;
     void setLastLocation (juce::File file);
 
     void paint (juce::Graphics& g) override;
@@ -193,7 +183,7 @@ protected:
 
     void selectedItem (const juce::ValueTree& node) override;
     void guiItemDropped ([[maybe_unused]] const juce::ValueTree& node, [[maybe_unused]] juce::ValueTree& droppedOnto) override { }
-    void guiCreated () override;
+    void stateWasReloaded () override;
     void editModeToggled (bool editModeOn) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ToolBox)

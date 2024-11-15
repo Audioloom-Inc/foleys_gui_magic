@@ -41,7 +41,11 @@ namespace IDs
     static juce::String lastLocation { "lastLocation" };
 }
 
-ToolBoxBase::ToolBoxBase() 
+
+//==============================================================================
+//==============================================================================
+ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
+  : parent (props.first.get ()), builder (builderToControl), undo (builder.getUndoManager())
 {
     setColour (backgroundColourId, findColour (juce::ResizableWindow::backgroundColourId));
     setColour (outlineColourId, juce::Colours::silver);
@@ -49,13 +53,7 @@ ToolBoxBase::ToolBoxBase()
     setColour (disabledTextColourId, juce::Colours::grey);
     setColour (removeButtonColourId, juce::Colours::darkred);
     setColour (selectedBackgroundColourId, juce::Colours::darkorange);    
-}
 
-//==============================================================================
-//==============================================================================
-ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
-  : parent (props.first.get ()), builder (builderToControl), undo (builder.getUndoManager())
-{
     appProperties.setStorageParameters (getApplicationPropertyStorage());
 
     juce::Desktop::getInstance().addGlobalMouseListener (this);
@@ -120,7 +118,7 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
     undoButton.onClick = [&] { undo.undo(); };
 
     editSwitch.setClickingTogglesState (true);
-    editSwitch.setColour (juce::TextButton::buttonOnColourId, findColour (ToolBoxBase::selectedBackgroundColourId, true));
+    editSwitch.setColour (juce::TextButton::buttonOnColourId, findColour (ToolBox::selectedBackgroundColourId, true));
     editSwitch.onStateChange = [&] { builder.setEditMode (editSwitch.getToggleState()); };
 
     updateLayout ();
@@ -254,7 +252,7 @@ void ToolBox::loadGUI (const juce::File& xmlFile)
     if (tree.isValid() && tree.getType() == IDs::magic)
     {
         builder.getMagicState().setGuiValueTree (tree);
-        stateWasReloaded();
+        // stateWasReloaded(); // already called with the line above
     }
 
     setLastLocation (xmlFile);
@@ -290,7 +288,7 @@ ToolBox::Layout ToolBox::getLayout() const
 void ToolBox::setSelectedNode (const juce::ValueTree& node)
 {
     treeEditor.setSelectedNode (node);
-    propertiesEditor.setNodeToEdit (node);
+    propertiesEditor.setSelectedNode (node);
     builder.setSelectedNode (node);
 
     for (int i = tabs.getNumTabs (); --i >= 0;)
@@ -300,11 +298,11 @@ void ToolBox::setSelectedNode (const juce::ValueTree& node)
 
 void ToolBox::setNodeToEdit (juce::ValueTree node)
 {
-    propertiesEditor.setNodeToEdit (node);
+    propertiesEditor.setSelectedNode (node);
     
     for (int i = tabs.getNumTabs (); --i >= 0;)
         if (auto tab = dynamic_cast<ToolBoxContentBase*> (tabs.getTabContentComponent (i)))
-            tab->setNodeToEdit (node);
+            tab->setSelectedNode (node);
 }
 
 void ToolBox::stateWasReloaded()
@@ -312,15 +310,19 @@ void ToolBox::stateWasReloaded()
     treeEditor.updateTree();
     propertiesEditor.setStyle (builder.getStylesheet().getCurrentStyle());
     palette.update();
+    for (int i = tabs.getNumTabs (); --i >= 0;)
+        if (auto tab = dynamic_cast<ToolBoxContentBase*> (tabs.getTabContentComponent (i)))
+            tab->stateWasReloaded ();
+
     builder.updateComponents();
 }
 
 void ToolBox::paint (juce::Graphics& g)
 {
-    g.fillAll (findColour (ToolBoxBase::backgroundColourId, true));
-    g.setColour (findColour (ToolBoxBase::outlineColourId, true));
+    g.fillAll (findColour (ToolBox::backgroundColourId, true));
+    g.setColour (findColour (ToolBox::outlineColourId, true));
     g.drawRect (getLocalBounds().toFloat(), 2.0f);
-    g.setColour (findColour (ToolBoxBase::textColourId, true));
+    g.setColour (findColour (ToolBox::textColourId, true));
     g.drawFittedText ("foleys GUI magic", getLocalBounds().withHeight (24), juce::Justification::centred, 1);
 }
 
@@ -362,11 +364,18 @@ bool ToolBox::keyPressed (const juce::KeyPress& key, juce::Component*)
 
 void ToolBox::mouseDoubleClick (const juce::MouseEvent& event) 
 {
-    if (builder.isEditModeOn ())
+    if (auto comp = dynamic_cast<StylePropertyComponent*> (event.originalComponent))
+    {
+        if (auto node = comp->getInheritedFrom(); node.isValid ())
+            setNodeToEdit (node);
+    }
+    else if (builder.isEditModeOn ())
+    {
         if (layout == Layout::TabbedLayout)
             if (auto comp = dynamic_cast<foleys::GuiItem*> (event.originalComponent))
                 if (comp->isSelected ())
                     openTab ("Inspector");
+    }
 }
 
 bool ToolBox::keyPressed (const juce::KeyPress& key)
@@ -436,13 +445,6 @@ void ToolBox::timerCallback (int timer)
         updateToolboxPosition();
     else if (timer == Timers::AutoSave)
         saveGUI (autoSaveFile);
-}
-
-void ToolBox::guiCreated() 
-{
-    for (int i = tabs.getNumTabs (); --i >= 0;)
-        if (auto tab = dynamic_cast<ToolBoxContentBase*> (tabs.getTabContentComponent (i)))
-            tab->guiCreated ();
 }
 
 void ToolBox::editModeToggled (bool editModeOn)

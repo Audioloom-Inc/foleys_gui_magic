@@ -50,9 +50,9 @@ GUITreeEditor::GUITreeEditor (MagicGUIBuilder& builderToEdit)
 
 void GUITreeEditor::paint (juce::Graphics& g)
 {
-    g.setColour (findColour (ToolBoxBase::outlineColourId, true));
+    g.setColour (findColour (ToolBox::outlineColourId, true));
     g.drawRect (getLocalBounds(), 1);
-    g.setColour (findColour (ToolBoxBase::textColourId, true));
+    g.setColour (findColour (ToolBox::textColourId, true));
     g.drawFittedText (TRANS ("GUI tree"), 2, 2, getWidth() - 4, 20, juce::Justification::centred, 1);
 }
 
@@ -170,9 +170,9 @@ bool GUITreeEditor::GuiTreeItem::mightContainSubItems()
 void GUITreeEditor::GuiTreeItem::paintItem (juce::Graphics& g, int width, int height)
 {
     if (isSelected())
-        g.fillAll (owner.findColour (ToolBoxBase::selectedBackgroundColourId, true).withAlpha (0.5f));
+        g.fillAll (owner.findColour (ToolBox::selectedBackgroundColourId, true).withAlpha (0.5f));
 
-    g.setColour (owner.findColour (ToolBoxBase::textColourId, true));
+    g.setColour (owner.findColour (ToolBox::textColourId, true));
     g.setFont (height * 0.7f);
 
     juce::String name = itemNode.getType().toString();

@@ -43,7 +43,7 @@
 namespace foleys
 {
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
-    class ToolBoxBase;
+    class ToolBox;
 #endif
 
     class StylePropertyComponent;
@@ -238,14 +238,16 @@ public:
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     void attachToolboxToWindow (juce::Component& window);
-    void setToolbox (ToolBoxBase * toolbox, bool ownsToolbox = false);
+    void setToolbox (ToolBox * toolbox, bool ownsToolbox = false);
 
-    ToolBoxBase* getMagicToolBox();
+    ToolBox* getMagicToolBox();
 #endif
 
     class Listener
     {
     public:
+        virtual ~Listener() = default;
+        
         /** This is called in edit mode, when the user selects an item */
         virtual void selectedItem (const juce::ValueTree& node) = 0;
 
@@ -253,7 +255,7 @@ public:
         virtual void guiItemDropped (const juce::ValueTree& node, juce::ValueTree& droppedOnto) = 0;
 
         /** */
-        virtual void guiCreated () {}
+        virtual void stateWasReloaded () {}
 
         /** */
         virtual void editModeToggled (bool editModeOn) {}
@@ -298,7 +300,7 @@ protected:
     juce::ValueTree              selectedNode;
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
-    std::unique_ptr<ToolBoxBase> magicToolBox;
+    std::unique_ptr<ToolBox> magicToolBox;
     bool ownsToolbox{ true };
 #endif
 

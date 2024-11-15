@@ -48,7 +48,7 @@ public:
 
     void setStyle (juce::ValueTree style);
 
-    void setNodeToEdit (juce::ValueTree node);
+    void setSelectedNode (juce::ValueTree node);
     juce::ValueTree& getNodeToEdit();
 
     void createNewClass();

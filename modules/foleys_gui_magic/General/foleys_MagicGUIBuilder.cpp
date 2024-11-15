@@ -59,10 +59,6 @@ MagicGUIBuilder::~MagicGUIBuilder()
 {
     getConfigTree().removeListener (this);
     masterReference.clear();
-
-#if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
-    setToolbox (nullptr);
-#endif
 }
 
 Stylesheet& MagicGUIBuilder::getStylesheet()
@@ -528,30 +524,10 @@ void MagicGUIBuilder::attachToolboxToWindow (juce::Component& window)
       {
           if (reference != nullptr)
           {
-              auto toolbox = new ToolBox (ToolBox::Properties (reference->getTopLevelComponent(), true), *this);
-              toolbox->setToolboxPosition (ToolBox::PositionOption::right);
-              setToolbox (toolbox, true);
+              magicToolBox = std::make_unique<ToolBox> (std::make_pair (reference->getTopLevelComponent(), true), *this);
+              magicToolBox->setLastLocation (magicState.getResourcesFolder());
           }
       });
-}
-
-void MagicGUIBuilder::setToolbox (ToolBox* toolbox, bool ownsToolbox) 
-{
-    if (! this->ownsToolbox)
-        magicToolBox.release();
-
-    magicToolBox.reset (toolbox);
-    this->ownsToolbox = ownsToolbox;
-}
-
-ToolBox* MagicGUIBuilder::getMagicToolBox()
-{
-    // The magicToolBox should always be present!
-    // This method wouldn't be included, if
-    // FOLEYS_SHOW_GUI_EDITOR_PALLETTE was 0
-    jassert (magicToolBox.get() != nullptr);
-
-    return magicToolBox.get ();
 }
 
 #endif

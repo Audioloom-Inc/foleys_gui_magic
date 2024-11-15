@@ -133,15 +133,6 @@ void StylePropertyComponent::resized()
         editor->setBounds (b);
 }
 
-void StylePropertyComponent::mouseDoubleClick (const juce::MouseEvent&)
-{
-#if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
-    if (inheritedFrom.isValid())
-        if (auto toolBox = builder.getMagicToolBox())
-            toolBox->setSelectedNode (inheritedFrom);
-#endif
-}
-
 juce::ValueTree StylePropertyComponent::getInheritedFrom() const
 {
     return inheritedFrom;

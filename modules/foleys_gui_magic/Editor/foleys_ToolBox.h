@@ -120,6 +120,7 @@ public:
     void mouseDoubleClick (const juce::MouseEvent& event) override;
     
     void openTab (const juce::String& name);
+    void setLastLocation (juce::File file);
 
     static juce::PropertiesFile::Options getApplicationPropertyStorage();
 
@@ -174,8 +175,6 @@ protected:
 
     void mouseDown (const juce::MouseEvent& e) override;
     void mouseDrag (const juce::MouseEvent& e) override;
-
-    void setLastLocation (juce::File file);
 
     void paint (juce::Graphics& g) override;
     void resized() override;

@@ -238,9 +238,6 @@ public:
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     void attachToolboxToWindow (juce::Component& window);
-    void setToolbox (ToolBox * toolbox, bool ownsToolbox = false);
-
-    ToolBox* getMagicToolBox();
 #endif
 
     class Listener
@@ -301,7 +298,6 @@ protected:
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     std::unique_ptr<ToolBox> magicToolBox;
-    bool ownsToolbox{ true };
 #endif
 
     JUCE_DECLARE_WEAK_REFERENCEABLE (MagicGUIBuilder)

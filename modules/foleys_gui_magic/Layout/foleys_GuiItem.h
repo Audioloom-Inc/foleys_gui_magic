@@ -204,7 +204,8 @@ public:
 
     bool isInterestedInDragSource (const juce::DragAndDropTarget::SourceDetails &dragSourceDetails) override;
     void itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSourceDetails) override;
-
+    bool isSelected () const;
+    
     MagicGUIBuilder& magicBuilder;
 
     bool isRoot () const;

@@ -126,8 +126,9 @@ public:
 
     bool keyPressed (const juce::KeyPress& key) override;
     bool keyPressed (const juce::KeyPress& key, juce::Component* originalComponent) override;
-
-    void selectedItem (const juce::ValueTree& node) override;
+    void mouseDoubleClick (const juce::MouseEvent& event) override;
+    
+    void openTab (const juce::String& name);
 
     static juce::PropertiesFile::Options getApplicationPropertyStorage();
 
@@ -190,8 +191,10 @@ protected:
     void resized() override;
     void timerCallback (int timer) override;
 
+    void selectedItem (const juce::ValueTree& node) override;
     void guiItemDropped ([[maybe_unused]] const juce::ValueTree& node, [[maybe_unused]] juce::ValueTree& droppedOnto) override { }
     void guiCreated () override;
+    void editModeToggled (bool editModeOn) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ToolBox)
 };

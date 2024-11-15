@@ -58,6 +58,8 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
 {
     appProperties.setStorageParameters (getApplicationPropertyStorage());
 
+    juce::Desktop::getInstance().addGlobalMouseListener (this);
+
     if (props.second)
     {
         if (auto* properties = appProperties.getUserSettings())
@@ -142,6 +144,8 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
 
 ToolBox::~ToolBox()
 {
+    juce::Desktop::getInstance ().removeGlobalMouseListener (this);
+
     builder.removeListener (this);
 
     if (parent != nullptr)
@@ -156,14 +160,18 @@ ToolBox::~ToolBox()
 
 void ToolBox::mouseDown (const juce::MouseEvent& e)
 {
-    if (positionOption == PositionOption::detached)
-        componentDragger.startDraggingComponent (this, e);
+    if (auto c = e.eventComponent)
+        if (isParentOf (c))
+            if (positionOption == PositionOption::detached)
+                componentDragger.startDraggingComponent (this, e);
 }
 
 void ToolBox::mouseDrag (const juce::MouseEvent& e)
 {
-    if (positionOption == PositionOption::detached)
-        componentDragger.dragComponent (this, e, nullptr);
+    if (auto c = e.eventComponent)
+        if (isParentOf (c))
+            if (positionOption == PositionOption::detached)
+                componentDragger.dragComponent (this, e, nullptr);
 }
 
 void ToolBox::updateLayout ()
@@ -352,6 +360,15 @@ bool ToolBox::keyPressed (const juce::KeyPress& key, juce::Component*)
     return keyPressed (key);
 }
 
+void ToolBox::mouseDoubleClick (const juce::MouseEvent& event) 
+{
+    if (builder.isEditModeOn ())
+        if (layout == Layout::TabbedLayout)
+            if (auto comp = dynamic_cast<foleys::GuiItem*> (event.originalComponent))
+                if (comp->isSelected ())
+                    openTab ("Inspector");
+}
+
 bool ToolBox::keyPressed (const juce::KeyPress& key)
 {
     if (key.isKeyCode (juce::KeyPress::backspaceKey) || key.isKeyCode (juce::KeyPress::deleteKey))
@@ -404,6 +421,15 @@ void ToolBox::selectedItem (const juce::ValueTree& node)
     setSelectedNode (node);
 }
 
+void ToolBox::openTab (const juce::String& name) 
+{
+    if (name.isEmpty())
+        return;
+
+    if (auto index = tabs.getTabNames ().indexOf (name); index >= 0)
+        tabs.setCurrentTabIndex (index);
+}
+
 void ToolBox::timerCallback (int timer)
 {
     if (timer == Timers::WindowDrag)
@@ -417,6 +443,11 @@ void ToolBox::guiCreated()
     for (int i = tabs.getNumTabs (); --i >= 0;)
         if (auto tab = dynamic_cast<ToolBoxContentBase*> (tabs.getTabContentComponent (i)))
             tab->guiCreated ();
+}
+
+void ToolBox::editModeToggled (bool editModeOn)
+{
+    editSwitch.setToggleState (editModeOn, juce::NotificationType::dontSendNotification);
 }
 
 void ToolBox::setToolboxPosition (PositionOption position)

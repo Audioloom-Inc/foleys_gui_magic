@@ -454,6 +454,8 @@ void MagicGUIBuilder::setEditMode (bool shouldEdit)
     if (shouldEdit == false)
         setSelectedNode (juce::ValueTree());
 
+    listeners.call (&Listener::editModeToggled, editMode);
+    
     parent->repaint();
 }
 

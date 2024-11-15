@@ -254,6 +254,10 @@ public:
 
         /** */
         virtual void guiCreated () {}
+
+        /** */
+        virtual void editModeToggled (bool editModeOn) {}
+
     };
 
     void addListener (Listener* listener) { listeners.add (listener); }

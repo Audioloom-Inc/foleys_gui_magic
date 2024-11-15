@@ -34,13 +34,14 @@
 #pragma once
 
 #include <juce_gui_basics/juce_gui_basics.h>
+#include "foleys_ToolBoxContent.h"
 
 namespace foleys
 {
 
 class MagicGUIBuilder;
 
-class PropertiesEditor  : public juce::Component,
+class PropertiesEditor  : public ToolBoxContentComponent,
                           private juce::ValueTree::Listener
 {
 public:
@@ -48,7 +49,9 @@ public:
 
     void setStyle (juce::ValueTree style);
 
-    void setSelectedNode (juce::ValueTree node);
+    void setSelectedNode (const juce::ValueTree& node) override;
+    void stateWasReloaded () override;
+    
     juce::ValueTree& getNodeToEdit();
 
     void createNewClass();

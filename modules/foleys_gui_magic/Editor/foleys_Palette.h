@@ -34,6 +34,7 @@
 #pragma once
 
 #include <juce_gui_basics/juce_gui_basics.h>
+#include "foleys_ToolBoxContent.h"
 
 namespace foleys
 {
@@ -44,7 +45,7 @@ class MagicGUIBuilder;
  The Palette is the list of available components to be dragged into the tree or the GUI window.
  To be able to drop into the GUI directly, the edit mode must be enabled.
  */
-class Palette  : public juce::Component
+class Palette  : public ToolBoxContentComponent
 {
 public:
     Palette (MagicGUIBuilder& builder);
@@ -54,6 +55,7 @@ public:
     void resized() override;
 
     void update();
+    void stateWasReloaded() override;
 
 private:
 

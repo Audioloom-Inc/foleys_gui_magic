@@ -35,6 +35,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "foleys_ToolBoxContent.h"
+
 namespace foleys
 {
 
@@ -44,7 +46,7 @@ class MagicGUIBuilder;
  This GUITreeEditor shows the DOM tree for the GUI. The order can be dragged within and nodes be selected
  to edit them in the PropertiesEditor. It also allows copy and paste via CMD+C/V of sub trees.
  */
-class GUITreeEditor  : public juce::Component,
+class GUITreeEditor  : public ToolBoxContentComponent,
                        private juce::ValueTree::Listener
 {
 public:
@@ -57,7 +59,8 @@ public:
 
     void updateTree();
 
-    void setSelectedNode (const juce::ValueTree& node);
+    void setSelectedNode (const juce::ValueTree& node) override;
+    void stateWasReloaded() override;
 
 private:
     class GuiTreeItem : public juce::TreeViewItem

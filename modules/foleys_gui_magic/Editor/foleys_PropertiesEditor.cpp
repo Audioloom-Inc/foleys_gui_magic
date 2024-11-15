@@ -110,7 +110,7 @@ void PropertiesEditor::setStyle (juce::ValueTree styleToEdit)
     style.addListener (this);
 }
 
-void PropertiesEditor::setSelectedNode (juce::ValueTree node)
+void PropertiesEditor::setSelectedNode (const juce::ValueTree& node)
 {
     const auto openness = properties.getOpennessState();
 
@@ -168,6 +168,11 @@ void PropertiesEditor::setSelectedNode (juce::ValueTree node)
         nodeSelect.setText (TRANS ("Editing node"), juce::dontSendNotification);
 
     properties.restoreOpennessState (*openness);
+}
+
+void PropertiesEditor::stateWasReloaded() 
+{
+    setStyle (getMagicBuilder ().getStylesheet().getCurrentStyle());
 }
 
 juce::ValueTree& PropertiesEditor::getNodeToEdit()

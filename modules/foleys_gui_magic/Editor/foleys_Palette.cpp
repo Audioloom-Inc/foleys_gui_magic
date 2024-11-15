@@ -63,6 +63,11 @@ void Palette::update()
     paletteList.updateContent();
 }
 
+void Palette::stateWasReloaded() 
+{
+    update ();
+}
+
 //==============================================================================
 
 void Palette::PaletteListModel::setFactoryNames (juce::StringArray names)

@@ -116,6 +116,11 @@ void GUITreeEditor::setSelectedNode (const juce::ValueTree& node)
     treeView.scrollToKeepItemVisible (itemToSelect);
 }
 
+void GUITreeEditor::stateWasReloaded()
+{
+    updateTree ();
+}
+
 void GUITreeEditor::valueTreePropertyChanged (juce::ValueTree&, const juce::Identifier&)
 {
     updateTree();

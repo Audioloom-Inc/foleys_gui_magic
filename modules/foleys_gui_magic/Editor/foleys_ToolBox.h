@@ -33,25 +33,14 @@
 
 #pragma once
 
-#include "foleys_GUITreeEditor.h"
-#include "foleys_Palette.h"
-#include "foleys_PropertiesEditor.h"
-
 #include <juce_gui_basics/juce_gui_basics.h>
+#include "foleys_ToolBoxContent.h"
 
 namespace foleys
 {
 
 class MagicGUIBuilder;
-
-class ToolBoxContentBase
-{
-public:
-    virtual ~ToolBoxContentBase() = default;
-    
-    virtual void setSelectedNode (const juce::ValueTree& node) = 0;
-    virtual void stateWasReloaded () {}
-};
+class ToolBoxContentComponent;
 
 /**
  The Toolbox defines a floating window, that allows live editing of the currently loaded GUI.
@@ -62,6 +51,7 @@ class ToolBox
   , public juce::KeyListener
   , private juce::MultiTimer
   , private foleys::MagicGUIBuilder::Listener
+  , private juce::AsyncUpdater
 {
 public:
 
@@ -106,6 +96,9 @@ public:
     virtual void loadGUI (const juce::File& file);
     virtual bool saveGUI (const juce::File& file);
     
+    void addContent (ToolBoxContentComponent* content, const juce::String& name);
+    ToolBoxContentComponent* getContent (const juce::String& name) const;
+
     /** updates the layout to use either tabs or a stretchable layout */
     void setLayout (const Layout& layout);
     Layout getLayout () const;
@@ -153,15 +146,11 @@ protected:
 
     Layout layout { StretchableLayout };
 
-    juce::TabbedComponent tabs { juce::TabbedButtonBar::TabsAtTop };
-
-    GUITreeEditor    treeEditor { builder };
-    PropertiesEditor propertiesEditor { builder };
-    Palette          palette { builder };
-
+    // owns content (and resizers in stretchable layout    )
+    juce::OwnedArray<Component>             content;
     juce::StretchableLayoutManager    resizeManager;
-    juce::StretchableLayoutResizerBar resizer1 { &resizeManager, 1, false };
-    juce::StretchableLayoutResizerBar resizer3 { &resizeManager, 3, false };
+
+    juce::TabbedComponent tabs { juce::TabbedButtonBar::TabsAtTop };
 
     std::unique_ptr<juce::FileBrowserComponent> fileBrowser;
     juce::File                                  lastLocation;
@@ -171,6 +160,7 @@ protected:
     juce::ResizableCornerComponent resizeCorner { this, nullptr };
     juce::ComponentDragger         componentDragger;
 
+    bool layoutIsUpdating { false };
     void updateLayout ();
 
     void mouseDown (const juce::MouseEvent& e) override;
@@ -184,6 +174,16 @@ protected:
     void guiItemDropped ([[maybe_unused]] const juce::ValueTree& node, [[maybe_unused]] juce::ValueTree& droppedOnto) override { }
     void stateWasReloaded () override;
     void editModeToggled (bool editModeOn) override;
+
+    void handleAsyncUpdate() override;
+
+    template<typename... MethodArgs, typename... Args>
+    void call (void (ToolBoxContentComponent::*callbackFunction) (MethodArgs...), Args&&... args) const
+    {
+        for (auto comp : content)
+            if (auto c = dynamic_cast<ToolBoxContentComponent*> (comp))
+                (c->*callbackFunction) (args...);
+    }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ToolBox)
 };

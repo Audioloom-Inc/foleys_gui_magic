@@ -54,9 +54,9 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
     setColour (removeButtonColourId, juce::Colours::darkred);
     setColour (selectedBackgroundColourId, juce::Colours::darkorange);    
 
-    addContent (new GUITreeEditor (builder), "Tree");
-    addContent (new PropertiesEditor (builder), "Inspector");
-    addContent (new Palette (builder), "Palette");
+    addContentComponent (new GUITreeEditor (builder), "Tree");
+    addContentComponent (new PropertiesEditor (builder), "Inspector");
+    addContentComponent (new Palette (builder), "Palette");
 
     appProperties.setStorageParameters (getApplicationPropertyStorage());
 
@@ -180,42 +180,45 @@ void ToolBox::updateLayout ()
 {
     juce::ScopedValueSetter<bool> setter (layoutIsUpdating, true);
 
-    // remove all resizers
-    for (int i = content.size (); --i >= 0;)
-    {
-        if (auto c = dynamic_cast<juce::StretchableLayoutResizerBar*> (content.getUnchecked (i)))
-            content.remove (i);
-        else 
-            removeChildComponent (content.getUnchecked (i));
-    }
+    resizers.clear (true);
+    layoutComponents.clear ();
 
-    // init layouts
     if (layout == StretchableLayout)
     {
-        removeChildComponent (&tabs);
+        const auto numContents = content.size();
+        const auto totalNumItems = juce::jmax (0, numContents * 2 - 1);
 
-        auto sizeWithoutResizers = content.size ();
-        auto nHeight = sizeWithoutResizers > 0.f ? 1.0f / sizeWithoutResizers : 1.f;
-        
-        // add resizer bars
-        for (int i = 1; i < content.size(); i = i + 2)
-            content.insert (i, new juce::StretchableLayoutResizerBar (&resizeManager, i, false));
+        for (int i = 1; i < totalNumItems; i = i + 1)
+        {
+            auto r = resizers.add (new juce::StretchableLayoutResizerBar (&resizeManager, i, false));
+            addAndMakeVisible (r);
+            
+            layoutComponents.add (r);
+            resizeManager.setItemLayout (i, 6, 6, 6);
+        }
 
-        // init layout
+        const auto nHeight = numContents > 0 ? 1.0f / numContents : 1.f;
+
         for (int i = 0; i < content.size (); i++)
         {
-            addAndMakeVisible (content.getUnchecked (i));
-
-            if (i % 2 == 0)
-                resizeManager.setItemLayout (i, 1, -1.0, -nHeight);
-            else
-                resizeManager.setItemLayout (i, 6, 6, 6);
+            auto c = content.getUnchecked (i);
+            addAndMakeVisible (c);
+            
+            auto layoutIndex = i * 2;
+            layoutComponents.insert (layoutIndex, c);
+            resizeManager.setItemLayout (layoutIndex, 1, -1.0, -nHeight);
         }
+
+        // remove tabs
+        removeChildComponent (&tabs);
     }
     else
     {
         for (auto c : content)
+        {
+            removeChildComponent (c);
             tabs.addTab (c->getName (), juce::Colours::transparentBlack, c, false);
+        }
         
         addAndMakeVisible (tabs);
     }
@@ -288,7 +291,7 @@ bool ToolBox::saveGUI (const juce::File& xmlFile)
     return false;
 }
 
-void ToolBox::addContent (ToolBoxContentComponent* content, const juce::String& name)
+void ToolBox::addContentComponent (ToolBoxContentComponent* content, const juce::String& name)
 {
     content->setName (name);
     this->content.add (content);
@@ -296,7 +299,7 @@ void ToolBox::addContent (ToolBoxContentComponent* content, const juce::String& 
     triggerAsyncUpdate();
 }
 
-ToolBoxContentComponent* ToolBox::getContent (const juce::String& name) const
+ToolBoxContentComponent* ToolBox::getContentComponent (const juce::String& name) const
 {
     for (auto comp : content)
         if (auto c = dynamic_cast<ToolBoxContentComponent*> (comp))
@@ -304,6 +307,34 @@ ToolBoxContentComponent* ToolBox::getContent (const juce::String& name) const
                 return c;
             
     return nullptr;
+}
+
+ToolBoxContentComponent* ToolBox::getContentComponent (int index) const
+{
+    return dynamic_cast<ToolBoxContentComponent*> (content [index]);
+}
+
+void ToolBox::removeContentComponent (ToolBoxContentComponent* c) 
+{
+    content.removeObject (c, true);
+    triggerAsyncUpdate();
+}
+
+void ToolBox::removeContentComponent (int index) 
+{
+    content.remove (index, true);
+    triggerAsyncUpdate();
+}
+
+void ToolBox::removeAllContentComponents() 
+{
+    content.clear (true);
+    triggerAsyncUpdate();
+}
+
+int ToolBox::getNumContentComponents() const
+{
+    return content.size();
 }
 
 void ToolBox::setLayout(const Layout & layout)
@@ -324,7 +355,7 @@ void ToolBox::setSelectedNode (const juce::ValueTree& node)
 
 void ToolBox::setNodeToEdit (juce::ValueTree node)
 {
-    if (auto propertiesEditor = getContent ("Inspector"))
+    if (auto propertiesEditor = getContentComponent ("Inspector"))
         propertiesEditor->setSelectedNode (node);
 }
 
@@ -361,7 +392,7 @@ void ToolBox::resized()
 
     if (layout == StretchableLayout)
     {
-        resizeManager.layOutComponents (content.getRawDataPointer(), content.size(), bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), true, true);
+        resizeManager.layOutComponents (layoutComponents.getRawDataPointer(), layoutComponents.size(), bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(), true, true);
     }
     else
     {

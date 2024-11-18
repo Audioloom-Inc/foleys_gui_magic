@@ -96,8 +96,13 @@ public:
     virtual void loadGUI (const juce::File& file);
     virtual bool saveGUI (const juce::File& file);
     
-    void addContent (ToolBoxContentComponent* content, const juce::String& name);
-    ToolBoxContentComponent* getContent (const juce::String& name) const;
+    void addContentComponent (ToolBoxContentComponent* content, const juce::String& name);
+    ToolBoxContentComponent* getContentComponent (const juce::String& name) const;
+    ToolBoxContentComponent* getContentComponent (int index) const;
+    void removeContentComponent (ToolBoxContentComponent* content);
+    void removeContentComponent (int index);
+    void removeAllContentComponents ();
+    int getNumContentComponents() const;
 
     /** updates the layout to use either tabs or a stretchable layout */
     void setLayout (const Layout& layout);
@@ -147,8 +152,10 @@ protected:
     Layout layout { StretchableLayout };
 
     // owns content (and resizers in stretchable layout    )
-    juce::OwnedArray<Component>             content;
-    juce::StretchableLayoutManager    resizeManager;
+    juce::OwnedArray<Component>                         content;
+    juce::OwnedArray<juce::StretchableLayoutResizerBar> resizers;
+    juce::Array<Component*>                             layoutComponents;
+    juce::StretchableLayoutManager                      resizeManager;
 
     juce::TabbedComponent tabs { juce::TabbedButtonBar::TabsAtTop };
 

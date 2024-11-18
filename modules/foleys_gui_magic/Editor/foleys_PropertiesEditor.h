@@ -47,7 +47,15 @@ class PropertiesEditor  : public ToolBoxContentComponent,
 public:
     PropertiesEditor (MagicGUIBuilder& builder);
 
-    void setStyle (juce::ValueTree style);
+    enum ComboIDs : int
+    {
+        TypeEdit=1000,
+        NodeEdit=2000,
+        ClassEdit=3000,
+        PaletteEdit=4000
+    };
+
+    virtual void setStyle (juce::ValueTree style);
 
     void setSelectedNode (const juce::ValueTree& node) override;
     void stateWasReloaded () override;
@@ -72,7 +80,7 @@ public:
 
 protected:
 
-    void updatePopupMenu();
+    virtual void updatePopupMenu();
 
     void valueTreeChildAdded (juce::ValueTree& parentTree,
                               juce::ValueTree& childWhichHasBeenAdded) override;

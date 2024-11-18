@@ -43,14 +43,6 @@
 namespace foleys
 {
 
-enum ComboIDs : int
-{
-    TypeEdit=1000,
-    NodeEdit=2000,
-    ClassEdit=3000,
-    PaletteEdit=4000
-};
-
 PropertiesEditor::PropertiesEditor (MagicGUIBuilder& builderToEdit)
   : builder (builderToEdit),
     undo (builder.getUndoManager())

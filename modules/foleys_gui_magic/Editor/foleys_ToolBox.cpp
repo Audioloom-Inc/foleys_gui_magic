@@ -363,7 +363,7 @@ void ToolBox::stateWasReloaded()
 {
     call (&ToolBoxContentComponent::stateWasReloaded);
 
-    builder.updateComponents();
+    // builder.updateComponents();
 }
 
 void ToolBox::handleAsyncUpdate() 

@@ -56,12 +56,13 @@ struct SettableProperty
         Asset
     };
 
-    const juce::ValueTree  node;
-    const juce::Identifier name;
-    const PropertyType     type;
-    const juce::var        defaultValue;
-    const std::function<void(juce::ComboBox&)> menuCreationLambda;
-    const juce::StringArray allowedFileExtensions;
+    const juce::ValueTree                       node {};
+    const juce::Identifier                      name {};
+    const PropertyType                          type {};
+    const juce::var                             defaultValue {};
+    const std::function<void(juce::ComboBox&)>  menuCreationLambda {};
+    const juce::StringArray                     allowedFileExtensions {};
+    const juce::String                          category {};
 };
 
 } // namespace foleys

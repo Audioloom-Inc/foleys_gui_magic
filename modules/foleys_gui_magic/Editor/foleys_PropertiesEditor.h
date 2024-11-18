@@ -70,7 +70,7 @@ public:
 
     MagicGUIBuilder& getMagicBuilder();
 
-private:
+protected:
 
     void updatePopupMenu();
 

@@ -57,6 +57,9 @@ StylePropertyComponent* StylePropertyComponent::createComponent (MagicGUIBuilder
     if (property.type == SettableProperty::Gradient)
         return new StyleGradientPropertyComponent (builder, property.name, node);
 
+    if (property.type == SettableProperty::Colour)
+        return new StyleColourPropertyComponent (builder, property.name, node);
+        
     jassertfalse;
     return nullptr;
 }

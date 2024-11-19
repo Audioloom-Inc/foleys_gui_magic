@@ -127,37 +127,9 @@ void PropertiesEditor::setSelectedNode (const juce::ValueTree& node)
 
     updatePopupMenu();
 
-    addNodeProperties();
+    addProperties ();
 
-    addDecoratorProperties();
-
-    addFlexItemProperties();
-
-    juce::Array<juce::PropertyComponent*> additional;
-
-    if (stylesheet.isClassNode (styleItem))
-    {
-        for (auto factoryName : builder.getFactoryNames())
-            addTypeProperties (factoryName, {});
-    }
-    else
-    {
-        addTypeProperties (styleItem.getType(), additional);
-    }
-
-    if (styleItem.getType() == IDs::view || stylesheet.isClassNode (styleItem))
-        addContainerProperties();
-
-    if (stylesheet.isClassNode (styleItem))
-        nodeSelect.setText (TRANS ("Class: ") + styleItem.getType().toString(), juce::dontSendNotification);
-    else if (stylesheet.isTypeNode (styleItem))
-        nodeSelect.setText (TRANS ("Type: ") + styleItem.getType().toString(), juce::dontSendNotification);
-    else if (stylesheet.isIdNode (styleItem))
-        nodeSelect.setText (TRANS ("Node: ") + styleItem.getType().toString(), juce::dontSendNotification);
-    else if (stylesheet.isColourPaletteNode (styleItem))
-        nodeSelect.setText (TRANS ("Palette: ") + styleItem.getType().toString(), juce::dontSendNotification);
-    else
-        nodeSelect.setText (TRANS ("Editing node"), juce::dontSendNotification);
+    updateNodeSelect ();
 
     properties.restoreOpennessState (*openness);
 }
@@ -220,6 +192,33 @@ void PropertiesEditor::deleteClass (const juce::String& name)
 
 //==============================================================================
 
+void PropertiesEditor::addProperties ()
+{
+    addNodeProperties();
+
+    addDecoratorProperties();
+
+    addFlexItemProperties();
+
+    auto& stylesheet = builder.getStylesheet();
+
+    juce::Array<juce::PropertyComponent*> additional;
+
+    if (stylesheet.isClassNode (styleItem))
+    {
+        for (auto factoryName : builder.getFactoryNames())
+            addTypeProperties (factoryName, {});
+    }
+    else
+    {
+        addTypeProperties (styleItem.getType(), additional);
+    }
+
+    if (styleItem.getType() == IDs::view || stylesheet.isClassNode (styleItem))
+        addContainerProperties();
+
+}
+
 void PropertiesEditor::addNodeProperties()
 {
     const auto& stylesheet = builder.getStylesheet();
@@ -270,30 +269,9 @@ void PropertiesEditor::addNodeProperties()
 void PropertiesEditor::addDecoratorProperties()
 {
     juce::Array<juce::PropertyComponent*> array;
-    array.add (new StyleChoicePropertyComponent (builder, IDs::visibility, styleItem, builder.createPropertiesMenuLambda()));
-    array.add (new StyleTextPropertyComponent (builder, IDs::caption, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::captionSize, styleItem));
-    array.add (new StyleColourPropertyComponent (builder, IDs::captionColour, styleItem));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::captionPlacement, styleItem, getAllKeyNames (makeJustificationsChoices())));
-    array.add (new StyleTextPropertyComponent (builder, IDs::tooltip, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::accessibilityTitle, styleItem));
-    array.add (new StyleBoolPropertyComponent (builder, IDs::accessibility, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::accessibilityDescription, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::accessibilityHelpText, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::accessibilityFocusOrder, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::margin, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::padding, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::border, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::radius, styleItem));
-    array.add (new StyleColourPropertyComponent (builder, IDs::borderColour, styleItem));
-    array.add (new StyleColourPropertyComponent (builder, IDs::backgroundColour, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::tabCaption, styleItem));
-    array.add (new StyleColourPropertyComponent (builder, IDs::tabColour, styleItem));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::lookAndFeel, styleItem, builder.getStylesheet().getLookAndFeelNames()));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::backgroundImage, styleItem, Resources::getResourceFileNames()));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::imagePlacement, styleItem, { IDs::imageCentred, IDs::imageFill, IDs::imageStretch }));
-    array.add (new StyleTextPropertyComponent (builder, IDs::backgroundAlpha, styleItem));
-    array.add (new StyleGradientPropertyComponent (builder, IDs::backgroundGradient, styleItem));
+    
+    for (auto p : createDecoratorProperties ())
+        array.add (builder.createStylePropertyComponent (p, styleItem));
 
     properties.addSection ("Decorator", array, false);
 }
@@ -304,43 +282,125 @@ void PropertiesEditor::addTypeProperties (juce::Identifier type, juce::Array<juc
 
     array.addArray (additional);
 
-    juce::ValueTree node (type);
+    for (auto p : createTypeProperties (type))
+        if (auto comp = builder.createStylePropertyComponent (p, styleItem))
+            array.add (comp);
+
+    properties.addSection (type.toString(), array, false);
+}
+
+std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (juce::Identifier type)
+{
+    std::vector<SettableProperty> properties;
+
+    juce::ValueTree node{ type };
+
     if (auto item = builder.createGuiItem (node))
     {
-        for (auto& p : item->getSettableProperties())
+        auto props = item->getSettableProperties();
+        for (auto& other : props)
         {
-            if (auto* component = builder.createStylePropertyComponent (p, styleItem))
-                array.add (component);
+            other.node = styleItem;   
+            properties.push_back (other);
         }
 
-        for (auto colour : item->getColourNames())
+        for (auto colour : item->getColourNames ())
         {
-            array.add (new StyleColourPropertyComponent (builder, colour, styleItem));
+            properties.push_back ({ styleItem, colour, SettableProperty::PropertyType::Colour, {}, {}, {}, "Colours" });
         }
     }
 
-    properties.addSection (type.toString(), array, false);
+    return properties;
+}
+
+std::vector<SettableProperty> PropertiesEditor::createDecoratorProperties(const juce::String& category)
+{
+    std::vector<SettableProperty> array;
+    
+    auto toMenuLambda = [&](const juce::StringArray& names){
+        return [names](juce::ComboBox& box){
+            box.addItemList (names, 1);
+        };
+    };
+
+    array.push_back ( { styleItem, IDs::visibility, SettableProperty::Choice, {}, builder.createPropertiesMenuLambda(), {}, category });
+    array.push_back ( { styleItem, IDs::caption, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::captionSize, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::captionColour, SettableProperty::Colour, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::captionPlacement, SettableProperty::Choice, {}, toMenuLambda (getAllKeyNames (makeJustificationsChoices ())), {}, category } );
+    array.push_back ( { styleItem, IDs::tooltip, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::accessibilityTitle, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::accessibility, SettableProperty::Toggle, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::accessibilityDescription, SettableProperty::Text } );
+    array.push_back ( { styleItem, IDs::accessibilityHelpText, SettableProperty::Text } );
+    array.push_back ( { styleItem, IDs::accessibilityFocusOrder, SettableProperty::Text } );
+    array.push_back ( { styleItem, IDs::margin, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::padding, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::border, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::radius, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::borderColour, SettableProperty::Colour } );
+    array.push_back ( { styleItem, IDs::backgroundColour, SettableProperty::Colour } );
+    array.push_back ( { styleItem, IDs::tabCaption, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::tabColour, SettableProperty::Colour, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::lookAndFeel, SettableProperty::Choice, {}, toMenuLambda (builder.getStylesheet().getLookAndFeelNames()), {}, category } );
+    array.push_back ( { styleItem, IDs::backgroundImage, SettableProperty::Choice, {}, toMenuLambda (Resources::getResourceFileNames()), {}, category } );
+    array.push_back ( { styleItem, IDs::imagePlacement, SettableProperty::Choice, {}, toMenuLambda ({IDs::imageCentred, IDs::imageFill, IDs::imageStretch }), {}, category } );
+    array.push_back ( { styleItem, IDs::backgroundAlpha, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::backgroundGradient, SettableProperty::Gradient , {}, {}, {}, category } );
+
+    return array;
+}
+
+std::vector<SettableProperty> PropertiesEditor::createFlexItemProperties(const juce::String& category)
+{
+    std::vector<SettableProperty> properties;
+
+    properties.push_back ({ styleItem, IDs::posX, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::posY, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::posWidth, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::posHeight, SettableProperty::Number, {}, {}, {}, category });
+
+    properties.push_back ({ styleItem, IDs::width, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::height, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::minWidth, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::minHeight, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::maxWidth, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::maxHeight, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::flexGrow, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::flexShrink, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::flexOrder, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::flexAlignSelf, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexAuto }), {}, category });
+
+    return properties;
+}
+
+std::vector<SettableProperty> PropertiesEditor::createContainerProperties (const juce::String& categoryName)
+{
+    std::vector<SettableProperty> properties;
+
+    properties.push_back ({ styleItem, IDs::display, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::contents, IDs::flexbox, IDs::tabbed }), {}, categoryName });
+    properties.push_back ({ styleItem, IDs::repaintHz, SettableProperty::Number, {}, {}, {}, categoryName });
+    properties.push_back ({ styleItem, IDs::scrollMode, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::noScroll, IDs::scrollHorizontal, IDs::scrollVertical, IDs::scrollBoth }), {}, categoryName });
+    properties.push_back ({ styleItem, IDs::tabHeight, SettableProperty::Number, {}, {}, {}, categoryName });
+    properties.push_back ({ styleItem, IDs::selectedTab, SettableProperty::Choice, {}, builder.createPropertiesMenuLambda (), {}, categoryName });
+
+    properties.push_back ({ styleItem, IDs::flexDirection, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexDirRow, IDs::flexDirRowReverse, IDs::flexDirColumn, IDs::flexDirColumnReverse }), {}, categoryName });
+    properties.push_back ({ styleItem, IDs::flexWrap, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexNoWrap, IDs::flexWrapNormal, IDs::flexWrapReverse }), {}, categoryName });
+    properties.push_back ({ styleItem, IDs::flexAlignContent, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexSpaceAround, IDs::flexSpaceBetween }), {}, categoryName });
+    properties.push_back ({ styleItem, IDs::flexAlignItems, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter }), {}, categoryName });
+    properties.push_back ({ styleItem, IDs::flexJustifyContent, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexSpaceAround, IDs::flexSpaceBetween }), {}, categoryName });
+
+    properties.push_back ({ styleItem, IDs::focusContainerType, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::focusNone, IDs::focusContainer, IDs::focusKeyContainer }), {}, categoryName });
+
+    return properties;
 }
 
 void PropertiesEditor::addFlexItemProperties()
 {
     juce::Array<juce::PropertyComponent*> array;
-
-    array.add (new StyleTextPropertyComponent (builder, IDs::posX, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::posY, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::posWidth, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::posHeight, styleItem));
-
-    array.add (new StyleTextPropertyComponent (builder, IDs::width, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::height, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::minWidth, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::minHeight, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::maxWidth, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::maxHeight, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::flexGrow, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::flexShrink, styleItem));
-    array.add (new StyleTextPropertyComponent (builder, IDs::flexOrder, styleItem));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::flexAlignSelf, styleItem, { IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexAuto }));
+    
+    for (auto p : createFlexItemProperties ())
+        array.add (builder.createStylePropertyComponent (p, styleItem));    
 
     properties.addSection ("Item", array, false);
 }
@@ -349,20 +409,9 @@ void PropertiesEditor::addContainerProperties()
 {
     juce::Array<juce::PropertyComponent*> array;
 
-    array.add (new StyleChoicePropertyComponent (builder, IDs::display, styleItem, { IDs::contents, IDs::flexbox, IDs::tabbed }));
-    array.add (new StyleTextPropertyComponent (builder, IDs::repaintHz, styleItem));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::scrollMode, styleItem, { IDs::noScroll, IDs::scrollHorizontal, IDs::scrollVertical, IDs::scrollBoth }));
-    array.add (new StyleTextPropertyComponent (builder, IDs::tabHeight, styleItem));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::selectedTab, styleItem, builder.createPropertiesMenuLambda()));
-
-    array.add (new StyleChoicePropertyComponent (builder, IDs::flexDirection, styleItem, { IDs::flexDirRow, IDs::flexDirRowReverse, IDs::flexDirColumn, IDs::flexDirColumnReverse }));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::flexWrap, styleItem, { IDs::flexNoWrap, IDs::flexWrapNormal, IDs::flexWrapReverse }));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::flexAlignContent, styleItem, { IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexSpaceAround, IDs::flexSpaceBetween }));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::flexAlignItems, styleItem, { IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter }));
-    array.add (new StyleChoicePropertyComponent (builder, IDs::flexJustifyContent, styleItem, { IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexSpaceAround, IDs::flexSpaceBetween }));
-
-    array.add (new StyleChoicePropertyComponent (builder, IDs::focusContainerType, styleItem, { IDs::focusNone, IDs::focusContainer, IDs::focusKeyContainer }));
-
+    for (auto p : createContainerProperties ("Container"))
+        array.add (builder.createStylePropertyComponent (p, styleItem));
+        
     properties.addSection ("Container", array, false);
 }
 
@@ -483,6 +532,22 @@ void PropertiesEditor::valueTreeChildRemoved (juce::ValueTree&,
 {
     if (childWhichHasBeenRemoved == styleItem)
         setSelectedNode ({});
+}
+
+void PropertiesEditor::updateNodeSelect() 
+{
+    auto& stylesheet = builder.getStylesheet();
+
+    if (stylesheet.isClassNode (styleItem))
+        nodeSelect.setText (TRANS ("Class: ") + styleItem.getType().toString(), juce::dontSendNotification);
+    else if (stylesheet.isTypeNode (styleItem))
+        nodeSelect.setText (TRANS ("Type: ") + styleItem.getType().toString(), juce::dontSendNotification);
+    else if (stylesheet.isIdNode (styleItem))
+        nodeSelect.setText (TRANS ("Node: ") + styleItem.getType().toString(), juce::dontSendNotification);
+    else if (stylesheet.isColourPaletteNode (styleItem))
+        nodeSelect.setText (TRANS ("Palette: ") + styleItem.getType().toString(), juce::dontSendNotification);
+    else
+        nodeSelect.setText (TRANS ("Editing node"), juce::dontSendNotification);
 }
 
 

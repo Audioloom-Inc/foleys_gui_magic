@@ -65,6 +65,10 @@ public:
     void createNewClass();
     void deleteClass (const juce::String& name);
 
+    /** override this to customize your properties the user can edit
+     */
+    virtual void addProperties();
+
     void addNodeProperties();
     void addDecoratorProperties();
     void addTypeProperties (juce::Identifier type, juce::Array<juce::PropertyComponent*> additional);
@@ -77,6 +81,11 @@ public:
     void resized() override;
 
     MagicGUIBuilder& getMagicBuilder();
+
+    virtual std::vector<SettableProperty> createTypeProperties (const juce::Identifier type);
+    virtual std::vector<SettableProperty> createDecoratorProperties (const juce::String& categoryName = "Decorator");
+    virtual std::vector<SettableProperty> createFlexItemProperties (const juce::String& categoryName = "Item");
+    virtual std::vector<SettableProperty> createContainerProperties (const juce::String& categoryName = "Container");
 
 protected:
 
@@ -93,6 +102,7 @@ protected:
     void valueTreeChildOrderChanged (juce::ValueTree&, int, int) override {}
     void valueTreeParentChanged (juce::ValueTree&) override {}
 
+    void updateNodeSelect ();
 
     MagicGUIBuilder&    builder;
     juce::UndoManager&  undo;

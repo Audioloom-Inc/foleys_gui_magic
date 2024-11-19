@@ -56,7 +56,7 @@ struct SettableProperty
         Asset
     };
 
-    const juce::ValueTree                       node {};
+    juce::ValueTree                             node {};
     const juce::Identifier                      name {};
     const PropertyType                          type {};
     const juce::var                             defaultValue {};

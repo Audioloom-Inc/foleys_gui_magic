@@ -208,17 +208,17 @@ juce::var Stylesheet::getStyleProperty (const juce::Identifier& name, const juce
                 return classNode.getProperty (name);
             }
         }
+    }
 
-        if (inherit)
+    if (inherit)
+    {
+        auto typeNode = currentStyle.getChildWithName (IDs::types).getChildWithName (node.getType());
+        if (typeNode.isValid() && typeNode.hasProperty (name))
         {
-            auto typeNode = currentStyle.getChildWithName (IDs::types).getChildWithName (node.getType());
-            if (typeNode.isValid() && typeNode.hasProperty (name))
-            {
-                if (definedHere)
-                    *definedHere = typeNode;
+            if (definedHere)
+                *definedHere = typeNode;
 
-                return typeNode.getProperty (name);
-            }
+            return typeNode.getProperty (name);
         }
     }
 

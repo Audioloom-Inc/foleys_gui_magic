@@ -67,7 +67,7 @@ public:
 
     /** override this function and/or the following to customize your properties the user can edit
      */
-    virtual void addProperties();
+    virtual void setupProperties ();
 
     virtual std::vector<SettableProperty> createTypeProperties (const juce::Identifier type);
     virtual std::vector<SettableProperty> createDecoratorProperties (const juce::String& categoryName = "Decorator");
@@ -107,7 +107,17 @@ protected:
     void valueTreeParentChanged (juce::ValueTree&) override {}
 
     void updateNodeSelect ();
+    
+    /** add properties in setupProperties, afterwards finishPropertySetup is called */
+    void addProperties (std::vector<SettableProperty> properties, const juce::String& parentCategory = {});
+    void finishPropertySetup ();
 
+    /** helper */
+    bool isClassNode () const;
+    bool isTypeNode () const;
+    bool isIdNode () const;
+    bool isContainer () const;
+    
     MagicGUIBuilder&    builder;
     juce::UndoManager&  undo;
 
@@ -120,6 +130,8 @@ protected:
 
     juce::ValueTree     style;
     juce::ValueTree     styleItem;
+
+    juce::HashMap<juce::String, std::vector<SettableProperty>> categories;
 
     std::unique_ptr<juce::AlertWindow> classNameInput;
 

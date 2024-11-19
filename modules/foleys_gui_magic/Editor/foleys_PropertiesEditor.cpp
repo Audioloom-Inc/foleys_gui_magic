@@ -125,9 +125,10 @@ void PropertiesEditor::setSelectedNode (const juce::ValueTree& node)
         return;
     }
 
-    updatePopupMenu();
-
-    addProperties ();
+    // clear categories, add all properties and create sections
+    categories.clear ();
+    setupProperties ();
+    finishPropertySetup ();
 
     updateNodeSelect ();
 
@@ -192,57 +193,29 @@ void PropertiesEditor::deleteClass (const juce::String& name)
 
 //==============================================================================
 
-void PropertiesEditor::addProperties ()
+void PropertiesEditor::setupProperties ()
 {
-    auto& stylesheet = builder.getStylesheet();
+    auto& stylesheet = builder.getStylesheet ();
     
-    juce::HashMap<juce::String, std::vector<SettableProperty>> categories;
-    
-    auto add = [&](const std::vector<SettableProperty>& props, const juce::String& subCategory = {}){
-        for (auto p : props)
-        {
-            const auto category = p.category.isEmpty() ? "---" : p.category;
-            categories.getReference (category).push_back (p);
-        }
-    };
-
     if (stylesheet.isClassNode (styleItem))
-        add (createClassProperties ());
+        addProperties (createClassProperties ());
     else
-        add (createNodeProperties ());
+        addProperties (createNodeProperties ());
 
-
-
-    add (createFlexItemProperties());
+    addProperties (createFlexItemProperties());
 
     if (stylesheet.isClassNode (styleItem))
     {
         for (auto factoryName : builder.getFactoryNames())
-            add (createTypeProperties (factoryName), factoryName);
+            addProperties (createTypeProperties (factoryName), factoryName);
     }
     else
     {
-        add (createTypeProperties (styleItem.getType()));
+        addProperties (createTypeProperties (styleItem.getType()));
     }
 
     if (styleItem.getType() == IDs::view || stylesheet.isClassNode (styleItem))
-        add (createContainerProperties ());
-
-
-    juce::HashMap<juce::String, std::vector<SettableProperty>>::Iterator iter (categories);
-    while (iter.next())
-    {
-        const auto& category = iter.getKey();
-        const auto& items = iter.getValue();
-        
-        juce::Array<juce::PropertyComponent*> array;
-
-        for (auto p : items)
-            if (auto comp = builder.createStylePropertyComponent (p, p.node))
-                array.add (comp);
-
-        properties.addSection (category, array, false);
-    }
+        addProperties (createContainerProperties ());
 }
 
 void PropertiesEditor::addNodeProperties()
@@ -476,8 +449,6 @@ void PropertiesEditor::addPaletteColours()
 
     for (int i=0; i < styleItem.getNumProperties(); ++i)
         array.add (new StyleColourPropertyComponent (builder, styleItem.getPropertyName (i), styleItem));
-
-    properties.addProperties (array);
 }
 
 //==============================================================================
@@ -605,5 +576,52 @@ void PropertiesEditor::updateNodeSelect()
         nodeSelect.setText (TRANS ("Editing node"), juce::dontSendNotification);
 }
 
+void PropertiesEditor::addProperties (std::vector<SettableProperty> props, const juce::String& parentCategory) 
+{
+    for (auto p : props)
+    {
+        const auto category = p.category.isEmpty() ? "---" : p.category;
+        categories.getReference (category).push_back (p);
+    }
+}
+
+void PropertiesEditor::finishPropertySetup()
+{
+    juce::HashMap<juce::String, std::vector<SettableProperty>>::Iterator iter (categories);
+    
+    while (iter.next())
+    {
+        const auto& category = iter.getKey();
+        const auto& items = iter.getValue();
+        
+        juce::Array<juce::PropertyComponent*> array;
+
+        for (auto p : items)
+            if (auto comp = builder.createStylePropertyComponent (p, p.node))
+                array.add (comp);
+
+        properties.addSection (category, array, false);
+    }
+}
+
+bool PropertiesEditor::isClassNode() const
+{
+    return builder.getStylesheet().isClassNode (styleItem);
+}
+
+bool PropertiesEditor::isTypeNode() const
+{
+    return builder.getStylesheet().isTypeNode (styleItem);
+}
+
+bool PropertiesEditor::isIdNode() const
+{
+    return builder.getStylesheet().isIdNode (styleItem);
+}
+
+bool PropertiesEditor::isContainer() const
+{
+    return styleItem.getType() == IDs::view;
+}
 
 } // namespace foleys

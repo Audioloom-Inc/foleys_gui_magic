@@ -199,7 +199,7 @@ public:
     virtual std::unique_ptr<GuiItem> createContainer (const juce::ValueTree& node);
 
     /**  */
-    virtual StylePropertyComponent * createStylePropertyComponent (SettableProperty property, juce::ValueTree node);
+    virtual juce::PropertyComponent * createStylePropertyComponent (SettableProperty property, juce::ValueTree node);
 
     std::function<void (juce::ComboBox&)> createChoicesMenuLambda (juce::StringArray choices) const;
     std::function<void (juce::ComboBox&)> createParameterMenuLambda() const;

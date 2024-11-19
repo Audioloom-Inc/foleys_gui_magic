@@ -53,16 +53,34 @@ struct SettableProperty
         Gradient,       /*< Show a bespoke gradient editor */
 
         File,           /** custom styles */
-        Asset
+        Asset,
+        MultiList
     };
 
-    juce::ValueTree                             node {};
+    juce::ValueTree                       node {};
     const juce::Identifier                      name {};
     const PropertyType                          type {};
     const juce::var                             defaultValue {};
     const std::function<void(juce::ComboBox&)>  menuCreationLambda {};
     const juce::StringArray                     allowedFileExtensions {};
-    const juce::String                          category {};
+    juce::String                          category {};
+
+    juce::StringArray getChoicesFromLambda () const
+    {
+        if (menuCreationLambda)
+        {
+            juce::ComboBox box;
+
+            juce::StringArray choices;
+            menuCreationLambda (box);
+            for (int i=0; i<box.getNumItems(); ++i)
+                choices.add (box.getItemText(i));
+
+            return choices;
+        }
+
+        return {};
+    }
 };
 
 } // namespace foleys

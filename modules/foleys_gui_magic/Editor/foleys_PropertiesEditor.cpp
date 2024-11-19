@@ -194,29 +194,55 @@ void PropertiesEditor::deleteClass (const juce::String& name)
 
 void PropertiesEditor::addProperties ()
 {
-    addNodeProperties();
-
-    addDecoratorProperties();
-
-    addFlexItemProperties();
-
     auto& stylesheet = builder.getStylesheet();
+    
+    juce::HashMap<juce::String, std::vector<SettableProperty>> categories;
+    
+    auto add = [&](const std::vector<SettableProperty>& props, const juce::String& subCategory = {}){
+        for (auto p : props)
+        {
+            const auto category = p.category.isEmpty() ? "---" : p.category;
+            categories.getReference (category).push_back (p);
+        }
+    };
 
-    juce::Array<juce::PropertyComponent*> additional;
+    if (stylesheet.isClassNode (styleItem))
+        add (createClassProperties ());
+    else
+        add (createNodeProperties ());
+
+
+
+    add (createFlexItemProperties());
 
     if (stylesheet.isClassNode (styleItem))
     {
         for (auto factoryName : builder.getFactoryNames())
-            addTypeProperties (factoryName, {});
+            add (createTypeProperties (factoryName), factoryName);
     }
     else
     {
-        addTypeProperties (styleItem.getType(), additional);
+        add (createTypeProperties (styleItem.getType()));
     }
 
     if (styleItem.getType() == IDs::view || stylesheet.isClassNode (styleItem))
-        addContainerProperties();
+        add (createContainerProperties ());
 
+
+    juce::HashMap<juce::String, std::vector<SettableProperty>>::Iterator iter (categories);
+    while (iter.next())
+    {
+        const auto& category = iter.getKey();
+        const auto& items = iter.getValue();
+        
+        juce::Array<juce::PropertyComponent*> array;
+
+        for (auto p : items)
+            if (auto comp = builder.createStylePropertyComponent (p, p.node))
+                array.add (comp);
+
+        properties.addSection (category, array, false);
+    }
 }
 
 void PropertiesEditor::addNodeProperties()
@@ -229,41 +255,20 @@ void PropertiesEditor::addNodeProperties()
 
     juce::Array<juce::PropertyComponent*> array;
 
-    if (stylesheet.isClassNode (styleItem))
-    {
-        array.add (new juce::BooleanPropertyComponent (styleItem.getPropertyAsValue (IDs::recursive, &undo), IDs::recursive.toString(), {}));
-        array.add (new StyleChoicePropertyComponent (builder, IDs::active, styleItem, builder.createPropertiesMenuLambda()));
+    for (auto p : createNodeProperties ("Node"))
+        array.add (builder.createStylePropertyComponent (p, styleItem));
 
-        auto media = styleItem.getOrCreateChildWithName (IDs::media, &undo);
-        array.add (new juce::TextPropertyComponent (media.getPropertyAsValue (IDs::minWidth, &undo), IDs::minWidth.toString(), 10, false));
-        array.add (new juce::TextPropertyComponent (media.getPropertyAsValue (IDs::maxWidth, &undo), IDs::maxWidth.toString(), 10, false));
-        array.add (new juce::TextPropertyComponent (media.getPropertyAsValue (IDs::minHeight, &undo), IDs::minHeight.toString(), 10, false));
-        array.add (new juce::TextPropertyComponent (media.getPropertyAsValue (IDs::maxHeight, &undo), IDs::maxHeight.toString(), 10, false));
-        properties.addSection ("Class", array, false);
-        return;
-    }
-
-    array.add (new juce::TextPropertyComponent (styleItem.getPropertyAsValue (IDs::id, &undo, true), IDs::id.toString(), 64, false, true));
-
-    if (styleItem == builder.getGuiRootNode())
-    {
-        array.add (new juce::BooleanPropertyComponent (styleItem.getPropertyAsValue (IDs::resizable, &undo), IDs::resizable.toString(), {}));
-        array.add (new juce::BooleanPropertyComponent (styleItem.getPropertyAsValue (IDs::resizeCorner, &undo), IDs::resizeCorner.toString(), {}));
-        array.add (new juce::TextPropertyComponent (styleItem.getPropertyAsValue (IDs::width, &undo), IDs::width.toString(), 8, false));
-        array.add (new juce::TextPropertyComponent (styleItem.getPropertyAsValue (IDs::height, &undo), IDs::height.toString(), 8, false));
-        array.add (new juce::TextPropertyComponent (styleItem.getPropertyAsValue (IDs::minWidth, &undo), IDs::minWidth.toString(), 8, false));
-        array.add (new juce::TextPropertyComponent (styleItem.getPropertyAsValue (IDs::maxWidth, &undo), IDs::maxWidth.toString(), 8, false));
-        array.add (new juce::TextPropertyComponent (styleItem.getPropertyAsValue (IDs::minHeight, &undo), IDs::minHeight.toString(), 8, false));
-        array.add (new juce::TextPropertyComponent (styleItem.getPropertyAsValue (IDs::maxHeight, &undo), IDs::maxHeight.toString(), 8, false));
-        array.add (new juce::TextPropertyComponent (styleItem.getPropertyAsValue (IDs::aspect, &undo), IDs::aspect.toString(), 8, false));
-        array.add (new StyleColourPropertyComponent (builder, IDs::tooltipText, styleItem));
-        array.add (new StyleColourPropertyComponent (builder, IDs::tooltipBackground, styleItem));
-        array.add (new StyleColourPropertyComponent (builder, IDs::tooltipOutline, styleItem));
-    }
-
-    auto classNames = builder.getStylesheet().getAllClassesNames();
-    array.add (new MultiListPropertyComponent (styleItem.getPropertyAsValue (IDs::styleClass, &undo, true), IDs::styleClass.toString(), classNames));
     properties.addSection ("Node", array, false);
+}
+
+void PropertiesEditor::addClassProperties() 
+{
+    juce::Array<juce::PropertyComponent*> array;
+
+    for (auto p : createClassProperties ("Class"))
+        array.add (builder.createStylePropertyComponent (p, styleItem));
+        
+    properties.addSection ("Class", array, false);
 }
 
 void PropertiesEditor::addDecoratorProperties()
@@ -301,6 +306,10 @@ std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (ju
         for (auto& other : props)
         {
             other.node = styleItem;   
+
+            if (other.category.isEmpty())
+                other.category = type.toString();
+
             properties.push_back (other);
         }
 
@@ -391,6 +400,52 @@ std::vector<SettableProperty> PropertiesEditor::createContainerProperties (const
     properties.push_back ({ styleItem, IDs::flexJustifyContent, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexSpaceAround, IDs::flexSpaceBetween }), {}, categoryName });
 
     properties.push_back ({ styleItem, IDs::focusContainerType, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::focusNone, IDs::focusContainer, IDs::focusKeyContainer }), {}, categoryName });
+
+    return properties;
+}
+
+std::vector<SettableProperty> PropertiesEditor::createClassProperties (const juce::String& categoryName)
+{
+    std::vector<SettableProperty> properties;
+
+    auto media = styleItem.getOrCreateChildWithName (IDs::media, &undo);
+
+    properties.push_back ({ styleItem, IDs::recursive, SettableProperty::Toggle, {}, {}, {}, categoryName });
+    properties.push_back ({ styleItem, IDs::active, SettableProperty::Choice, {}, builder.createPropertiesMenuLambda(), {}, categoryName });
+    properties.push_back ({ media, IDs::minWidth, SettableProperty::Text , {}, {}, {}, categoryName}); 
+    properties.push_back ({ media, IDs::maxWidth, SettableProperty::Text , {}, {}, {}, categoryName}); 
+    properties.push_back ({ media, IDs::minHeight, SettableProperty::Text, {}, {}, {}, categoryName });
+    properties.push_back ({ media, IDs::maxHeight, SettableProperty::Text, {}, {}, {}, categoryName });
+
+    return properties;
+}
+
+std::vector<SettableProperty> PropertiesEditor::createNodeProperties (const juce::String& categoryName)
+{
+        
+    std::vector<SettableProperty> properties;
+
+    properties.push_back ({ styleItem, IDs::id, SettableProperty::Text, {}, {}, {}, categoryName });
+
+    if (styleItem == builder.getGuiRootNode())
+    {
+        properties.push_back ({ styleItem, IDs::resizable, SettableProperty::Toggle, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::resizeCorner, SettableProperty::Toggle, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::width, SettableProperty::Number, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::height, SettableProperty::Number, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::minWidth, SettableProperty::Number, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::maxWidth, SettableProperty::Number, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::minHeight, SettableProperty::Number, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::maxHeight, SettableProperty::Number, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::aspect, SettableProperty::Number, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::tooltipText, SettableProperty::Colour, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::tooltipBackground, SettableProperty::Colour, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::tooltipOutline, SettableProperty::Colour, {}, {}, {}, categoryName });
+    }
+    
+    auto classNames = builder.getStylesheet().getAllClassesNames();
+    // array.add (new MultiListPropertyComponent (styleItem.getPropertyAsValue (IDs::styleClass, &undo, true), IDs::styleClass.toString(), classNames));
+    properties.push_back ({ styleItem, IDs::styleClass, SettableProperty::MultiList, {}, [classNames](juce::ComboBox& box) { box.addItemList (classNames, 1); }, {}, categoryName });
 
     return properties;
 }

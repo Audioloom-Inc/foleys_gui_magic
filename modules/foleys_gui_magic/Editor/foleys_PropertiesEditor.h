@@ -65,11 +65,19 @@ public:
     void createNewClass();
     void deleteClass (const juce::String& name);
 
-    /** override this to customize your properties the user can edit
+    /** override this function and/or the following to customize your properties the user can edit
      */
     virtual void addProperties();
 
+    virtual std::vector<SettableProperty> createTypeProperties (const juce::Identifier type);
+    virtual std::vector<SettableProperty> createDecoratorProperties (const juce::String& categoryName = "Decorator");
+    virtual std::vector<SettableProperty> createFlexItemProperties (const juce::String& categoryName = "Item");
+    virtual std::vector<SettableProperty> createContainerProperties (const juce::String& categoryName = "Container");
+    virtual std::vector<SettableProperty> createNodeProperties (const juce::String& categoryName = "Node");
+    virtual std::vector<SettableProperty> createClassProperties (const juce::String& categoryName = "Class");
+
     void addNodeProperties();
+    void addClassProperties();
     void addDecoratorProperties();
     void addTypeProperties (juce::Identifier type, juce::Array<juce::PropertyComponent*> additional);
     void addFlexItemProperties();
@@ -82,10 +90,6 @@ public:
 
     MagicGUIBuilder& getMagicBuilder();
 
-    virtual std::vector<SettableProperty> createTypeProperties (const juce::Identifier type);
-    virtual std::vector<SettableProperty> createDecoratorProperties (const juce::String& categoryName = "Decorator");
-    virtual std::vector<SettableProperty> createFlexItemProperties (const juce::String& categoryName = "Item");
-    virtual std::vector<SettableProperty> createContainerProperties (const juce::String& categoryName = "Container");
 
 protected:
 

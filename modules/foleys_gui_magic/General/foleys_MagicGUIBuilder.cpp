@@ -329,7 +329,7 @@ juce::StringArray MagicGUIBuilder::getColourNames (juce::Identifier type)
     return {};
 }
 
-StylePropertyComponent * MagicGUIBuilder::createStylePropertyComponent(SettableProperty property, juce::ValueTree node)
+juce::PropertyComponent * MagicGUIBuilder::createStylePropertyComponent(SettableProperty property, juce::ValueTree node)
 {
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     return StylePropertyComponent::createComponent (*this, property, node);

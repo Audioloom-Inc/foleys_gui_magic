@@ -51,7 +51,7 @@ public:
 
     juce::ValueTree getInheritedFrom () const;
 
-    static StylePropertyComponent* createComponent (MagicGUIBuilder& builder, SettableProperty& property, juce::ValueTree& node);
+    static juce::PropertyComponent* createComponent (MagicGUIBuilder& builder, SettableProperty& property, juce::ValueTree& node);
 
 protected:
 

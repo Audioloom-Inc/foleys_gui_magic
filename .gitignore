@@ -6,3 +6,4 @@ cmake-build-*
 logs/
 docs/
 **/*.sav.xml
+JuceLibraryCode/

@@ -114,7 +114,7 @@ public:
 
      @param node is the node in the GUI DOM
      */
-    juce::Image getBackgroundImage (const juce::ValueTree& node) const;
+    virtual juce::Image getBackgroundImage (const juce::ValueTree& node) const;
 
     /**
      This is a slightly more intelligent colour lookup than the JUCE one, as it allows to

@@ -313,15 +313,15 @@ std::vector<SettableProperty> PropertiesEditor::createDecoratorProperties(const 
     array.push_back ( { styleItem, IDs::tooltip, SettableProperty::Text, {}, {}, {}, category } );
     array.push_back ( { styleItem, IDs::accessibilityTitle, SettableProperty::Text, {}, {}, {}, category } );
     array.push_back ( { styleItem, IDs::accessibility, SettableProperty::Toggle, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::accessibilityDescription, SettableProperty::Text } );
-    array.push_back ( { styleItem, IDs::accessibilityHelpText, SettableProperty::Text } );
-    array.push_back ( { styleItem, IDs::accessibilityFocusOrder, SettableProperty::Text } );
+    array.push_back ( { styleItem, IDs::accessibilityDescription, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::accessibilityHelpText, SettableProperty::Text, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::accessibilityFocusOrder, SettableProperty::Text, {}, {}, {}, category } );
     array.push_back ( { styleItem, IDs::margin, SettableProperty::Text, {}, {}, {}, category } );
     array.push_back ( { styleItem, IDs::padding, SettableProperty::Text, {}, {}, {}, category } );
     array.push_back ( { styleItem, IDs::border, SettableProperty::Text, {}, {}, {}, category } );
     array.push_back ( { styleItem, IDs::radius, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::borderColour, SettableProperty::Colour } );
-    array.push_back ( { styleItem, IDs::backgroundColour, SettableProperty::Colour } );
+    array.push_back ( { styleItem, IDs::borderColour, SettableProperty::Colour, {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::backgroundColour, SettableProperty::Colour, {}, {}, {}, category } );
     array.push_back ( { styleItem, IDs::tabCaption, SettableProperty::Text, {}, {}, {}, category } );
     array.push_back ( { styleItem, IDs::tabColour, SettableProperty::Colour, {}, {}, {}, category } );
     array.push_back ( { styleItem, IDs::lookAndFeel, SettableProperty::Choice, {}, toMenuLambda (builder.getStylesheet().getLookAndFeelNames()), {}, category } );
@@ -579,20 +579,29 @@ void PropertiesEditor::updateNodeSelect()
 void PropertiesEditor::addProperties (std::vector<SettableProperty> props, const juce::String& parentCategory) 
 {
     for (auto p : props)
-    {
-        const auto category = p.category.isEmpty() ? "---" : p.category;
-        categories.getReference (category).push_back (p);
-    }
+        addProperty (p, parentCategory);
+}
+
+void PropertiesEditor::addProperty (const SettableProperty& property, const juce::String& parentCategory) 
+{
+    const auto category = property.category.isEmpty() ? "---" : property.category;
+    categories.getReference (category).push_back (property);
 }
 
 void PropertiesEditor::finishPropertySetup()
 {
     juce::HashMap<juce::String, std::vector<SettableProperty>>::Iterator iter (categories);
     
+    juce::StringArray sorted;
+    
     while (iter.next())
+        sorted.add (iter.getKey());
+
+    sorted.sort (true);
+
+    for (auto category : sorted)
     {
-        const auto& category = iter.getKey();
-        const auto& items = iter.getValue();
+        const auto& items = categories.getReference (category);
         
         juce::Array<juce::PropertyComponent*> array;
 

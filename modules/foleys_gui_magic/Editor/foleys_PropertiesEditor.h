@@ -110,6 +110,8 @@ protected:
     
     /** add properties in setupProperties, afterwards finishPropertySetup is called */
     void addProperties (std::vector<SettableProperty> properties, const juce::String& parentCategory = {});
+    void addProperty (const SettableProperty& property, const juce::String& parentCategory =  {});
+    
     void finishPropertySetup ();
 
     /** helper */

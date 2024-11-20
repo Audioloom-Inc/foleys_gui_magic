@@ -46,6 +46,8 @@ GuiItem::GuiItem (MagicGUIBuilder& builder, juce::ValueTree node)
     visibility.addListener (this);
     configNode.addListener (this);
     magicBuilder.getStylesheet().addListener (this);
+
+    setDraggable (isSelected ());
 }
 
 GuiItem::~GuiItem()
@@ -509,13 +511,19 @@ void GuiItem::mouseDrag (const juce::MouseEvent& event)
 {
     if (componentDragger)
     {
-        componentDragger->dragComponent (this, event, nullptr);
-        triggerAsyncUpdate ();
-    }
-    else if (event.mouseWasDraggedSinceMouseDown())
-    {
-        auto* container = juce::DragAndDropContainer::findParentDragContainerFor (this);
-        container->startDragging (IDs::dragSelected, this);
+        if (event.mouseWasDraggedSinceMouseDown() && event.mods.isShiftDown ())
+        {
+            // prevent any calls to drag the component until next mouse up
+            setDraggable (false);
+
+            auto* container = juce::DragAndDropContainer::findParentDragContainerFor (this);
+            container->startDragging (IDs::dragSelected, this);
+        }
+        else
+        {
+            componentDragger->dragComponent (this, event, nullptr);
+            triggerAsyncUpdate ();
+        }
     }
 }
 
@@ -547,27 +555,24 @@ void GuiItem::itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSou
         return;
     }
 
+    const auto margin = (int) magicBuilder.getStylesheet ().getStyleProperty (IDs::margin, configNode, true);
+    const auto padding = (int) magicBuilder.getStylesheet ().getStyleProperty (IDs::padding, configNode, true);
+    
+    const auto dropPosition = dragSourceDetails.localPosition - juce::Point<int> (margin, margin) - juce::Point<int> (padding, padding);
+
     if (dragSourceDetails.description == IDs::dragSelected)
     {
         auto dragged = magicBuilder.getSelectedNode();
         if (dragged.isValid() == false)
             return;
 
-        magicBuilder.draggedItemOnto (dragged, configNode);
+        magicBuilder.draggedItemOnto (dragged, configNode, dropPosition);
         return;
     }
 
     auto node = juce::ValueTree::fromXml (dragSourceDetails.description.toString());
     if (node.isValid())
-    {
-        const auto margin = (int) magicBuilder.getStylesheet ().getStyleProperty (IDs::margin, configNode, true);
-        const auto padding = (int) magicBuilder.getStylesheet ().getStyleProperty (IDs::padding, configNode, true);
-
-        node.setProperty (IDs::posX, dragSourceDetails.localPosition.x - margin - padding, nullptr);
-        node.setProperty (IDs::posY, dragSourceDetails.localPosition.y - margin - padding, nullptr);
-
-        magicBuilder.draggedItemOnto (node, configNode);
-    }
+        magicBuilder.draggedItemOnto (node, configNode, dropPosition);
 }
 
 bool GuiItem::isSelected() const

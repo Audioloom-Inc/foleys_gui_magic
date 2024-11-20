@@ -222,14 +222,14 @@ void GUITreeEditor::GuiTreeItem::itemDropped (const juce::DragAndDropTarget::Sou
     if (text == IDs::dragSelected)
     {
         auto selectedNode = builder.getSelectedNode();
-        builder.draggedItemOnto (selectedNode, itemNode, index);
+        builder.draggedItemOnto (selectedNode, itemNode, {}, index);
         return;
     }
 
     const auto node = juce::ValueTree::fromXml (text);
     if (node.isValid())
     {
-        builder.draggedItemOnto (node, itemNode, index);
+        builder.draggedItemOnto (node, itemNode, {}, index);
         return;
     }
 }

@@ -484,13 +484,19 @@ const juce::ValueTree& MagicGUIBuilder::getSelectedNode() const
     return selectedNode;
 }
 
-void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree target, int index)
+void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree target, juce::Point<int> targetPos, int index)
 {
     if (dragged == target)
         return;
 
     undo.beginNewTransaction();
 
+    if (targetPos.x > 0 && targetPos.y > 0)
+    {
+        dragged.setProperty (IDs::posX, targetPos.x, &undo);
+        dragged.setProperty (IDs::posY, targetPos.y, &undo);
+    }
+    
     auto targetParent  = target.getParent();
     auto draggedParent = dragged.getParent();
 

@@ -49,8 +49,13 @@ namespace foleys
 {
 
 
-MagicGUIBuilder::MagicGUIBuilder (MagicGUIState& state) : magicState (state)
+MagicGUIBuilder::MagicGUIBuilder (MagicGUIState& state, std::unique_ptr<Stylesheet> customStylesheet) : magicState (state)
 {
+    if (customStylesheet)
+        stylesheet.reset (customStylesheet.release());
+    else
+        stylesheet = std::make_unique<Stylesheet> (*this);
+
     updateStylesheet();
     getConfigTree().addListener (this);
 }
@@ -63,7 +68,7 @@ MagicGUIBuilder::~MagicGUIBuilder()
 
 Stylesheet& MagicGUIBuilder::getStylesheet()
 {
-    return stylesheet;
+    return *stylesheet.get ();
 }
 
 juce::ValueTree& MagicGUIBuilder::getConfigTree()
@@ -109,15 +114,15 @@ void MagicGUIBuilder::updateStylesheet()
     if (selectedName.isNotEmpty())
     {
         auto style = stylesNode.getChildWithProperty (IDs::name, selectedName);
-        stylesheet.setStyle (style);
+        stylesheet->setStyle (style);
     }
     else
     {
-        stylesheet.setStyle (stylesNode.getChild (0));
+        stylesheet->setStyle (stylesNode.getChild (0));
     }
 
-    stylesheet.updateStyleClasses();
-    stylesheet.updateValidRanges();
+    stylesheet->updateStyleClasses();
+    stylesheet->updateValidRanges();
 }
 
 void MagicGUIBuilder::clearGUI()
@@ -177,9 +182,9 @@ void MagicGUIBuilder::updateLayout (juce::Rectangle<int> bounds)
 
     if (root.get() != nullptr)
     {
-        if (!stylesheet.setMediaSize (bounds.getWidth(), bounds.getHeight()))
+        if (!stylesheet->setMediaSize (bounds.getWidth(), bounds.getHeight()))
         {
-            stylesheet.updateValidRanges();
+            stylesheet->updateValidRanges();
             root->updateInternal();
         }
 
@@ -279,22 +284,22 @@ std::unique_ptr<GuiItem> MagicGUIBuilder::createContainer (const juce::ValueTree
 
 void MagicGUIBuilder::registerLookAndFeel (juce::String name, std::unique_ptr<juce::LookAndFeel> lookAndFeel)
 {
-    stylesheet.registerLookAndFeel (name, std::move (lookAndFeel));
+    stylesheet->registerLookAndFeel (name, std::move (lookAndFeel));
 }
 
 void MagicGUIBuilder::registerJUCELookAndFeels()
 {
-    stylesheet.registerLookAndFeel ("LookAndFeel_V1", std::make_unique<juce::LookAndFeel_V1>());
-    stylesheet.registerLookAndFeel ("LookAndFeel_V2", std::make_unique<JuceLookAndFeel_V2>());
-    stylesheet.registerLookAndFeel ("LookAndFeel_V3", std::make_unique<JuceLookAndFeel_V3>());
-    stylesheet.registerLookAndFeel ("LookAndFeel_V4", std::make_unique<JuceLookAndFeel_V4>());
-    stylesheet.registerLookAndFeel ("FoleysFinest", std::make_unique<LookAndFeel>());
-    stylesheet.registerLookAndFeel ("Skeuomorphic", std::make_unique<Skeuomorphic>());
+    stylesheet->registerLookAndFeel ("LookAndFeel_V1", std::make_unique<juce::LookAndFeel_V1>());
+    stylesheet->registerLookAndFeel ("LookAndFeel_V2", std::make_unique<JuceLookAndFeel_V2>());
+    stylesheet->registerLookAndFeel ("LookAndFeel_V3", std::make_unique<JuceLookAndFeel_V3>());
+    stylesheet->registerLookAndFeel ("LookAndFeel_V4", std::make_unique<JuceLookAndFeel_V4>());
+    stylesheet->registerLookAndFeel ("FoleysFinest", std::make_unique<LookAndFeel>());
+    stylesheet->registerLookAndFeel ("Skeuomorphic", std::make_unique<Skeuomorphic>());
 }
 
 juce::var MagicGUIBuilder::getStyleProperty (const juce::Identifier& name, const juce::ValueTree& node) const
 {
-    if (auto value = stylesheet.getStyleProperty (name, node); ! value.isVoid ())
+    if (auto value = stylesheet->getStyleProperty (name, node); ! value.isVoid ())
         return value;
 
     if (auto defaults = defaultProperties.find (node.getType()); defaults != defaultProperties.end ())

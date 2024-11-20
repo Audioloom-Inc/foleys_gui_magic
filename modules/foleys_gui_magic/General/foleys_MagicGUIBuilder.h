@@ -57,7 +57,7 @@ class MagicGUIBuilder
   , public juce::ValueTree::Listener
 {
 public:
-    MagicGUIBuilder (MagicGUIState& magicStateToUse);
+    MagicGUIBuilder (MagicGUIState& magicStateToUse, std::unique_ptr<Stylesheet> customStylesheet = {});
     ~MagicGUIBuilder() override;
 
     /**
@@ -277,7 +277,7 @@ protected:
     MagicGUIState& magicState;
 
     juce::UndoManager undo;
-    Stylesheet        stylesheet { *this };
+    std::unique_ptr<Stylesheet>        stylesheet;
 
     //==============================================================================
 

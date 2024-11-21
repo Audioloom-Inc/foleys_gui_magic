@@ -43,17 +43,17 @@ class MagicGUIState;
 namespace DefaultGuiTrees
 {
 
-static inline juce::ValueTree createDefaultDocument (juce::ValueTree gui);
+juce::ValueTree createDefaultDocument (juce::ValueTree gui);
 
-static inline juce::ValueTree createHelloWorld();
+juce::ValueTree createHelloWorld();
 
-static inline juce::ValueTree createProcessorGui (const juce::AudioProcessorParameterGroup& tree);
+juce::ValueTree createProcessorGui (const juce::AudioProcessorParameterGroup& tree);
 
-static inline void createDefaultFromParameters (juce::ValueTree& node, const juce::AudioProcessorParameterGroup& tree);
+void createDefaultFromParameters (juce::ValueTree& node, const juce::AudioProcessorParameterGroup& tree);
 
-static inline juce::ValueTree createPlotView (const MagicGUIState& magicState);
+juce::ValueTree createPlotView (const MagicGUIState& magicState);
 
-static inline juce::ValueTree createDefaultStylesheet();
+juce::ValueTree createDefaultStylesheet();
 
 }
 

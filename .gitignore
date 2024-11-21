@@ -5,5 +5,5 @@ cmake-build-*
 [Bb]build/
 logs/
 docs/
-**/*.sav.xml
+**/*.sav*.xml
 JuceLibraryCode/

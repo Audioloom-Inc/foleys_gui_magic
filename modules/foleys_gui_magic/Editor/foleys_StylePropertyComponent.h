@@ -66,11 +66,16 @@ protected:
     juce::TextButton    remove { "X" };
 
     void lookAndFeelChanged () override;
-    
+    bool isRefreshing () { return refreshing; }
+
 private:
     void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged,
                                    const juce::Identifier& changedProperty) override;
-
+    
+    // true during call to refresh
+    bool refreshing{ false };
+    void internalRefresh ();
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StylePropertyComponent)
 };
 

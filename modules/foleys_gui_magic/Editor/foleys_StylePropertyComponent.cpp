@@ -81,7 +81,7 @@ StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, j
     remove.onClick = [&]
     {
         node.removeProperty (property, &builder.getUndoManager());
-        refresh();
+        internalRefresh();
     };
 
     node.addListener (this);
@@ -155,7 +155,13 @@ void StylePropertyComponent::valueTreePropertyChanged (juce::ValueTree& tree, co
         return;
 
     if (tree == node && property == changedProperty)
-        refresh();
+        internalRefresh();
+}
+
+void StylePropertyComponent::internalRefresh() 
+{ 
+    juce::ScopedValueSetter<bool> flag (refreshing, true);
+    refresh();
 }
 
 } // namespace foleys

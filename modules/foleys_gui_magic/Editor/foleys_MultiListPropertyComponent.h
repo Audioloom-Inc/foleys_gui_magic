@@ -46,9 +46,14 @@ public:
     void refresh() override;
     void resized() override;
 
+    void setQuoteCharacters (const juce::String& quotes);
+    juce::String getQuoteCharacters() const;
+
 private:
     const juce::StringArray choices;
     const juce::String      separator;
+    juce::String            quoteCharacters{ };
+    bool                    storeAsString{ true };
 
     juce::Label             text;
     juce::TextButton        select {"..."};

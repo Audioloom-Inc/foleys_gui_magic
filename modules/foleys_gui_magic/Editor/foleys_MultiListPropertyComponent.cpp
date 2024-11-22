@@ -51,8 +51,15 @@ MultiListPropertyComponent::MultiListPropertyComponent (const juce::Value& value
     };
 
     addAndMakeVisible (text);
-    addAndMakeVisible (select);
 
+    
+    
+    if (choicesToUse.isEmpty ())
+        return;
+
+
+    addAndMakeVisible (select);
+    
     select.onClick = [&]
     {
         auto strings = juce::StringArray::fromTokens (text.getText(), separator, "");
@@ -92,8 +99,20 @@ void MultiListPropertyComponent::resized()
 {
     auto area = getLookAndFeel().getPropertyComponentContentPosition (*this);
 
-    select.setBounds (area.removeFromRight (getHeight()));
+    if (select.isVisible ())
+        select.setBounds (area.removeFromRight (getHeight()));
+
     text.setBounds (area);
+}
+
+void MultiListPropertyComponent::setQuoteCharacters (const juce::String& quotes) 
+{
+    quoteCharacters = quotes;    
+}
+
+juce::String MultiListPropertyComponent::getQuoteCharacters() const
+{
+    return quoteCharacters;
 }
 
 

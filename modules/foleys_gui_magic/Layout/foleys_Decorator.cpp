@@ -163,10 +163,12 @@ void Decorator::configure (MagicGUIBuilder& builder, const juce::ValueTree& node
     auto marginVar = builder.getStyleProperty (IDs::margin, node);
     if (! marginVar.isVoid())
         margin = Box<float>::fromString (marginVar.toString());
+        
+    const auto pad = (float)builder.getStyleProperty (IDs::padding, node);
+    const auto paddingX = pad + (float)builder.getStyleProperty (IDs::paddingX, node);
+    const auto paddingY = pad + (float)builder.getStyleProperty (IDs::paddingY, node);
 
-    auto paddingVar = builder.getStyleProperty (IDs::padding, node);
-    if (! paddingVar.isVoid())
-        padding = Box<float>::fromString (paddingVar.toString());
+    padding = Box<float> (paddingX, paddingY);
 
     auto radiusVar = builder.getStyleProperty (IDs::radius, node);
     if (! radiusVar.isVoid())

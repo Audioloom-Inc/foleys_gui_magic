@@ -47,7 +47,8 @@ struct Box
     T bottom = {};
 
     Box() = default;
-    Box (T value) : top (value), left (value), right (value), bottom (value) {}
+    Box (T x, T y) : top (y), left (x), right (x), bottom (y) {}
+    Box (T value) : Box (value, value) {}
 
     static Box fromString (const juce::String& text)
     {

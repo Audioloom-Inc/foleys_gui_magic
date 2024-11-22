@@ -94,6 +94,10 @@ namespace IDs
     static juce::Identifier border       { "border" };
     static juce::Identifier margin       { "margin" };
     static juce::Identifier padding      { "padding" };
+    
+    static juce::Identifier paddingX     { "paddingX" };
+    static juce::Identifier paddingY     { "paddingY" };
+
     static juce::Identifier radius       { "radius" };
 
     static juce::Identifier display      { "display" };

@@ -519,7 +519,7 @@ void GuiItem::mouseDrag (const juce::MouseEvent& event)
             setDraggable (false);
 
             auto* container = juce::DragAndDropContainer::findParentDragContainerFor (this);
-            container->startDragging (IDs::dragSelected, this);
+            container->startDragging (getDragSourceDescription (event), this);
         }
         else
         {
@@ -574,7 +574,12 @@ void GuiItem::itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSou
 
     auto node = juce::ValueTree::fromXml (dragSourceDetails.description.toString());
     if (node.isValid())
+    {
         magicBuilder.draggedItemOnto (node, configNode, dropPosition);
+        return;
+    }
+
+    customItemDropAction (dragSourceDetails);
 }
 
 bool GuiItem::isSelected() const

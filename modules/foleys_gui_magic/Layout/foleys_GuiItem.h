@@ -204,6 +204,9 @@ public:
 
     bool isInterestedInDragSource (const juce::DragAndDropTarget::SourceDetails &dragSourceDetails) override;
     void itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSourceDetails) override;
+    virtual void customItemDropAction (const juce::DragAndDropTarget::SourceDetails &dragSourceDetails) {}
+    virtual juce::String getDragSourceDescription(const juce::MouseEvent&) { return IDs::dragSelected; }
+
     bool isSelected () const;
     
     MagicGUIBuilder& magicBuilder;

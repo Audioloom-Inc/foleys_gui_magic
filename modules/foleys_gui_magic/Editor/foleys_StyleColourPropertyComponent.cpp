@@ -50,14 +50,14 @@ StyleColourPropertyComponent::StyleColourPropertyComponent (MagicGUIBuilder& bui
 
     label->getTextValue().addListener (this);
     label->onTextChange = [&]
-    {
-        if (! blockTextChange)
-        {
-            if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
-                node.setProperty (property, l->getText(), &builder.getUndoManager());
+    {       
+        if (isRefreshing ())
+            return;
 
-            refresh();
-        }
+        if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
+            node.setProperty (property, l->getText(), &builder.getUndoManager());
+
+        refresh();
     };
 
     variables.onClick = [&]

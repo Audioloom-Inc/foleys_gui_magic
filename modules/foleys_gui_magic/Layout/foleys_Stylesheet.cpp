@@ -224,12 +224,13 @@ juce::var Stylesheet::getStyleProperty (const juce::Identifier& name, const juce
 
     auto parent = node.getParent();
     if (parent.isValid() && parent.getType() != IDs::magic)
-        return getStyleProperty (name, parent, name == IDs::lookAndFeel, definedHere);
+        if (auto val = getStyleProperty (name, parent, name == IDs::lookAndFeel, definedHere); ! val.isVoid ())
+            return val;
 
     if (definedHere)
         *definedHere = juce::ValueTree();
 
-    return builder.getPropertyDefaultValue (name);
+    return builder.getPropertyDefaultValue (name, node.getType());
 }
 
 juce::Colour Stylesheet::getColour (const juce::String& name) const

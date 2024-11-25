@@ -230,8 +230,8 @@ public:
     /**
      Lookup the default value of the property
      */
-    virtual juce::var getPropertyDefaultValue (juce::Identifier property) const;
-
+    virtual juce::var getPropertyDefaultValue (juce::Identifier propert, juce::Identifier type = {}) const;
+    
     MagicGUIState& getMagicState();
 
     juce::UndoManager& getUndoManager();

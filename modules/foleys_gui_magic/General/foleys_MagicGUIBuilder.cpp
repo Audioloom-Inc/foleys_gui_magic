@@ -302,10 +302,10 @@ juce::var MagicGUIBuilder::getStyleProperty (const juce::Identifier& name, const
     if (auto value = stylesheet->getStyleProperty (name, node); ! value.isVoid ())
         return value;
 
-    if (auto defaults = defaultProperties.find (node.getType()); defaults != defaultProperties.end ())
-        for (auto property : defaults->second)
-            if (property.name == name)
-                return property.defaultValue;
+    // if (auto defaults = defaultProperties.find (node.getType()); defaults != defaultProperties.end ())
+    //     for (auto property : defaults->second)
+    //         if (property.name == name)
+    //             return property.defaultValue;
 
     return {};
 }
@@ -369,8 +369,14 @@ std::function<void (juce::ComboBox&)> MagicGUIBuilder::createTriggerMenuLambda()
     return [this] (juce::ComboBox& combo) { *combo.getRootMenu() = magicState.createTriggerMenu(); };
 }
 
-juce::var MagicGUIBuilder::getPropertyDefaultValue (juce::Identifier property) const
+juce::var MagicGUIBuilder::getPropertyDefaultValue (juce::Identifier property, juce::Identifier type) const
 {
+    if (! type.isNull ())
+        if (auto defaults = defaultProperties.find (type); defaults != defaultProperties.end ())
+            for (auto pDefault : defaults->second)
+                if (pDefault.name == property)
+                    return pDefault.defaultValue;
+                    
     // flexbox
     if (property == IDs::flexDirection)
         return IDs::flexDirRow;

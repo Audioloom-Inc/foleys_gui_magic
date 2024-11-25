@@ -231,7 +231,7 @@ void PropertiesEditor::addNodeProperties()
     for (auto p : createNodeProperties ("Node"))
         array.add (builder.createStylePropertyComponent (p, styleItem));
 
-    properties.addSection ("Node", array, false);
+    addSection ("Node", array);
 }
 
 void PropertiesEditor::addClassProperties() 
@@ -241,7 +241,7 @@ void PropertiesEditor::addClassProperties()
     for (auto p : createClassProperties ("Class"))
         array.add (builder.createStylePropertyComponent (p, styleItem));
         
-    properties.addSection ("Class", array, false);
+    addSection ("Class", array);
 }
 
 void PropertiesEditor::addDecoratorProperties()
@@ -251,7 +251,7 @@ void PropertiesEditor::addDecoratorProperties()
     for (auto p : createDecoratorProperties ())
         array.add (builder.createStylePropertyComponent (p, styleItem));
 
-    properties.addSection ("Decorator", array, false);
+    addSection ("Decorator", array);
 }
 
 void PropertiesEditor::addTypeProperties (juce::Identifier type, juce::Array<juce::PropertyComponent*> additional)
@@ -264,7 +264,7 @@ void PropertiesEditor::addTypeProperties (juce::Identifier type, juce::Array<juc
         if (auto comp = builder.createStylePropertyComponent (p, styleItem))
             array.add (comp);
 
-    properties.addSection (type.toString(), array, false);
+    addSection (type.toString(), array);
 }
 
 std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (juce::Identifier type)
@@ -430,7 +430,7 @@ void PropertiesEditor::addFlexItemProperties()
     for (auto p : createFlexItemProperties ())
         array.add (builder.createStylePropertyComponent (p, styleItem));    
 
-    properties.addSection ("Item", array, false);
+    addSection ("Item", array);
 }
 
 void PropertiesEditor::addContainerProperties()
@@ -440,7 +440,12 @@ void PropertiesEditor::addContainerProperties()
     for (auto p : createContainerProperties ("Container"))
         array.add (builder.createStylePropertyComponent (p, styleItem));
         
-    properties.addSection ("Container", array, false);
+    addSection ("Container", array);
+}
+
+void PropertiesEditor::addSection (const juce::String& name, juce::Array<juce::PropertyComponent*> propertyComponents) 
+{
+    properties.addSection (name, propertyComponents, getDefaultOpennessState ());
 }
 
 void PropertiesEditor::addPaletteColours()
@@ -609,7 +614,7 @@ void PropertiesEditor::finishPropertySetup()
             if (auto comp = builder.createStylePropertyComponent (p, p.node))
                 array.add (comp);
 
-        properties.addSection (category, array, false);
+        addSection (category, array);
     }
 }
 

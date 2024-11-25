@@ -83,6 +83,9 @@ public:
     void addFlexItemProperties();
     void addContainerProperties();
 
+    virtual bool getDefaultOpennessState () { return false; }
+
+    void addSection (const juce::String& name, juce::Array<juce::PropertyComponent*> properties);
     void addPaletteColours();
 
     void paint (juce::Graphics&) override;

@@ -122,6 +122,8 @@ void GuiItem::updateColours()
         auto colour = magicBuilder.getStyleProperty (pair.first, configNode).toString();
         if (colour.isNotEmpty())
             component->setColour (pair.second, magicBuilder.getStylesheet().getColour (colour));
+        else
+            component->removeColour (pair.second);
     }
 }
 

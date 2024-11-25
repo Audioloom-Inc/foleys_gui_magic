@@ -403,13 +403,24 @@ juce::var MagicGUIBuilder::getPropertyDefaultValue (juce::Identifier property, j
     if (property == IDs::display)
         return IDs::flexbox;
 
+    // caption
     if (property == IDs::captionPlacement)
         return "centred-top";
+
+    // look and feel
     if (property == IDs::lookAndFeel)
         return "FoleysFinest";
 
+    // font
     if (property == juce::Identifier ("font-size"))
         return 12.0;
+
+    // // decorator
+    if (property == IDs::backgroundColour)
+        return juce::Colours::darkgrey.toString();
+    
+    if (property == IDs::borderColour || property == IDs::captionColour)
+        return juce::Colours::silver.toString();
 
     return {};
 }

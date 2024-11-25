@@ -72,8 +72,8 @@ public:
 
 private:
 
-    juce::Colour backgroundColour { juce::Colours::darkgrey };
-    juce::Colour borderColour     { juce::Colours::silver };
+    juce::Colour backgroundColour;
+    juce::Colour borderColour;
 
     Box<float> margin  { 0.f };
     Box<float> padding { 0.f };
@@ -83,7 +83,7 @@ private:
     juce::String        caption;
     juce::Justification justification = juce::Justification::centredTop;
     float               captionSize   = 20.0f;
-    juce::Colour        captionColour = juce::Colours::silver;
+    juce::Colour        captionColour;
 
     juce::String        tabCaption;
     juce::Colour        tabColour;

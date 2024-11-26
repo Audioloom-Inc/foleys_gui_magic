@@ -123,7 +123,7 @@ public:
     /**
      Recalculates the layout of all components
      */
-    void updateLayout (juce::Rectangle<int> bounds);
+    virtual void updateLayout (juce::Rectangle<int> bounds);
 
     /**
      Resolve all colours fresh, in case the palette has changed

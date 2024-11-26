@@ -397,9 +397,9 @@ juce::var MagicGUIBuilder::getPropertyDefaultValue (juce::Identifier property, j
     if (property == IDs::flexShrink)
         return 1.0;
     if (property == IDs::minWidth)
-        return 0.0;
+        return 10.0;
     if (property == IDs::minHeight)
-        return 0.0;
+        return 10.0;
     if (property == IDs::display)
         return IDs::flexbox;
 

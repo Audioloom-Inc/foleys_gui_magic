@@ -424,9 +424,20 @@ void ToolBox::mouseDoubleClick (const juce::MouseEvent& event)
     else if (builder.isEditModeOn ())
     {
         if (layout == Layout::TabbedLayout)
-            if (auto comp = dynamic_cast<foleys::GuiItem*> (event.originalComponent))
-                if (comp->isSelected ())
-                    openTab ("Inspector");
+        {
+            auto original = event.originalComponent;
+
+            if (! original)
+                return;
+
+            auto guiItem = dynamic_cast<foleys::GuiItem*> (original);
+
+            if (! guiItem)
+                guiItem = original->findParentComponentOfClass<foleys::GuiItem> ();
+
+            if (guiItem && guiItem->isSelected ())
+                openTab ("Inspector");  
+        }
     }
 }
 

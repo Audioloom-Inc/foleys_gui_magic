@@ -51,6 +51,9 @@ StyleTextPropertyComponent::StyleTextPropertyComponent (MagicGUIBuilder& builder
 
     label->onTextChange = [&]
     {
+        if (isRefreshing ())
+            return;
+
         if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
             node.setProperty (property, l->getText(), &builder.getUndoManager());
 
@@ -72,7 +75,7 @@ void StyleTextPropertyComponent::refresh()
         }
         else
         {
-            label->getTextValue().referTo (label->getTextValue());
+            label->getTextValue().referTo ({});
             label->setText (value.toString(), juce::dontSendNotification);
         }
     }

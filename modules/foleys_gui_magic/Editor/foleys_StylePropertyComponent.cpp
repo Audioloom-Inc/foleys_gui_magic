@@ -160,6 +160,9 @@ void StylePropertyComponent::valueTreePropertyChanged (juce::ValueTree& tree, co
 
 void StylePropertyComponent::internalRefresh() 
 { 
+    if (isRefreshing ())
+        return;
+        
     juce::ScopedValueSetter<bool> flag (refreshing, true);
     refresh();
 }

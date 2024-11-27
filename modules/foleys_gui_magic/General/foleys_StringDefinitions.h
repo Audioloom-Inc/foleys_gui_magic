@@ -196,6 +196,7 @@ namespace IDs
     static juce::Identifier properties  { "Properties" };
     static juce::Identifier editor      { "Editor" };
     static juce::Identifier lastSize    { "last-size" };
+    static juce::Identifier editModeEnabled { "edit-mode-enabled" };
 }
 
 } // namespace foleys

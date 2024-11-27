@@ -226,6 +226,7 @@ public:
     void changeListenerCallback (juce::ChangeBroadcaster* sender) override;
 
     void valueTreeRedirected (juce::ValueTree& treeWhichHasBeenChanged) override;
+    void valueTreePropertyChanged (juce::ValueTree& tree, const juce::Identifier& property) override;
 
     /**
      Lookup the default value of the property

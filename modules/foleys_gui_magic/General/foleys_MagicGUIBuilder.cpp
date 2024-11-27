@@ -444,6 +444,15 @@ void MagicGUIBuilder::valueTreeRedirected (juce::ValueTree& treeWhichHasBeenChan
     updateComponents();
 }
 
+void MagicGUIBuilder::valueTreePropertyChanged(juce::ValueTree & tree, const juce::Identifier & property)
+{
+    if (tree == magicState.getEditorRoot ())
+    {
+        if (property == IDs::editModeEnabled)
+            setEditMode (tree[property]);
+    }
+}
+
 MagicGUIState& MagicGUIBuilder::getMagicState()
 {
     return magicState;
@@ -469,6 +478,8 @@ void MagicGUIBuilder::setEditMode (bool shouldEdit)
 
     listeners.call (&Listener::editModeToggled, editMode);
     
+    getMagicState ().getEditorRoot ().setProperty (IDs::editModeEnabled, editMode, nullptr);
+
     parent->repaint();
 }
 

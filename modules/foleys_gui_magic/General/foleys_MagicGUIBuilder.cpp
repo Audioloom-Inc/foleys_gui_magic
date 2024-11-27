@@ -167,7 +167,10 @@ void MagicGUIBuilder::updateComponents()
     root = createGuiItem (getGuiRootNode());
     parent->addAndMakeVisible (root.get());
 
-    parent->setBounds (root->getLocalBounds ());
+    auto width = getGuiRootNode().getProperty (IDs::width, 600);
+    auto height = getGuiRootNode().getProperty (IDs::height, 800);
+
+    parent->setSize (width, height);
 
     if (root.get() != nullptr)
         root->setEditMode (editMode);

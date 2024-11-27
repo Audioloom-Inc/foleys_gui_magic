@@ -194,6 +194,7 @@ namespace IDs
     static juce::Identifier buttonRadioValue { "button-radio-value" };
 
     static juce::Identifier properties  { "Properties" };
+    static juce::Identifier editor      { "Editor" };
     static juce::Identifier lastSize    { "last-size" };
 }
 

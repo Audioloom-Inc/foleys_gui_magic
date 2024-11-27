@@ -75,6 +75,10 @@ public:
     juce::ValueTree getPropertyRoot();
     juce::ValueTree getPropertyRoot() const;
 
+    /** Returns the root node for all properties necessary for the editor, toolbox */
+    juce::ValueTree getEditorRoot();
+    juce::ValueTree getEditorRoot() const;
+
     /**
      Set the GUI DOM to create the GUI components from
      */

@@ -78,6 +78,16 @@ juce::ValueTree MagicGUIState::getPropertyRoot() const
     return state.getChildWithName (IDs::properties);
 }
 
+juce::ValueTree MagicGUIState::getEditorRoot()
+{
+    return guiValueTree.getOrCreateChildWithName (IDs::editor, nullptr);
+}
+
+juce::ValueTree MagicGUIState::getEditorRoot() const
+{
+    return guiValueTree.getChildWithName (IDs::editor);
+}
+
 void MagicGUIState::setGuiValueTree (const juce::ValueTree& dom)
 {
     jassert (dom.hasType (IDs::magic));

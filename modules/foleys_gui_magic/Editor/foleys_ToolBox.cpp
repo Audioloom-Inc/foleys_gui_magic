@@ -182,7 +182,8 @@ void ToolBox::updateLayout ()
 
     resizers.clear (true);
     layoutComponents.clear ();
-
+    tabs.clearTabs ();
+    
     if (layout == StretchableLayout)
     {
         const auto numContents = content.size();

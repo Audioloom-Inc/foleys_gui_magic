@@ -87,6 +87,11 @@ public:
      */
     juce::ValueTree& getGuiTree();
 
+    /**
+     Grants acces to the state tree that currently holds the exposed properties root. when FOLEYS_SHOW_GUI_EDITOR_PALLETTE is enabled, the guitree is added as a child.
+
+     @see getPropertyRoot
+     */
     juce::ValueTree& getValueTree();
 
     /**

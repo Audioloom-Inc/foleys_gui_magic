@@ -296,7 +296,7 @@ void ToolBox::addContentComponent (ToolBoxContentComponent* content, const juce:
     content->setName (name);
     this->content.add (content);
 
-    triggerAsyncUpdate();
+    handleAsyncUpdate();
 }
 
 ToolBoxContentComponent* ToolBox::getContentComponent (const juce::String& name) const
@@ -317,19 +317,19 @@ ToolBoxContentComponent* ToolBox::getContentComponent (int index) const
 void ToolBox::removeContentComponent (ToolBoxContentComponent* c) 
 {
     content.removeObject (c, true);
-    triggerAsyncUpdate();
+    handleAsyncUpdate();
 }
 
 void ToolBox::removeContentComponent (int index) 
 {
     content.remove (index, true);
-    triggerAsyncUpdate();
+    handleAsyncUpdate();
 }
 
 void ToolBox::removeAllContentComponents() 
 {
     content.clear (true);
-    triggerAsyncUpdate();
+    handleAsyncUpdate();
 }
 
 int ToolBox::getNumContentComponents() const
@@ -340,7 +340,7 @@ int ToolBox::getNumContentComponents() const
 void ToolBox::setLayout(const Layout & layout)
 {
     this->layout = layout;
-    triggerAsyncUpdate ();
+    handleAsyncUpdate ();
 }
 
 ToolBox::Layout ToolBox::getLayout() const

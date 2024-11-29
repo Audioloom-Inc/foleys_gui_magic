@@ -71,7 +71,7 @@ public:
      You can use the magicBuilder to resolve properties from CSS.
      The Colours will be handled by default.
      */
-    virtual void update() = 0;
+    virtual void update() {}
 
     /**
      Set colours in the wrapped Component to the value from the stylesheet and palette.
@@ -195,6 +195,10 @@ public:
     /**
      */
     virtual void propertyChanged (const juce::Identifier& property) {}
+
+    /**
+     */
+    virtual void updateParameterConnection (const juce::String& paramID) {}
 
     void setDraggable (bool selected);
 

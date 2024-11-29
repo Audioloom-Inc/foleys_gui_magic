@@ -297,10 +297,10 @@ void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const 
     // replace ongoing calls to updateInternal with single calls – WIP
     if (property == foleys::IDs::styleClass)
         init ();
+    else if (property == foleys::IDs::parameter)
+        updateParameterConnection (getProperty (IDs::parameter));
     else
         propertyChanged (property);
-
-
 
     // ongoing calls here ...
     if (treeThatChanged == configNode)
@@ -416,7 +416,10 @@ void GuiItem::init()
     auto properties = getSettableProperties ();
 
     for (auto p : properties)
-        propertyChanged (p.name);
+        if (p.name == foleys::IDs::parameter)
+            updateParameterConnection (getProperty (IDs::parameter));
+        else
+            propertyChanged (p.name);
 }
 
 void GuiItem::setDraggable (bool selected)

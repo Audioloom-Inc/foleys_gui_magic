@@ -37,7 +37,12 @@ namespace foleys
 {
 
 MagicProcessorState::MagicProcessorState (juce::AudioProcessor& processorToUse)
-  : processor (processorToUse)
+  : processor (processorToUse), parameters (processorToUse)
+{
+}
+
+MagicProcessorState::MagicProcessorState (juce::AudioProcessor& processorToUse, juce::Array<juce::RangedAudioParameter*>& parameters) 
+: processor (processorToUse), parameters (parameters)
 {
 }
 

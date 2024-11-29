@@ -40,6 +40,7 @@ class ParameterManager
 {
 public:
     ParameterManager (juce::AudioProcessor& processor);
+    ParameterManager (juce::Array<juce::RangedAudioParameter*>& parameters);
 
     juce::RangedAudioParameter* getParameter (const juce::String& paramID);
 
@@ -56,7 +57,8 @@ public:
     static juce::Identifier nodeValue;
 
 private:
-    juce::AudioProcessor& processor;
+    juce::AudioProcessor* processor{ nullptr };
+    juce::Array<juce::RangedAudioParameter*>* parameters{ nullptr };
 
     std::map<juce::String, juce::RangedAudioParameter*> parameterLookup;
 

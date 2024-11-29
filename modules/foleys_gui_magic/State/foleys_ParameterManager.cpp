@@ -44,7 +44,17 @@ juce::Identifier ParameterManager::nodeValue { "value" };
 
 
 ParameterManager::ParameterManager (juce::AudioProcessor& p)
-  : processor (p)
+:
+processor (&p), 
+parameters (nullptr)
+{
+    updateParameterMap();
+}
+
+ParameterManager::ParameterManager (juce::Array<juce::RangedAudioParameter*>& parameters)
+:
+processor (nullptr),
+parameters (&parameters)
 {
     updateParameterMap();
 }
@@ -60,9 +70,17 @@ juce::RangedAudioParameter* ParameterManager::getParameter (const juce::String& 
 
 void ParameterManager::updateParameterMap()
 {
-    for (auto* parameter : processor.getParameters())
-        if (auto* withID = dynamic_cast<juce::RangedAudioParameter*>(parameter))
-            parameterLookup [withID->paramID] = withID;
+    if (processor)
+    {
+        for (auto* parameter : processor->getParameters())
+            if (auto* withID = dynamic_cast<juce::RangedAudioParameter*>(parameter))
+                parameterLookup [withID->paramID] = withID;
+    }
+    else if (parameters)
+    {
+        for (auto* parameter : *parameters)
+            parameterLookup [parameter->paramID] = parameter;
+    }
 }
 
 juce::StringArray ParameterManager::getParameterNames() const

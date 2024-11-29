@@ -53,6 +53,14 @@ public:
      processor and it's internals.
      */
     MagicProcessorState (juce::AudioProcessor& processorToUse);
+
+    /**
+     Create a MagicProcessorState to let the generated GUI communicate with the processor and it's internals. 
+     Unlike the other constructor, this one allows to pass in a list of parameters to use.
+     */
+    MagicProcessorState (juce::AudioProcessor& processorToUse, juce::Array<juce::RangedAudioParameter*>& parameters);
+    
+    
     ~MagicProcessorState() override;
 
     /**
@@ -149,7 +157,7 @@ private:
 
     juce::AudioProcessor& processor;
 
-    ParameterManager    parameters { processor };
+    ParameterManager    parameters;
     MidiParameterMapper midiMapper { *this };
 
     std::atomic<double> bpm;

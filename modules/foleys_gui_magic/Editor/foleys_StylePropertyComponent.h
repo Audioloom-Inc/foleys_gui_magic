@@ -59,6 +59,7 @@ protected:
 
     MagicGUIBuilder&    builder;
     juce::Identifier    property;
+    juce::String        displayName;
     juce::ValueTree     node;
     juce::ValueTree     inheritedFrom;
 

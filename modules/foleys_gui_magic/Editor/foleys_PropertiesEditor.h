@@ -93,7 +93,9 @@ public:
 
     MagicGUIBuilder& getMagicBuilder();
 
-
+    void setCategoryOrder (juce::StringArray order);
+    juce::StringArray getCategoryOrder() const;
+    
 protected:
 
     virtual void updatePopupMenu();
@@ -137,6 +139,7 @@ protected:
     juce::ValueTree     styleItem;
 
     juce::HashMap<juce::String, std::vector<SettableProperty>> categories;
+    juce::StringArray categoryOrder;
 
     std::unique_ptr<juce::AlertWindow> classNameInput;
 

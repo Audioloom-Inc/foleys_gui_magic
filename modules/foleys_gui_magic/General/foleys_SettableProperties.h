@@ -57,13 +57,33 @@ struct SettableProperty
         MultiList
     };
 
-    juce::ValueTree                       node {};
+    juce::ValueTree                             node {};
     const juce::Identifier                      name {};
     const PropertyType                          type {};
     const juce::var                             defaultValue {};
     const std::function<void(juce::ComboBox&)>  menuCreationLambda {};
     const juce::StringArray                     allowedFileExtensions {};
-    juce::String                          category {};
+    juce::String                                category {};
+    juce::String                                description {};
+    juce::String                                displayName {};
+
+    juce::String getDisplayName () const
+    {
+        if (displayName.isNotEmpty())
+            return displayName;
+
+        return name.toString();
+    }
+    
+    SettableProperty withDisplayName (const juce::String& newName)
+    {
+        return with (*this, &SettableProperty::displayName, newName);
+    }
+
+    SettableProperty withDescription (const juce::String& desc)
+    {
+        return with (*this, &SettableProperty::description, desc);
+    }
 
     juce::StringArray getChoicesFromLambda () const
     {
@@ -80,6 +100,14 @@ struct SettableProperty
         }
 
         return {};
+    }
+
+private:
+    template <typename Member, typename Item>
+    static SettableProperty with (SettableProperty property, Member&& member, Item&& item)
+    {
+        property.*member = std::forward<Item> (item);
+        return property;
     }
 };
 

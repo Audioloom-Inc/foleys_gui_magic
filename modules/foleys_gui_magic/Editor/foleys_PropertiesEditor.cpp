@@ -555,6 +555,16 @@ MagicGUIBuilder& PropertiesEditor::getMagicBuilder()
     return builder;
 }
 
+void PropertiesEditor::setCategoryOrder (juce::StringArray order) 
+{
+    categoryOrder = order;
+}
+
+juce::StringArray PropertiesEditor::getCategoryOrder() const
+{
+    return categoryOrder;
+}
+
 void PropertiesEditor::valueTreeChildAdded (juce::ValueTree&, juce::ValueTree&)
 {
     updatePopupMenu();
@@ -600,12 +610,16 @@ void PropertiesEditor::finishPropertySetup()
 {
     juce::HashMap<juce::String, std::vector<SettableProperty>>::Iterator iter (categories);
     
-    juce::StringArray sorted;
-    
-    while (iter.next())
-        sorted.add (iter.getKey());
+    juce::StringArray sorted = categoryOrder;
+    juce::StringArray missing;
 
-    sorted.sort (true);
+    while (iter.next())
+        if (auto key = iter.getKey (); ! sorted.contains (key))
+            missing.add (iter.getKey());
+
+    missing.sort (true);
+
+    sorted.addArray (missing);
 
     for (auto category : sorted)
     {

@@ -84,11 +84,11 @@ public:
     SettableProperty (const SettableProperty&) = default;
 
     juce::ValueTree                             node {};
-    const juce::Identifier                      name {};
-    const PropertyType                          type {};
-    const juce::var                             defaultValue {};
-    const std::function<void(juce::ComboBox&)>  menuCreationLambda {};
-    const juce::StringArray                     allowedFileExtensions {};
+    juce::Identifier                            name {};
+    PropertyType                                type {};
+    juce::var                                   defaultValue {};
+    std::function<void(juce::ComboBox&)>        menuCreationLambda {};
+    juce::StringArray                           allowedFileExtensions {};
     juce::String                                category {};
     juce::String                                description {};
     juce::String                                displayName {};
@@ -106,14 +106,44 @@ public:
         return with (*this, &SettableProperty::node, newNode);
     }
     
-    SettableProperty withDisplayName (const juce::String& newName)
+    SettableProperty withName (juce::Identifier newName) const
     {
-        return with (*this, &SettableProperty::displayName, newName);
+        return with (*this, &SettableProperty::name, newName);
+    }
+
+    SettableProperty withType (PropertyType newType) const
+    {
+        return with (*this, &SettableProperty::type, newType);
+    }
+
+    SettableProperty withDefaultValue (juce::var newDefault) const
+    {
+        return with (*this, &SettableProperty::defaultValue, newDefault);
+    }
+
+    SettableProperty withMenuCreationLambda (std::function<void(juce::ComboBox&)> newLambda) const
+    {
+        return with (*this, &SettableProperty::menuCreationLambda, newLambda);
+    }
+
+    SettableProperty withAllowedFileExtensions (juce::StringArray newExtensions) const
+    {
+        return with (*this, &SettableProperty::allowedFileExtensions, newExtensions);
+    }
+
+    SettableProperty withCategory (const juce::String& newCategory) const
+    {
+        return with (*this, &SettableProperty::category, newCategory);
     }
 
     SettableProperty withDescription (const juce::String& desc)
     {
         return with (*this, &SettableProperty::description, desc);
+    }
+
+    SettableProperty withDisplayName (const juce::String& newName)
+    {
+        return with (*this, &SettableProperty::displayName, newName);
     }
 
     juce::StringArray getChoicesFromLambda () const

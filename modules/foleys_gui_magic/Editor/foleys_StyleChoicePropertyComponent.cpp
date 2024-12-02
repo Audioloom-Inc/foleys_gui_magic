@@ -37,7 +37,7 @@ namespace foleys
 {
 
 StyleChoicePropertyComponent::StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse,
-                                                            juce::Identifier propertyToUse,
+                                                            SettableProperty propertyToUse,
                                                             juce::ValueTree& nodeToUse,
                                                             juce::StringArray choicesToUse)
   : StylePropertyComponent (builderToUse, propertyToUse, nodeToUse),
@@ -46,7 +46,7 @@ StyleChoicePropertyComponent::StyleChoicePropertyComponent (MagicGUIBuilder& bui
     initialiseComboBox (false);
 }
 
-StyleChoicePropertyComponent::StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, juce::Identifier propertyToUse, juce::ValueTree& nodeToUse, std::function<void(juce::ComboBox&)> lambdaToUse)
+StyleChoicePropertyComponent::StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, std::function<void(juce::ComboBox&)> lambdaToUse)
   : StylePropertyComponent (builderToUse, propertyToUse, nodeToUse),
     menuCreationLambda (lambdaToUse)
 {

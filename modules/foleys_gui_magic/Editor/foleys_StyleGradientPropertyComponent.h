@@ -43,7 +43,7 @@ class StyleGradientPropertyComponent  : public StylePropertyComponent,
                                         private juce::ChangeListener
 {
 public:
-    StyleGradientPropertyComponent (MagicGUIBuilder& builderToUse, juce::Identifier propertyToUse, juce::ValueTree& nodeToUse);
+    StyleGradientPropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty  propertyToUse, juce::ValueTree& nodeToUse);
     ~StyleGradientPropertyComponent() override;
 
     void refresh() override;

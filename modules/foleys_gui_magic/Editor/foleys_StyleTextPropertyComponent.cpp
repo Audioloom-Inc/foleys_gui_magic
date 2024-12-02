@@ -44,23 +44,15 @@ StyleTextPropertyComponent::StyleTextPropertyComponent (MagicGUIBuilder& builder
                                                         juce::ValueTree& nodeToUse)
   : StylePropertyComponent (builderToUse, propertyToUse, nodeToUse)
 {
-    auto label = std::make_unique<juce::Label>();
-    label->setEditable (true);
+    init();
+}
 
-    addAndMakeVisible (label.get());
-
-    label->onTextChange = [&]
-    {
-        if (isRefreshing ())
-            return;
-
-        if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
-            node.setProperty (property, l->getText(), &builder.getUndoManager());
-
-        refresh();
-    };
-
-    editor = std::move (label);
+StyleTextPropertyComponent::StyleTextPropertyComponent (MagicGUIBuilder& builderToUse, 
+                                                        SettableProperty& propertyToUse,
+                                                        juce::ValueTree& nodeToUse) 
+  : StylePropertyComponent (builderToUse, propertyToUse, nodeToUse)
+{
+    init ();
 }
 
 void StyleTextPropertyComponent::refresh()
@@ -82,6 +74,28 @@ void StyleTextPropertyComponent::refresh()
 
     repaint();
 }
+
+void StyleTextPropertyComponent::init() 
+{
+    auto label = std::make_unique<juce::Label>();
+    label->setEditable (true);
+
+    addAndMakeVisible (label.get());
+
+    label->onTextChange = [&]
+    {
+        if (isRefreshing ())
+            return;
+
+        if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
+            node.setProperty (property, l->getText(), &builder.getUndoManager());
+
+        refresh();
+    };
+
+    editor = std::move (label);
+
+ }
 
 
 } // namespace foleys

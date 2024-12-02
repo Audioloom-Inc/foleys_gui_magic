@@ -38,7 +38,7 @@ namespace foleys
 
 
 StyleGradientPropertyComponent::StyleGradientPropertyComponent (MagicGUIBuilder& builderToUse,
-                                                                juce::Identifier propertyToUse,
+                                                                SettableProperty propertyToUse,
                                                                 juce::ValueTree& nodeToUse)
   : StylePropertyComponent (builderToUse, propertyToUse, nodeToUse)
 {

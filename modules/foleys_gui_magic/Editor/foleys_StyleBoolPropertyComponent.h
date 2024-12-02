@@ -41,7 +41,7 @@ namespace foleys
 class StyleBoolPropertyComponent  : public StylePropertyComponent
 {
 public:
-    StyleBoolPropertyComponent (MagicGUIBuilder& builderToUse, juce::Identifier propertyToUse, juce::ValueTree& nodeToUse);
+    StyleBoolPropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty& propertyToUse, juce::ValueTree& nodeToUse);
 
     void refresh() override;
 

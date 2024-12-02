@@ -41,8 +41,9 @@ namespace foleys
  A SettableProperty is a value that can be selected by the designer and will be
  set for the Component each time the ValueTree is loaded.
  */
-struct SettableProperty
+class SettableProperty
 {
+public:
     enum PropertyType
     {
         Text,           /*< Plain text, e.g. for buttons */
@@ -56,6 +57,31 @@ struct SettableProperty
         Asset,
         MultiList
     };
+
+    // contrutcotr with all members below and default values for each
+    SettableProperty (juce::ValueTree nodeToUse,
+                      juce::Identifier nameToUse,
+                      PropertyType typeToUse,
+                      juce::var defaultValueToUse = {},
+                      std::function<void(juce::ComboBox&)> menuCreationLambdaToUse = {},
+                      juce::StringArray allowedFileExtensionsToUse = {},
+                      juce::String categoryToUse = {},
+                      juce::String descriptionToUse = {},
+                      juce::String displayNameToUse = {})
+      : node (nodeToUse),
+        name (nameToUse),
+        type (typeToUse),
+        defaultValue (defaultValueToUse),
+        menuCreationLambda (menuCreationLambdaToUse),
+        allowedFileExtensions (allowedFileExtensionsToUse),
+        category (categoryToUse),
+        description (descriptionToUse),
+        displayName (displayNameToUse)
+    {
+    }
+
+    // default copy ctor
+    SettableProperty (const SettableProperty&) = default;
 
     juce::ValueTree                             node {};
     const juce::Identifier                      name {};
@@ -73,6 +99,11 @@ struct SettableProperty
             return displayName;
 
         return name.toString();
+    }
+
+    SettableProperty withNode (juce::ValueTree newNode) const
+    {
+        return with (*this, &SettableProperty::node, newNode);
     }
     
     SettableProperty withDisplayName (const juce::String& newName)

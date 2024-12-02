@@ -44,6 +44,7 @@ class StylePropertyComponent  : public juce::PropertyComponent,
 {
 public:
     StylePropertyComponent (MagicGUIBuilder& builder, juce::Identifier property, juce::ValueTree& node);
+    StylePropertyComponent (MagicGUIBuilder& builder, SettableProperty& property, juce::ValueTree& node);
     ~StylePropertyComponent() override;
 
     void paint (juce::Graphics& g) override;

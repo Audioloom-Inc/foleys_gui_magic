@@ -43,22 +43,22 @@ namespace foleys
 juce::PropertyComponent* StylePropertyComponent::createComponent (MagicGUIBuilder& builder, SettableProperty& property, juce::ValueTree& node)
 {
     if (property.type == SettableProperty::Text)
-        return new StyleTextPropertyComponent (builder, property.name, node);
+        return new StyleTextPropertyComponent (builder, property, node);
 
     if (property.type == SettableProperty::Number)
-        return new StyleTextPropertyComponent (builder, property.name, node);
+        return new StyleTextPropertyComponent (builder, property, node);
 
     if (property.type == SettableProperty::Toggle)
-        return new StyleBoolPropertyComponent (builder, property.name, node);
+        return new StyleBoolPropertyComponent (builder, property, node);
 
     if (property.type == SettableProperty::Choice)
-        return new StyleChoicePropertyComponent (builder, property.name, node, property.menuCreationLambda);
+        return new StyleChoicePropertyComponent (builder, property, node, property.menuCreationLambda);
 
     if (property.type == SettableProperty::Gradient)
-        return new StyleGradientPropertyComponent (builder, property.name, node);
+        return new StyleGradientPropertyComponent (builder, property, node);
 
     if (property.type == SettableProperty::Colour)
-        return new StyleColourPropertyComponent (builder, property.name, node);
+        return new StyleColourPropertyComponent (builder, property, node);
         
     if (property.type == SettableProperty::MultiList)
         return new MultiListPropertyComponent (node.getPropertyAsValue (property.name, nullptr), property.name.toString(), property.getChoicesFromLambda());
@@ -69,12 +69,21 @@ juce::PropertyComponent* StylePropertyComponent::createComponent (MagicGUIBuilde
 
 //==============================================================================
 
+StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty& propertyToUse, juce::ValueTree& nodeToUse)
+:
+StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
+{
+    displayName = propertyToUse.getDisplayName();
+}
+
 StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, juce::Identifier propertyToUse, juce::ValueTree& nodeToUse)
   : juce::PropertyComponent (propertyToUse.toString()),
     builder (builderToUse),
     property (propertyToUse),
     node (nodeToUse)
 {
+    displayName = property.toString();
+    
     addAndMakeVisible (remove);
 
     remove.setConnectedEdges (juce::TextButton::ConnectedOnLeft | juce::TextButton::ConnectedOnRight);
@@ -128,7 +137,7 @@ void StylePropertyComponent::paint (juce::Graphics& g)
     g.drawHorizontalLine (0, 0.0f, static_cast<float>(getRight()));
     g.drawHorizontalLine (getBottom() - 1, 0.0f, static_cast<float>(getRight()));
     g.setColour (node == inheritedFrom ? findColour (ToolBox::textColourId, true) : findColour (ToolBox::disabledTextColourId, true));
-    g.drawFittedText (property.toString(), b, juce::Justification::left, 1);
+    g.drawFittedText (displayName, b, juce::Justification::left, 1);
 }
 
 void StylePropertyComponent::resized()

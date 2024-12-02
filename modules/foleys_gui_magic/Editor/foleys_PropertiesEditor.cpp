@@ -453,10 +453,10 @@ void PropertiesEditor::addSection (const juce::String& name, juce::Array<juce::P
 
 void PropertiesEditor::addPaletteColours()
 {
-    juce::Array<juce::PropertyComponent*> array;
+    // juce::Array<juce::PropertyComponent*> array;
 
-    for (int i=0; i < styleItem.getNumProperties(); ++i)
-        array.add (new StyleColourPropertyComponent (builder, styleItem.getPropertyName (i), styleItem));
+    // for (int i=0; i < styleItem.getNumProperties(); ++i)
+    //     array.add (new StyleColourPropertyComponent (builder, styleItem.getPropertyName (i), styleItem));
 }
 
 //==============================================================================

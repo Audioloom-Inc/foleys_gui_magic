@@ -207,11 +207,11 @@ void PropertiesEditor::setupProperties ()
     if (stylesheet.isClassNode (styleItem))
     {
         for (auto factoryName : builder.getFactoryNames())
-            addProperties (createTypeProperties (factoryName), factoryName);
+            addProperties (createTypeProperties (juce::ValueTree (factoryName)), factoryName);
     }
     else
     {
-        addProperties (createTypeProperties (styleItem.getType()));
+        addProperties (createTypeProperties (styleItem));
     }
 
     if (styleItem.getType() == IDs::view || stylesheet.isClassNode (styleItem))
@@ -260,20 +260,23 @@ void PropertiesEditor::addTypeProperties (juce::Identifier type, juce::Array<juc
 
     array.addArray (additional);
 
-    for (auto p : createTypeProperties (type))
+    for (auto p : createTypeProperties (juce::ValueTree (type)))
         if (auto comp = builder.createStylePropertyComponent (p, styleItem))
             array.add (comp);
 
     addSection (type.toString(), array);
 }
 
-std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (juce::Identifier type)
+std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (juce::ValueTree node)
 {
     std::vector<SettableProperty> properties;
 
-    juce::ValueTree node{ type };
+    foleys::GuiItem* realItem = builder.findGuiItem (node); // the actual item in the hierarchy
+    std::unique_ptr<GuiItem> templateItem; // the template item to use when none is found
 
-    if (auto item = builder.createGuiItem (node))
+    foleys::GuiItem* item = realItem ? realItem : (templateItem = builder.createGuiItem (node)).get();
+    
+    if (item)
     {
         auto props = item->getSettableProperties();
         for (auto& other : props)
@@ -281,7 +284,7 @@ std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (ju
             other.node = styleItem;   
 
             if (other.category.isEmpty())
-                other.category = type.toString();
+                other.category = node.getType ().toString();
 
             properties.push_back (other);
         }

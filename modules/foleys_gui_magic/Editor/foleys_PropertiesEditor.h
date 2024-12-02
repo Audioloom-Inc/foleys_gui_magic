@@ -69,7 +69,7 @@ public:
      */
     virtual void setupProperties ();
 
-    virtual std::vector<SettableProperty> createTypeProperties (const juce::Identifier type);
+    virtual std::vector<SettableProperty> createTypeProperties (juce::ValueTree node);
     virtual std::vector<SettableProperty> createDecoratorProperties (const juce::String& categoryName = "Decorator");
     virtual std::vector<SettableProperty> createFlexItemProperties (const juce::String& categoryName = "Item");
     virtual std::vector<SettableProperty> createContainerProperties (const juce::String& categoryName = "Container");

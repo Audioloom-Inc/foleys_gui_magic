@@ -515,6 +515,11 @@ const juce::ValueTree& MagicGUIBuilder::getSelectedNode() const
     return selectedNode;
 }
 
+void MagicGUIBuilder::updateSelectedNode() 
+{
+    listeners.call ([&] (Listener& l) { l.selectedItem (selectedNode); });
+}
+
 void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree target, juce::Point<int> targetPos, int index)
 {
     if (dragged == target)

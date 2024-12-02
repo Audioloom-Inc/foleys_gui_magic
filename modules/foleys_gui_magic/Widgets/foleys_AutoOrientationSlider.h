@@ -47,6 +47,23 @@ public:
 
     AutoOrientationSlider() = default;
 
+    class StyleListener
+    {
+    public:
+        virtual ~StyleListener () = default;
+        virtual void sliderStyleChanged (AutoOrientationSlider&, juce::Slider::SliderStyle layout) = 0;
+    };
+
+    void addStyleListener (StyleListener* listener)
+    {
+        layoutListeners.add (listener);
+    }
+
+    void removeStyleListener (StyleListener* listener)
+    {
+        layoutListeners.remove (listener);
+    }
+
     void setAutoOrientation (bool shouldAutoOrient)
     {
         autoOrientation = shouldAutoOrient;
@@ -83,18 +100,25 @@ public:
     {
         if (autoOrientation)
         {
-            const auto w = getWidth();
-            const auto h = getHeight();
-
-            if (w > 2 * h)
-                setSliderStyle (juce::Slider::LinearHorizontal);
-            else if (h > 2 * w)
-                setSliderStyle (juce::Slider::LinearVertical);
+            if (isHorizontal ())
+                setSliderStyle (juce::Slider::LinearHorizontal, juce::sendNotification);
+            else if (isVertical ())
+                setSliderStyle (juce::Slider::LinearVertical, juce::sendNotification);
             else
-                setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
+                setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag, juce::sendNotification);
         }
 
         juce::Slider::resized();
+    }
+
+    void setSliderStyle (juce::Slider::SliderStyle newStyle, juce::NotificationType notification)
+    {
+        auto currentStyle = getSliderStyle();
+        juce::Slider::setSliderStyle (newStyle);
+
+        if (currentStyle != getSliderStyle ())
+            if (notification != juce::dontSendNotification)
+                layoutListeners.call (&StyleListener::sliderStyleChanged, *this, getSliderStyle ());
     }
 
     void setFilmStrip (juce::Image& image)
@@ -108,6 +132,55 @@ public:
         horizontalFilmStrip = horizontal;
     }
 
+    bool isHorizontal () const
+    {
+        if (autoOrientation)
+        {
+            const auto w = getWidth();
+            const auto h = getHeight();
+
+            return w > 2 * h;
+        }
+
+        switch (getSliderStyle())
+        {
+            case LinearHorizontal:
+            case LinearBar:
+            case TwoValueHorizontal:
+            case ThreeValueHorizontal:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    bool isVertical () const
+    {
+        if (autoOrientation)
+        {
+            const auto w = getWidth();
+            const auto h = getHeight();
+
+            return h > 2 * w;
+        }
+
+        switch (getSliderStyle())
+        {
+            case LinearVertical:
+            case LinearBarVertical:
+            case TwoValueVertical:
+            case ThreeValueVertical:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    bool isRotary () const
+    {
+        return ! isHorizontal() && ! isVertical();
+    }
+
 private:
 
     bool autoOrientation = true;
@@ -115,6 +188,8 @@ private:
     juce::Image filmStrip;
     int         numImages = 0;
     bool        horizontalFilmStrip = false;
+
+    juce::ListenerList<StyleListener> layoutListeners;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AutoOrientationSlider)
 };

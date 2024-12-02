@@ -95,15 +95,15 @@ public:
         slider.setAutoOrientation (type.isEmpty() || type == pSliderTypes [0]);
 
         if (type == pSliderTypes [1])
-            slider.setSliderStyle (juce::Slider::LinearHorizontal);
+            slider.setSliderStyle (juce::Slider::LinearHorizontal, juce::sendNotification);
         else if (type == pSliderTypes [2])
-            slider.setSliderStyle (juce::Slider::LinearVertical);
+            slider.setSliderStyle (juce::Slider::LinearVertical, juce::sendNotification);
         else if (type == pSliderTypes [3])
-            slider.setSliderStyle (juce::Slider::Rotary);
+            slider.setSliderStyle (juce::Slider::Rotary, juce::sendNotification);
         else if (type == pSliderTypes [4])
-            slider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
+            slider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag, juce::sendNotification);
         else if (type == pSliderTypes [5])
-            slider.setSliderStyle (juce::Slider::IncDecButtons);
+            slider.setSliderStyle (juce::Slider::IncDecButtons, juce::sendNotification);
 
         auto textbox = getProperty (pSliderTextBox).toString();
         if (textbox == pTextBoxPositions [0])

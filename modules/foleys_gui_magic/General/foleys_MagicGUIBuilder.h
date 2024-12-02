@@ -271,7 +271,9 @@ public:
 
     void                   setSelectedNode (const juce::ValueTree& node);
     const juce::ValueTree& getSelectedNode() const;
-
+    
+    /** */
+    void updateSelectedNode ();
     void draggedItemOnto (juce::ValueTree dropped, juce::ValueTree target, juce::Point<int> targetPos = {}, int index = -1);
 
 protected:

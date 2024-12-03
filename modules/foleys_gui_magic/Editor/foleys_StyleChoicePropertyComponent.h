@@ -42,7 +42,7 @@ class StyleChoicePropertyComponent  : public StylePropertyComponent,
                                       private juce::Value::Listener
 {
 public:
-    StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty  propertyToUse, juce::ValueTree& nodeToUse, juce::StringArray choices);
+    StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, juce::StringArray choices);
     StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, std::function<void(juce::ComboBox&)> menuCreationLambda);
 
     void refresh() override;

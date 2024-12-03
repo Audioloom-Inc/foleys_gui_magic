@@ -197,6 +197,8 @@ namespace IDs
     static juce::Identifier editor      { "Editor" };
     static juce::Identifier lastSize    { "last-size" };
     static juce::Identifier editModeEnabled { "edit-mode-enabled" };
+
+    static juce::Identifier useSelectedItemIdInComboBoxLambda { "use-selected-item-id-in-combobox-lambda" };
 }
 
 } // namespace foleys

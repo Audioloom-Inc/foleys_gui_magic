@@ -77,7 +77,10 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
     combo->onChange = [&, safeThis]
     {
         if (auto* c = dynamic_cast<juce::ComboBox*>(editor.get()))
-            node.setProperty (property, c->getText(), &builder.getUndoManager());
+        {
+            juce::var value = (bool)c->getProperties ()[IDs::useSelectedItemIdInComboBoxLambda] ? juce::var (c->getSelectedId()) : juce::var (c->getText());
+            node.setProperty (property, value, &builder.getUndoManager());
+        }
 
         if (safeThis)
             refresh();
@@ -101,7 +104,11 @@ void StyleChoicePropertyComponent::refresh()
         else
         {
             proxy.referTo (proxy);
-            combo->setText (value.toString(), juce::dontSendNotification);
+
+            if (combo->getProperties ()[IDs::useSelectedItemIdInComboBoxLambda])
+                combo->setSelectedId ((int)value);
+            else
+                combo->setText (value.toString(), juce::dontSendNotification);
         }
     }
 
@@ -118,7 +125,9 @@ void StyleChoicePropertyComponent::valueChanged (juce::Value&)
 
     if (auto* combo = dynamic_cast<juce::ComboBox*>(editor.get()))
     {
-        if (combo->getText() != v)
+        if (combo->getProperties ()[IDs::useSelectedItemIdInComboBoxLambda])
+            combo->setSelectedId (v.getIntValue (), juce::sendNotificationSync);
+        else if (combo->getText() != v)
             combo->setText (v, juce::sendNotificationSync);
     }
 

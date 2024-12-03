@@ -73,12 +73,14 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
 
     addAndMakeVisible (combo.get());
 
-    combo->onChange = [&]
+    auto safeThis = juce::Component::SafePointer<StyleChoicePropertyComponent> (this);
+    combo->onChange = [&, safeThis]
     {
         if (auto* c = dynamic_cast<juce::ComboBox*>(editor.get()))
             node.setProperty (property, c->getText(), &builder.getUndoManager());
 
-        refresh();
+        if (safeThis)
+            refresh();
     };
 
     editor = std::move (combo);

@@ -120,6 +120,12 @@ public:
     void openTab (const juce::String& name);
     void setLastLocation (juce::File file);
 
+    void setButtonsVisible (bool showButtons);
+    bool isAnyButtonVisible () const;
+
+    void setHeaderVisible (bool showHeader);
+    bool isHeaderVisible () const;
+
     static juce::PropertiesFile::Options getApplicationPropertyStorage();
 
 protected:
@@ -151,6 +157,8 @@ protected:
 
     Layout layout { StretchableLayout };
 
+    bool headerVisible{ false };
+    
     // owns content (and resizers in stretchable layout    )
     juce::OwnedArray<Component>                         content;
     juce::OwnedArray<juce::StretchableLayoutResizerBar> resizers;

@@ -79,13 +79,7 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
     undoButton.setConnectedEdges (juce::TextButton::ConnectedOnLeft | juce::TextButton::ConnectedOnRight);
     editSwitch.setConnectedEdges (juce::TextButton::ConnectedOnLeft | juce::TextButton::ConnectedOnRight);
 
-    addAndMakeVisible (fileMenu);
-    
-    if (props.second)
-        addAndMakeVisible (viewMenu);
-    
-    addAndMakeVisible (undoButton);
-    addAndMakeVisible (editSwitch);
+    setButtonsVisible (true);
 
     fileMenu.onClick = [&]
     {
@@ -377,19 +371,30 @@ void ToolBox::paint (juce::Graphics& g)
     g.fillAll (findColour (ToolBox::backgroundColourId, true));
     g.setColour (findColour (ToolBox::outlineColourId, true));
     g.drawRect (getLocalBounds().toFloat(), 2.0f);
-    g.setColour (findColour (ToolBox::textColourId, true));
-    g.drawFittedText ("foleys GUI magic", getLocalBounds().withHeight (24), juce::Justification::centred, 1);
+
+    if (isHeaderVisible ())
+    {
+        g.setColour (findColour (ToolBox::textColourId, true));
+        g.drawFittedText ("foleys GUI magic", getLocalBounds().withHeight (24), juce::Justification::centred, 1);
+    }
 }
 
 void ToolBox::resized()
 {
-    auto bounds  = getLocalBounds().reduced (2).withTop (24);
-    auto buttons = bounds.removeFromTop (24);
-    auto w       = buttons.getWidth() / 5;
-    fileMenu.setBounds (buttons.removeFromLeft (w));
-    viewMenu.setBounds (buttons.removeFromLeft (w));
-    undoButton.setBounds (buttons.removeFromLeft (w));
-    editSwitch.setBounds (buttons.removeFromLeft (w));
+    auto bounds  = getLocalBounds().reduced (2);
+    
+    if (isHeaderVisible ())
+        bounds.setTop (24);
+
+    if (isAnyButtonVisible ())
+    {
+        auto buttons = bounds.removeFromTop (24);
+        auto w       = buttons.getWidth() / 5;
+        fileMenu.setBounds (buttons.removeFromLeft (w));
+        viewMenu.setBounds (buttons.removeFromLeft (w));
+        undoButton.setBounds (buttons.removeFromLeft (w));
+        editSwitch.setBounds (buttons.removeFromLeft (w));
+    }
 
     if (layout == StretchableLayout)
     {
@@ -561,6 +566,42 @@ void ToolBox::setLastLocation (juce::File file)
     autoSaveFile = lastLocation.getParentDirectory().getNonexistentChildFile (file.getFileNameWithoutExtension() + ".sav", ".xml");
 
     startTimer (Timers::AutoSave, 10000);
+}
+
+void ToolBox::setButtonsVisible (bool showButtons) 
+{
+    addChildComponent (fileMenu);
+    fileMenu.setVisible (showButtons);
+
+    addChildComponent (viewMenu);
+    viewMenu.setVisible (showButtons);
+
+    addChildComponent (undoButton);
+    undoButton.setVisible (showButtons);
+
+    addChildComponent (editSwitch);
+    editSwitch.setVisible (showButtons);
+
+    if (! getLocalBounds ().isEmpty ())
+        resized ();
+}
+
+bool ToolBox::isAnyButtonVisible() const
+{
+    return fileMenu.isVisible() || viewMenu.isVisible() || undoButton.isVisible() || editSwitch.isVisible();
+}
+
+void ToolBox::setHeaderVisible (bool showHeader) 
+{
+    headerVisible = showHeader;
+
+    if (! getLocalBounds ().isEmpty ())
+        resized ();
+}
+
+bool ToolBox::isHeaderVisible() const
+{
+    return headerVisible;
 }
 
 std::unique_ptr<juce::FileFilter> ToolBox::getFileFilter()

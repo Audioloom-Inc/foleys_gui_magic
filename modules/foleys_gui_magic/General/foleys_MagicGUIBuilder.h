@@ -298,7 +298,8 @@ protected:
     juce::ListenerList<Listener> listeners;
     bool                         editMode = false;
     juce::ValueTree              selectedNode;
-
+    bool                         blockSelectedNodeUpdates{ false };
+    
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     std::unique_ptr<ToolBox> magicToolBox;
 #endif

@@ -46,6 +46,10 @@ class AutoOrientationSlider  : public juce::Slider
 public:
 
     AutoOrientationSlider() = default;
+    AutoOrientationSlider(juce::Slider::TextEntryBoxPosition textEntryBoxPosition)
+      : juce::Slider ((juce::Slider::SliderStyle)0, textEntryBoxPosition)
+    {
+    }
 
     class StyleListener
     {

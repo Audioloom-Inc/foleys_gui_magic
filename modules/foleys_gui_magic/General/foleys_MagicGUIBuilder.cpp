@@ -83,6 +83,9 @@ juce::ValueTree MagicGUIBuilder::getGuiRootNode()
 
 std::unique_ptr<GuiItem> MagicGUIBuilder::createGuiItem (const juce::ValueTree& node)
 {
+    // in case a gui item calls updateSelectedNode which would lead to infinite loop
+    juce::ScopedValueSetter svs{ blockSelectedNodeUpdates, true };
+    
     if (node.getType() == IDs::view)
     {
         auto item = (node == getGuiRootNode()) ? createRootItem (node) : createContainer (node);
@@ -517,6 +520,9 @@ const juce::ValueTree& MagicGUIBuilder::getSelectedNode() const
 
 void MagicGUIBuilder::updateSelectedNode() 
 {
+    if (blockSelectedNodeUpdates)
+        return;
+    
     listeners.call ([&] (Listener& l) { l.selectedItem (selectedNode); });
 }
 
@@ -539,14 +545,14 @@ void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree 
     if (draggedParent.isValid())
         draggedParent.removeChild (dragged, &undo);
 
-    if (targetParent.isValid() != false && index < 0)
-        index = targetParent.indexOf (target);
-
     if (target.getType() == IDs::view)
         target.addChild (dragged, index, &undo);
     else
     {
-        // update position 
+        if (targetParent.isValid() != false && index < 0)
+            index = targetParent.indexOf (target);
+        
+        // update position
         const auto posX = (int)dragged.getProperty (IDs::posX, 0);
         const auto posY = (int)dragged.getProperty (IDs::posY, 0);
 

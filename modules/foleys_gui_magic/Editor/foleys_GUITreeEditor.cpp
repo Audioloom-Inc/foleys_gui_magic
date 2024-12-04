@@ -112,8 +112,11 @@ void GUITreeEditor::setSelectedNode (const juce::ValueTree& node)
         itemToSelect = childItem;
     }
 
-    itemToSelect->setSelected (true, true, juce::dontSendNotification);
-    treeView.scrollToKeepItemVisible (itemToSelect);
+    if (itemToSelect)
+    {
+        itemToSelect->setSelected (true, true, juce::dontSendNotification);
+        treeView.scrollToKeepItemVisible (itemToSelect);        
+    }
 }
 
 void GUITreeEditor::stateWasReloaded()

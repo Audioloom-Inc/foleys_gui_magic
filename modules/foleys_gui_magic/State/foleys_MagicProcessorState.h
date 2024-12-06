@@ -96,7 +96,7 @@ public:
 
      @param destData is the memory block to fill
      */
-    void getStateInformation (juce::MemoryBlock& destData);
+    virtual void getStateInformation (juce::MemoryBlock& destData);
 
     /**
      This method restores the plugin state using the AudioProcessorValueTreeState.
@@ -107,7 +107,7 @@ public:
      @param sizeInBytes is the length of the data
      @param editor is an optional pointer to the editor to apply the last size to
      */
-    void setStateInformation (const void* data, int sizeInBytes, juce::AudioProcessorEditor* editor = nullptr);
+    virtual void setStateInformation (const void* data, int sizeInBytes, juce::AudioProcessorEditor* editor = nullptr);
 
     /**
      Returns a parameter for a parameter ID

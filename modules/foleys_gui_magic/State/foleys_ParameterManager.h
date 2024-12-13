@@ -41,13 +41,15 @@ class ParameterManager
 public:
     ParameterManager (juce::AudioProcessor& processor);
     ParameterManager (juce::Array<juce::RangedAudioParameter*>& parameters);
-
+    ParameterManager () = default;
+    
     juce::RangedAudioParameter* getParameter (const juce::String& paramID);
 
     juce::StringArray getParameterNames() const;
 
     void updateParameterMap();
-
+    void setProcessor (juce::AudioProcessor * processor);
+    
     void saveParameterValues (juce::ValueTree& tree);
 
     void loadParameterValues (juce::ValueTree& tree);

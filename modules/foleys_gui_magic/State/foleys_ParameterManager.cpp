@@ -83,6 +83,12 @@ void ParameterManager::updateParameterMap()
     }
 }
 
+void ParameterManager::setProcessor (juce::AudioProcessor * newProcessor)
+{
+    processor = newProcessor;
+    updateParameterMap();
+}
+
 juce::StringArray ParameterManager::getParameterNames() const
 {
     juce::StringArray names;

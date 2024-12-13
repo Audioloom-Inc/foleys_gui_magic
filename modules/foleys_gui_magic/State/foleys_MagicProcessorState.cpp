@@ -37,12 +37,12 @@ namespace foleys
 {
 
 MagicProcessorState::MagicProcessorState (juce::AudioProcessor& processorToUse)
-  : processor (processorToUse), parameters (processorToUse)
+  : processor (&processorToUse), parameters (processorToUse)
 {
 }
 
 MagicProcessorState::MagicProcessorState (juce::AudioProcessor& processorToUse, juce::Array<juce::RangedAudioParameter*>& parameters) 
-: processor (processorToUse), parameters (parameters)
+: processor (&processorToUse), parameters (parameters)
 {
 }
 
@@ -58,9 +58,11 @@ juce::StringArray MagicProcessorState::getParameterNames() const
 
 juce::PopupMenu MagicProcessorState::createParameterMenu() const
 {
+    jassert (processor);
+
     juce::PopupMenu menu;
     int index = 0;
-    addParametersToMenu (processor.getParameterTree(), menu, index);
+    addParametersToMenu (processor->getParameterTree(), menu, index);
     return menu;
 }
 
@@ -80,7 +82,9 @@ juce::ValueTree MagicProcessorState::createDefaultGuiValueTree() const
     if (plotView.isValid())
         rootNode.appendChild (plotView, nullptr);
 
-    auto params = DefaultGuiTrees::createProcessorGui (processor.getParameterTree());
+    jassert (processor);
+
+    auto params = DefaultGuiTrees::createProcessorGui (processor->getParameterTree());
     rootNode.appendChild (params, nullptr);
 
     magic.appendChild (rootNode, nullptr);
@@ -151,7 +155,15 @@ std::unique_ptr<juce::ButtonParameterAttachment> MagicProcessorState::createAtta
 
 juce::AudioProcessor* MagicProcessorState::getProcessor()
 {
-    return &processor;
+    return processor;
+}
+
+void MagicProcessorState::setProcessor (juce::AudioProcessor* processor) 
+{
+    this->processor = processor;
+    parameters.setProcessor (processor);
+    
+    updateParameterMap();
 }
 
 void MagicProcessorState::setLastEditorSize (int  width, int  height)

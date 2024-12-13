@@ -60,6 +60,7 @@ public:
      */
     MagicProcessorState (juce::AudioProcessor& processorToUse, juce::Array<juce::RangedAudioParameter*>& parameters);
     
+    MagicProcessorState () {}
     
     ~MagicProcessorState() override;
 
@@ -120,6 +121,7 @@ public:
     std::unique_ptr<juce::ButtonParameterAttachment>   createAttachment (const juce::String& paramID, juce::Button& button) override;
 
     juce::AudioProcessor* getProcessor() override;
+    void setProcessor (juce::AudioProcessor * processor);
 
     /**
      Send the midi data to the keyboard and to the MidiLearn mapper.
@@ -155,7 +157,7 @@ private:
 
     void timerCallback() override;
 
-    juce::AudioProcessor& processor;
+    juce::AudioProcessor * processor{ nullptr };
 
     ParameterManager    parameters;
     MidiParameterMapper midiMapper { *this };

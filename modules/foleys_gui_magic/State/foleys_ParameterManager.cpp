@@ -70,6 +70,8 @@ juce::RangedAudioParameter* ParameterManager::getParameter (const juce::String& 
 
 void ParameterManager::updateParameterMap()
 {
+    parameterLookup.clear ();
+    
     if (processor)
     {
         for (auto* parameter : processor->getParameters())

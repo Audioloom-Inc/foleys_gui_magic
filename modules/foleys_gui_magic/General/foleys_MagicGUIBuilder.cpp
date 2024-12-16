@@ -58,11 +58,14 @@ MagicGUIBuilder::MagicGUIBuilder (MagicGUIState& state, std::unique_ptr<Styleshe
 
     updateStylesheet();
     getConfigTree().addListener (this);
+    getEditorTree().addListener (this);
 }
 
 MagicGUIBuilder::~MagicGUIBuilder()
 {
     getConfigTree().removeListener (this);
+    getEditorTree().removeListener (this);
+    
     masterReference.clear();
 }
 
@@ -74,6 +77,11 @@ Stylesheet& MagicGUIBuilder::getStylesheet()
 juce::ValueTree& MagicGUIBuilder::getConfigTree()
 {
     return magicState.getGuiTree();
+}
+
+juce::ValueTree& MagicGUIBuilder::getEditorTree()
+{
+    return magicState.getEditorTree();
 }
 
 juce::ValueTree MagicGUIBuilder::getGuiRootNode()
@@ -452,7 +460,7 @@ void MagicGUIBuilder::valueTreeRedirected (juce::ValueTree& treeWhichHasBeenChan
 
 void MagicGUIBuilder::valueTreePropertyChanged(juce::ValueTree & tree, const juce::Identifier & property)
 {
-    if (tree == magicState.getEditorRoot ())
+    if (tree == magicState.getEditorTree ())
     {
         if (property == IDs::editModeEnabled)
             setEditMode (tree[property]);
@@ -484,7 +492,7 @@ void MagicGUIBuilder::setEditMode (bool shouldEdit)
 
     listeners.call (&Listener::editModeToggled, editMode);
     
-    getMagicState ().getEditorRoot ().setProperty (IDs::editModeEnabled, editMode, nullptr);
+    getMagicState ().getEditorTree ().setProperty (IDs::editModeEnabled, editMode, nullptr);
 
     parent->repaint();
 }

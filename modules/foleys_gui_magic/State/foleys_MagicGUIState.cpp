@@ -78,14 +78,9 @@ juce::ValueTree MagicGUIState::getPropertyRoot() const
     return state.getChildWithName (IDs::properties);
 }
 
-juce::ValueTree MagicGUIState::getEditorRoot()
+juce::ValueTree& MagicGUIState::getEditorTree()
 {
-    return guiValueTree.getOrCreateChildWithName (IDs::editor, nullptr);
-}
-
-juce::ValueTree MagicGUIState::getEditorRoot() const
-{
-    return guiValueTree.getChildWithName (IDs::editor);
+    return editorTree;
 }
 
 void MagicGUIState::setGuiValueTree (const juce::ValueTree& dom)
@@ -108,6 +103,27 @@ void MagicGUIState::setGuiValueTree (const juce::File& file)
     auto dom = juce::ValueTree::fromXml (file.loadFileAsString());
     if (dom.isValid())
         setGuiValueTree (dom);
+}
+
+void MagicGUIState::setEditorValueTree (const juce::ValueTree& eDom) 
+{
+    jassert (eDom.hasType (IDs::editor));
+    editorTree = eDom;
+}
+
+void MagicGUIState::setEditorValueTree (const char* data, int dataSize) 
+{
+    juce::String text (data, size_t (dataSize));
+    auto dom = juce::ValueTree::fromXml (text);
+    if (dom.isValid())
+        setEditorValueTree (dom);
+}
+
+void MagicGUIState::setEditorValueTree (const juce::File& file) 
+{
+    auto dom = juce::ValueTree::fromXml (file.loadFileAsString());
+    if (dom.isValid())
+        setEditorValueTree (dom);
 }
 
 juce::ValueTree& MagicGUIState::getGuiTree()

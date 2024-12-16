@@ -76,8 +76,7 @@ public:
     juce::ValueTree getPropertyRoot() const;
 
     /** Returns the root node for all properties necessary for the editor, toolbox */
-    juce::ValueTree getEditorRoot();
-    juce::ValueTree getEditorRoot() const;
+    juce::ValueTree& getEditorTree();
 
     /**
      Set the GUI DOM to create the GUI components from
@@ -85,6 +84,10 @@ public:
     void setGuiValueTree (const juce::ValueTree& dom);
     void setGuiValueTree (const char* data, int dataSize);
     void setGuiValueTree (const juce::File& file);
+
+    void setEditorValueTree (const juce::ValueTree& eDom);
+    void setEditorValueTree (const char* data, int dataSize);
+    void setEditorValueTree (const juce::File& file);
 
     /**
      Grants access to the gui tree. This is returned as reference so you are able to connect listeners to it.
@@ -262,7 +265,8 @@ private:
 
     juce::ValueTree guiValueTree { IDs::magic };
     juce::ValueTree state        { "state" };
-
+    juce::ValueTree editorTree   { IDs::editor };
+    
     juce::MidiKeyboardState keyboardState;
 
     std::map<juce::Identifier, std::function<void()>>       triggers;

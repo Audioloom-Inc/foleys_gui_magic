@@ -81,6 +81,10 @@ public:
     juce::ValueTree& getConfigTree();
 
     /**
+     */
+    juce::ValueTree& getEditorTree ();
+    
+    /**
      Grants access to the GUI root node.
      */
     juce::ValueTree getGuiRootNode();

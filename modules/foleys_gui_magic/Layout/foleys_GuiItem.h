@@ -119,7 +119,7 @@ public:
      */
     void updateInternal();
 
-    void paint (juce::Graphics& g) final;
+    void paint (juce::Graphics& g) override;
     void resized() override;
 
     virtual bool isContainer() const { return false; }

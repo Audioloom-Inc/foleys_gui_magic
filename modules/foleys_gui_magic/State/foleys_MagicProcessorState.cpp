@@ -125,9 +125,9 @@ std::unique_ptr<juce::SliderParameterAttachment> MagicProcessorState::createAtta
     if (auto* parameter = getParameter (paramID))
         return std::make_unique<juce::SliderParameterAttachment>(*parameter, slider);
 
-    // You have connected a control to a parameter that doesn't exist. Please fix your GUI.
-    // You may safely click continue in your debugger
-    jassertfalse;
+    // // You have connected a control to a parameter that doesn't exist. Please fix your GUI.
+    // // You may safely click continue in your debugger
+    // jassertfalse;
     return {};
 }
 
@@ -136,9 +136,9 @@ std::unique_ptr<juce::ComboBoxParameterAttachment> MagicProcessorState::createAt
     if (auto* parameter = getParameter (paramID))
         return std::make_unique<juce::ComboBoxParameterAttachment>(*parameter, combobox);
 
-    // You have connected a control to a parameter that doesn't exist. Please fix your GUI.
-    // You may safely click continue in your debugger
-    jassertfalse;
+    // // You have connected a control to a parameter that doesn't exist. Please fix your GUI.
+    // // You may safely click continue in your debugger
+    // jassertfalse;
     return {};
 }
 
@@ -147,9 +147,9 @@ std::unique_ptr<juce::ButtonParameterAttachment> MagicProcessorState::createAtta
     if (auto* parameter = getParameter (paramID))
         return std::make_unique<juce::ButtonParameterAttachment>(*parameter, button);
 
-    // You have connected a control to a parameter that doesn't exist. Please fix your GUI.
-    // You may safely click continue in your debugger
-    jassertfalse;
+    // // You have connected a control to a parameter that doesn't exist. Please fix your GUI.
+    // // You may safely click continue in your debugger
+    // jassertfalse;
     return {};
 }
 
@@ -160,10 +160,14 @@ juce::AudioProcessor* MagicProcessorState::getProcessor()
 
 void MagicProcessorState::setProcessor (juce::AudioProcessor* processor) 
 {
+    processorAboutToChange ();
+
     this->processor = processor;
     parameters.setProcessor (processor);
     
     updateParameterMap();
+
+    processorChanged ();
 }
 
 void MagicProcessorState::setLastEditorSize (int  width, int  height)

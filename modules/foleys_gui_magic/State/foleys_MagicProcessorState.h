@@ -146,6 +146,11 @@ public:
      Creates a default value tree from current parameters
      */
     juce::ValueTree createDefaultGuiValueTree () const override;
+
+protected:
+    virtual void processorAboutToChange () {}
+    virtual void processorChanged () {}
+    
 private:
 
     void addParametersToMenu (const juce::AudioProcessorParameterGroup& group, juce::PopupMenu& menu, int& index) const;

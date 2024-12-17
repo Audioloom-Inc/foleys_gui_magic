@@ -539,6 +539,8 @@ void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree 
     if (dragged == target)
         return;
 
+    setEditMode (true);
+    
     undo.beginNewTransaction();
 
     if (targetPos.x > 0 && targetPos.y > 0)

@@ -112,16 +112,13 @@ void Decorator::updateColours (MagicGUIBuilder& builder, const juce::ValueTree& 
     auto& stylesheet = builder.getStylesheet();
 
     auto bg = builder.getStyleProperty (IDs::backgroundColour, node);
-    if (! bg.isVoid())
-        backgroundColour = stylesheet.getColour (bg.toString());
-
+    backgroundColour = bg.isVoid() ? juce::Colour () : stylesheet.getColour (bg.toString());
+    
     auto bcVar = builder.getStyleProperty (IDs::borderColour, node);
-    if (! bcVar.isVoid())
-        borderColour = stylesheet.getColour (bcVar.toString());
+    borderColour = bcVar.isVoid() ? juce::Colour () : stylesheet.getColour (bcVar.toString());
 
     auto ccVar = builder.getStyleProperty (IDs::captionColour, node);
-    if (! ccVar.isVoid())
-        captionColour = stylesheet.getColour (ccVar.toString());
+    captionColour = ccVar.isVoid() ? juce::Colour () : stylesheet.getColour (ccVar.toString());
 }
 
 Decorator::ClientBounds Decorator::getClientBounds (juce::Rectangle<int> overallBounds) const
@@ -211,11 +208,11 @@ void Decorator::configure (MagicGUIBuilder& builder, const juce::ValueTree& node
 
 void Decorator::reset()
 {
-    backgroundColour = juce::Colours::darkgrey;
-    borderColour     = juce::Colours::silver;
+    backgroundColour = {};
+    borderColour     = {};
 
-    margin  = { 5.0f };
-    padding = { 5.0f };
+    margin  = { 0.0f };
+    padding = { 0.0f };
     border  = 0.0f;
     radius  = 5.0f;
 

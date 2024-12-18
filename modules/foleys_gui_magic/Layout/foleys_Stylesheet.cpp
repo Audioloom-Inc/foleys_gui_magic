@@ -224,7 +224,7 @@ juce::var Stylesheet::getStyleProperty (const juce::Identifier& name, const juce
 
     auto parent = node.getParent();
     if (parent.isValid() && parent.getType() != IDs::magic)
-        if (auto val = getStyleProperty (name, parent, name == IDs::lookAndFeel, definedHere); ! val.isVoid ())
+        if (auto val = getStyleProperty (name, parent, false, definedHere); ! val.isVoid ())
             return val;
 
     if (definedHere)

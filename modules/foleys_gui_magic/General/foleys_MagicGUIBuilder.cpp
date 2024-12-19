@@ -576,6 +576,11 @@ void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree 
     }
 }
 
+bool MagicGUIBuilder::canNodeBeDeleted (juce::ValueTree node)
+{
+    return node.getType () != IDs::magic;
+}
+
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
 
 void MagicGUIBuilder::attachToolboxToWindow (juce::Component& window)

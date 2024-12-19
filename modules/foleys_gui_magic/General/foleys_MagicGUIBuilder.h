@@ -278,7 +278,9 @@ public:
     
     /** */
     void updateSelectedNode ();
-    void draggedItemOnto (juce::ValueTree dropped, juce::ValueTree target, juce::Point<int> targetPos = {}, int index = -1);
+    virtual void draggedItemOnto (juce::ValueTree dropped, juce::ValueTree target, juce::Point<int> targetPos = {}, int index = -1);
+    virtual bool canNodeBeDeleted (juce::ValueTree node);
+    virtual bool isCopyingEnabled () { return true; }
 
 protected:
     MagicGUIState& magicState;

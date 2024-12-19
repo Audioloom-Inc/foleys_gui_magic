@@ -279,8 +279,13 @@ std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (ju
     if (item)
     {
         auto props = item->getSettableProperties();
+        
+        
         for (auto& other : props)
         {
+            if (other.name == IDs::parameter)
+                continue;
+                
             other.node = styleItem;   
 
             if (other.category.isEmpty())

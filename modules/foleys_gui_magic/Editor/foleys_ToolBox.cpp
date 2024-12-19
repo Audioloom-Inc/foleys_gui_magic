@@ -455,7 +455,7 @@ bool ToolBox::keyPressed (const juce::KeyPress& key)
         if (selected.isValid())
         {
             auto p = selected.getParent();
-            if (p.isValid() && p.getType () != IDs::magic)
+            if (p.isValid() && builder.canNodeBeDeleted (selected))
                 p.removeChild (selected, &undo);
         }
 
@@ -472,23 +472,26 @@ bool ToolBox::keyPressed (const juce::KeyPress& key)
         return true;
     }
 
-    if (key.isKeyCode ('C') && key.getModifiers().isCommandDown())
+    if (builder.isCopyingEnabled ())
     {
-        auto selected = builder.getSelectedNode();
-        if (selected.isValid())
-            juce::SystemClipboard::copyTextToClipboard (selected.toXmlString());
+        if (key.isKeyCode ('C') && key.getModifiers().isCommandDown())
+        {
+            auto selected = builder.getSelectedNode();
+            if (selected.isValid())
+                juce::SystemClipboard::copyTextToClipboard (selected.toXmlString());
 
-        return true;
-    }
+            return true;
+        }
 
-    if (key.isKeyCode ('V') && key.getModifiers().isCommandDown())
-    {
-        auto paste    = juce::ValueTree::fromXml (juce::SystemClipboard::getTextFromClipboard());
-        auto selected = builder.getSelectedNode();
-        if (paste.isValid() && selected.isValid())
-            builder.draggedItemOnto (paste, selected);
+        if (key.isKeyCode ('V') && key.getModifiers().isCommandDown())
+        {
+            auto paste    = juce::ValueTree::fromXml (juce::SystemClipboard::getTextFromClipboard());
+            auto selected = builder.getSelectedNode();
+            if (paste.isValid() && selected.isValid())
+                builder.draggedItemOnto (paste, selected);
 
-        return true;
+            return true;
+        }
     }
 
     return false;

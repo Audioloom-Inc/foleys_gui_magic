@@ -459,7 +459,7 @@ void GuiItem::setDraggable (bool selected)
         getParentsLayoutType() == LayoutType::Contents &&
         configNode != magicBuilder.getGuiRootNode())
     {
-        toFront (false);
+        // toFront (false);
         borderDragger = std::make_unique<BorderDragger>(this, nullptr);
         componentDragger = std::make_unique<juce::ComponentDragger>();
 

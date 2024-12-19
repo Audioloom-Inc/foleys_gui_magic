@@ -270,7 +270,7 @@ void GuiItem::updateLayout()
 
 bool GuiItem::shouldBeVisible()
 {
-    return visibility.getValue() && getProperty (IDs::shown); 
+    return visibility.getValue() && (shown || isEditModeOn ());
 }
 
 
@@ -417,6 +417,13 @@ void GuiItem::setEditMode (bool shouldEdit)
 
     if (auto* component = getWrappedComponent())
         component->setInterceptsMouseClicks (!shouldEdit, !shouldEdit);
+
+    updateVisibility ();
+}
+
+bool GuiItem::isEditModeOn () const
+{
+    return magicBuilder.isEditModeOn();
 }
 
 void GuiItem::init()
@@ -513,7 +520,14 @@ void GuiItem::handleAsyncUpdate ()
 
 void GuiItem::updateVisibility()
 {
-    setVisible (visibility.getValue () && (bool)getProperty (IDs::shown));
+    shown = getProperty (IDs::shown);
+
+    auto hidden = ! shown && isEditModeOn ();
+    auto visible = (bool)visibility.getValue() && (shown || hidden);
+
+    setVisible (visible);
+
+    setAlpha (hidden ? 0.4f : 1.f);
 }
 
 void GuiItem::mouseDown (const juce::MouseEvent& event)

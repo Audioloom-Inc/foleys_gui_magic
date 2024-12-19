@@ -139,8 +139,12 @@ public:
      This will trigger a recalculation of the children layout regardless of resized
      */
     virtual void updateLayout();
-    void setVisible (bool shouldBeVisible) override { juce::Component::setVisible (shouldBeVisible); }
+
+    /**
+     Returns true when the component is visible and not hidden
+    */
     bool shouldBeVisible ();
+
     /**
      Returns the layout type this item is managed by.
      */
@@ -188,7 +192,8 @@ public:
      This method sets the GUI in edit mode, that allows to drag the components around.
      */
     virtual void setEditMode (bool shouldEdit);
-
+    bool isEditModeOn() const;
+    
     /**  
     */
     virtual void init ();
@@ -283,7 +288,8 @@ private:
     void configureComponent();
 
     juce::Value     visibility { true };
-    juce::Value     shown{ true };
+    bool            shown{ true };
+    bool            hidden{ false };
 
     juce::String    highlight;
 

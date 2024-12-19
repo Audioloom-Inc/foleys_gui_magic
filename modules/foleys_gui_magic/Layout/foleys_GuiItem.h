@@ -72,7 +72,8 @@ public:
      The Colours will be handled by default.
      */
     virtual void update() {}
-
+    
+    void savePosition ();
     /**
      Set colours in the wrapped Component to the value from the stylesheet and palette.
      */
@@ -223,7 +224,11 @@ public:
 
     bool isRoot () const;
     
+    
     juce::ValueTree getNode () const;
+    
+    
+    void setBoundsForced (juce::Rectangle<int> rectangle);
     
 protected:
 
@@ -247,35 +252,63 @@ protected:
 
     void valueTreeParentChanged (juce::ValueTree&) override;
 
-    void savePosition ();
+
     
+    virtual void customResizeOperation (juce::Rectangle<int> delta) {}
+
 private:
 
     class BorderDragger : public juce::ResizableBorderComponent
     {
     public:
-        BorderDragger (juce::Component* component, juce::ComponentBoundsConstrainer* constrainer = nullptr) : juce::ResizableBorderComponent (component, constrainer) {}
+        BorderDragger (juce::Component* component, juce::ComponentBoundsConstrainer* constrainer = nullptr) : juce::ResizableBorderComponent (component, constrainer), c (component) {}
         std::function<void()> onDragStart, onDragging, onDragEnd;
 
         void mouseDown (const juce::MouseEvent& event) override
         {
+            storeBounds ();
+
             if (onDragStart) onDragStart();
             juce::ResizableBorderComponent::mouseDown (event);
         }
 
         void mouseDrag (const juce::MouseEvent& event) override
         {
+            storeBounds ();
+
             juce::ResizableBorderComponent::mouseDrag (event);
             if (onDragging) onDragging();
         }
 
         void mouseUp (const juce::MouseEvent& event) override
         {
+            storeBounds ();
+
             juce::ResizableBorderComponent::mouseUp (event);
             if (onDragEnd) onDragEnd();
         }
 
+        juce::Rectangle<int> getDeltaBounds ()
+        {
+            if (c)
+            {
+                auto bounds = c->getBounds();
+                
+                auto deltaPos = bounds.getPosition() - lastBounds.getPosition();
+                auto deltaWidth = bounds.getWidth() - lastBounds.getWidth();
+                auto deltaHeight = bounds.getHeight() - lastBounds.getHeight();
+
+                return { deltaPos.x, deltaPos.y, deltaWidth, deltaHeight };
+            }
+                
+            return {};
+        }
+
     private:
+        juce::WeakReference<juce::Component> c;
+        juce::Rectangle<int> lastBounds;
+        void storeBounds () { lastBounds = c ? c->getBounds () : juce::Rectangle<int> (); }
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BorderDragger)
     };
     std::unique_ptr<BorderDragger>          borderDragger;

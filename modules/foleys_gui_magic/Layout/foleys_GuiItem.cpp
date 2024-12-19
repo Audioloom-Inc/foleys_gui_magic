@@ -337,6 +337,22 @@ void GuiItem::valueTreeChildAdded (juce::ValueTree& treeThatChanged, juce::Value
         addSubComponent (childAdded);
 }
 
+void GuiItem::setBoundsForced (juce::Rectangle<int> rectangle)
+{
+    auto configure = [&] (Position& p, int d){
+        p.absolute = true;
+        p.value = d;
+    };
+    
+    configure (posX, rectangle.getX ());
+    configure (posY, rectangle.getY ());
+    configure (posWidth, rectangle.getWidth ());
+    configure (posHeight, rectangle.getHeight ());
+    
+    setBounds (rectangle);
+    savePosition ();
+}
+
 void GuiItem::valueTreeChildRemoved (juce::ValueTree& treeThatChanged, juce::ValueTree& childRemoved, int index)
 {
     if (treeThatChanged == configNode)
@@ -453,6 +469,7 @@ void GuiItem::setDraggable (bool selected)
         };
         borderDragger->onDragging = [&]
         {
+            customResizeOperation (borderDragger->getDeltaBounds ());
             triggerAsyncUpdate ();
         };
         borderDragger->onDragEnd = [&]

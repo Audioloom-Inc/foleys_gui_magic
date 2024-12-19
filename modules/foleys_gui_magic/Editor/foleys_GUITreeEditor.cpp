@@ -183,13 +183,23 @@ void GUITreeEditor::GuiTreeItem::paintItem (juce::Graphics& g, int width, int he
     g.setColour (owner.findColour (ToolBox::textColourId, true));
     g.setFont (height * 0.7f);
 
-    juce::String name = itemNode.getType().toString();
+    juce::String name = itemNode.getProperty (IDs::customNodeName, itemNode.getType().toString()).toString ();
 
-    if (itemNode.hasProperty (IDs::id) && itemNode.getProperty (IDs::id).toString().isNotEmpty())
-        name += " (" + itemNode.getProperty (IDs::id).toString() + ")";
-
-    if (itemNode.hasProperty (IDs::caption))
-        name += ": " + itemNode.getProperty (IDs::caption).toString();
+    if (auto paramId = itemNode.getProperty (IDs::parameter).toString (); paramId.isNotEmpty ())
+    {
+        if (auto param = builder.getMagicState ().getParameter (paramId))
+            name += " (" + param->getName (25) + ")";
+        else
+            name += " (missing param)";
+    }
+    else
+    {
+        if (itemNode.hasProperty (IDs::id) && itemNode.getProperty (IDs::id).toString().isNotEmpty())
+            name += " (" + itemNode.getProperty (IDs::id).toString() + ")";
+        
+        if (itemNode.hasProperty (IDs::caption))
+            name += ": " + itemNode.getProperty (IDs::caption).toString();
+    }
 
     g.drawText (name, 4, 0, width - 4, height, juce::Justification::centredLeft, true);
 }

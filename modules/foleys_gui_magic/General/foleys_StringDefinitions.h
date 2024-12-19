@@ -89,6 +89,8 @@ namespace IDs
     static juce::Identifier styleClass   { "class" };
     static juce::Identifier active       { "active" };
 
+    static juce::Identifier customNodeName{ "customNodeName" };
+
     static juce::Identifier backgroundColour  { "background-color" };
     static juce::Identifier borderColour      { "border-color" };
     static juce::Identifier tabCaption   { "tab-caption" };

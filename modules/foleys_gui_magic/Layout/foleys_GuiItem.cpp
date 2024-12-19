@@ -268,6 +268,12 @@ void GuiItem::updateLayout()
     resized();
 }
 
+bool GuiItem::shouldBeVisible()
+{
+    return visibility.getValue() && getProperty (IDs::shown); 
+}
+
+
 LayoutType GuiItem::getParentsLayoutType() const
 {
     if (auto* container = dynamic_cast<Container*>(getParentComponent()))
@@ -289,7 +295,7 @@ juce::Colour GuiItem::getTabColour() const
 void GuiItem::valueChanged (juce::Value& source)
 {
     if (source == visibility)
-        setVisible (visibility.getValue());
+        updateVisibility ();
 }
 
 void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const juce::Identifier& property)
@@ -299,6 +305,8 @@ void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const 
         init ();
     else if (property == foleys::IDs::parameter)
         updateParameterConnection (getProperty (IDs::parameter));
+    else if (property == foleys::IDs::shown)
+        updateVisibility ();
     else
         propertyChanged (property);
 
@@ -501,6 +509,11 @@ void GuiItem::savePosition ()
 void GuiItem::handleAsyncUpdate ()
 {
     savePosition ();
+}
+
+void GuiItem::updateVisibility()
+{
+    setVisible (visibility.getValue () && (bool)getProperty (IDs::shown));
 }
 
 void GuiItem::mouseDown (const juce::MouseEvent& event)

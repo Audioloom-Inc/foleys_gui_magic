@@ -139,7 +139,8 @@ public:
      This will trigger a recalculation of the children layout regardless of resized
      */
     virtual void updateLayout();
-
+    void setVisible (bool shouldBeVisible) override { juce::Component::setVisible (shouldBeVisible); }
+    bool shouldBeVisible ();
     /**
      Returns the layout type this item is managed by.
      */
@@ -242,6 +243,7 @@ protected:
     void valueTreeParentChanged (juce::ValueTree&) override;
 
     void savePosition ();
+    
 private:
 
     class BorderDragger : public juce::ResizableBorderComponent
@@ -281,6 +283,7 @@ private:
     void configureComponent();
 
     juce::Value     visibility { true };
+    juce::Value     shown{ true };
 
     juce::String    highlight;
 
@@ -292,9 +295,9 @@ private:
     Position posX, posY, posWidth, posHeight;
 
     void configurePosition (const juce::var& v, Position& p, double d);
-
     void handleAsyncUpdate () override;
-    
+    void updateVisibility ();
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiItem)
 };
 

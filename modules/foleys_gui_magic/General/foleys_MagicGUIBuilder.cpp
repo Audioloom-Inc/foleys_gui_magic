@@ -391,6 +391,9 @@ juce::var MagicGUIBuilder::getPropertyDefaultValue (juce::Identifier property, j
                 if (pDefault.name == property)
                     return pDefault.defaultValue;
                     
+    if (property == IDs::shown)
+        return true;
+
     // flexbox
     if (property == IDs::flexDirection)
         return IDs::flexDirRow;

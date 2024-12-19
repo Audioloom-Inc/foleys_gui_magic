@@ -58,7 +58,9 @@ namespace IDs
     static juce::Identifier drumpadComponent  { "DrumpadComponent" };
     static juce::Identifier webBrowser   { "WebBrowserComponent" };
 
-    static juce::Identifier visibility   { "visibility" };
+    static juce::Identifier shown        { "shown" };           // used to hide and show components instead of deleting them from the tree
+    static juce::Identifier visibility   { "visibility" };      // this is used to hide the component when some given value changes
+
     static juce::Identifier caption      { "caption" };
     static juce::Identifier captionPlacement { "caption-placement" };
     static juce::Identifier captionColour { "caption-color" };

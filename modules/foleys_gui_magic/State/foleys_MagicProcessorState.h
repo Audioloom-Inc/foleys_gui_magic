@@ -148,8 +148,8 @@ public:
     juce::ValueTree createDefaultGuiValueTree () const override;
 
 protected:
-    virtual void processorAboutToChange () {}
-    virtual void processorChanged () {}
+    virtual void processorAboutToBeReplaced () {}
+    virtual void processorReplaced () {}
     
 private:
 

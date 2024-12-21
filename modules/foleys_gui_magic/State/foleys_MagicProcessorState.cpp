@@ -160,14 +160,14 @@ juce::AudioProcessor* MagicProcessorState::getProcessor()
 
 void MagicProcessorState::setProcessor (juce::AudioProcessor* processor) 
 {
-    processorAboutToChange ();
+    processorAboutToBeReplaced ();
 
     this->processor = processor;
     parameters.setProcessor (processor);
     
     updateParameterMap();
 
-    processorChanged ();
+    processorReplaced ();
 }
 
 void MagicProcessorState::setLastEditorSize (int  width, int  height)

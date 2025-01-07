@@ -286,6 +286,11 @@ juce::StringArray MagicGUIBuilder::getFactoryNames() const
     return names;
 }
 
+bool MagicGUIBuilder::isFactoryName (const juce::Identifier& name) const
+{
+    return getFactoryNames ().contains (name.toString ());
+}
+
 std::unique_ptr<GuiItem> MagicGUIBuilder::createRootItem (const juce::ValueTree& node)
 {
     return std::make_unique<RootItem> (*this, node);

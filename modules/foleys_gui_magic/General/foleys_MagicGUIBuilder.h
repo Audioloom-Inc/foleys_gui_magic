@@ -195,6 +195,11 @@ public:
     juce::StringArray getFactoryNames() const;
 
     /**
+     returns true when a factory with this name has been registered
+     */
+    bool isFactoryName (const juce::Identifier& name) const;
+
+    /**
      creates a new root item. You can override this mtethod to create your own root item.
      */
     virtual std::unique_ptr<GuiItem> createRootItem (const juce::ValueTree& node);

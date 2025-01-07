@@ -220,6 +220,8 @@ public:
 
     bool isSelected () const;
     
+    bool isInitializing () const;
+    
     MagicGUIBuilder& magicBuilder;
 
     bool isRoot () const;
@@ -323,6 +325,7 @@ private:
     juce::Value     visibility { true };
     bool            shown{ true };
     bool            hidden{ false };
+    bool            initializing{ false };
 
     juce::String    highlight;
 

@@ -444,6 +444,8 @@ bool GuiItem::isEditModeOn () const
 
 void GuiItem::init()
 {
+    juce::ScopedValueSetter<bool> setter (initializing, true);
+
     auto properties = getSettableProperties ();
 
     for (auto p : properties)
@@ -632,6 +634,11 @@ void GuiItem::itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSou
 bool GuiItem::isSelected() const
 {
     return magicBuilder.getSelectedNode() == configNode;
+}
+
+bool GuiItem::isInitializing() const
+{
+    return initializing;
 }
 
 bool GuiItem::isRoot() const

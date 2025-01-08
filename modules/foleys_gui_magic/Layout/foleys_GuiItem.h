@@ -72,6 +72,7 @@ public:
      The Colours will be handled by default.
      */
     virtual void update() {}
+    virtual void update(const juce::Identifier& propertyThatHasChange) { update (); }
     
     void savePosition ();
     /**
@@ -116,9 +117,9 @@ public:
     virtual GuiItem* findGuiItemWithId (const juce::String& name);
 
     /**
-     Reread properties from the config ValueTree
+     Reread properties from the config ValueTree. When propertyThatHasChanged isNull () assume that you should init all properties.l
      */
-    void updateInternal();
+    void updateInternal(const juce::Identifier& propertyThatHasChanged = {});
 
     void paint (juce::Graphics& g) override;
     void resized() override;

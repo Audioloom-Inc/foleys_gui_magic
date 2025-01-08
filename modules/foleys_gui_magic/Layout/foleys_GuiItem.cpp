@@ -88,22 +88,31 @@ GuiItem* GuiItem::findGuiItemWithId (const juce::String& name)
     return nullptr;
 }
 
-void GuiItem::updateInternal()
+void GuiItem::updateInternal(const juce::Identifier& property)
 {
-    auto& stylesheet = magicBuilder.getStylesheet();
+    const bool all = property.isNull ();
+    const bool position = all || (property == IDs::posX) || (property == IDs::posY) || (property == IDs::posWidth) || (property == IDs::posHeight) || (property == IDs::width) || (property == IDs::height);
+    const bool other = all || ! position;
+    
+    if (other)
+    {
+        auto& stylesheet = magicBuilder.getStylesheet();
+        
+        if (auto* newLookAndFeel = stylesheet.getLookAndFeel (configNode))
+            setLookAndFeel (newLookAndFeel);
+        
+        decorator.configure (magicBuilder, configNode);
+        configureComponent();
+        configureFlexBoxItem (configNode);
+    }
 
-    if (auto* newLookAndFeel = stylesheet.getLookAndFeel (configNode))
-        setLookAndFeel (newLookAndFeel);
+    if (position)
+        configurePosition (configNode);
 
-    decorator.configure (magicBuilder, configNode);
-    configureComponent();
-    configureFlexBoxItem (configNode);
-    configurePosition (configNode);
+    if (other)
+        updateColours();
 
-    updateColours();
-
-    update();
-
+    update(property);
     setEditMode (magicBuilder.isEditModeOn());
 
     repaint();
@@ -309,14 +318,14 @@ void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const 
         updateVisibility ();
     else
         propertyChanged (property);
-
-    // ongoing calls here ...
+    
+    // ongoing calls here
     if (treeThatChanged == configNode)
     {
         if (auto* parent = findParentComponentOfClass<GuiItem>())
-            parent->updateInternal();
+            parent->updateInternal(property);
         else
-            updateInternal();
+            updateInternal(property);
 
         return;
     }
@@ -622,11 +631,30 @@ void GuiItem::itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSou
     }
 
     auto node = juce::ValueTree::fromXml (dragSourceDetails.description.toString());
+    
     if (node.isValid())
     {
         magicBuilder.draggedItemOnto (node, configNode, dropPosition);
         return;
     }
+
+    // if (node.isValid () && node.getType () == IDs::itemGroup)
+    // {
+    //     juce::Array<juce::ValueTree> children;
+        
+    //     for (auto child : node)
+    //         children.add (child);
+
+    //     node.removeAllChildren (nullptr);
+
+    //     for (auto child : children)
+    //     {
+    //         auto position = juce::Point<int> (child.getProperty (IDs::posX, 0), child.getProperty (IDs::posY, 0));
+    //         magicBuilder.draggedItemOnto (child, configNode, dropPosition + position);
+    //     }
+            
+    //     return;
+    // }
 
     customItemDropAction (dragSourceDetails);
 }

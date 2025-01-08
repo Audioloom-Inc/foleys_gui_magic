@@ -456,7 +456,10 @@ bool ToolBox::keyPressed (const juce::KeyPress& key)
         {
             auto p = selected.getParent();
             if (p.isValid() && builder.canNodeBeDeleted (selected))
+            {
+                undo.beginNewTransaction ("Delete " + selected.getType().toString());
                 p.removeChild (selected, &undo);
+            }
         }
 
         return true;

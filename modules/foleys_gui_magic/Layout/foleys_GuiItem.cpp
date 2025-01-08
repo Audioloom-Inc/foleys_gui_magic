@@ -491,6 +491,9 @@ void GuiItem::setDraggable (bool selected)
 
 void GuiItem::savePosition ()
 {
+    // this way we can prevent so many unnecessary calls to update layout without breaking undo redo
+    magicBuilder.beginSavePosition (this);
+    
     auto findContainer = [&](){
         
         for (auto* p = findParentComponentOfClass<GuiItem> (); p != nullptr; p = p->findParentComponentOfClass<GuiItem> ())
@@ -530,6 +533,9 @@ void GuiItem::savePosition ()
         configNode.setProperty (IDs::posWidth, pw, undo);
         configNode.setProperty (IDs::posHeight, ph, undo);
     }
+
+    // this way we can prevent so many unnecessary calls to update layout without breaking undo redo
+    magicBuilder.endSavePosition (this);
 }
 
 void GuiItem::handleAsyncUpdate ()

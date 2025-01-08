@@ -589,6 +589,24 @@ bool MagicGUIBuilder::canNodeBeDeleted (juce::ValueTree node)
     return node.getType () != IDs::magic;
 }
 
+void MagicGUIBuilder::beginSavePosition (juce::Component* saver)
+{
+    currentlySavingPositions = true;
+    
+    if (currentlySavingCaller == nullptr)
+
+    currentlySavingCaller = saver;
+}
+
+void MagicGUIBuilder::endSavePosition (juce::Component * saver) 
+{
+    if (currentlySavingCaller == saver)
+    {
+        currentlySavingPositions = false;
+        currentlySavingCaller = nullptr;
+    }
+}
+
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
 
 void MagicGUIBuilder::attachToolboxToWindow (juce::Component& window)

@@ -287,12 +287,20 @@ public:
     virtual bool canNodeBeDeleted (juce::ValueTree node);
     virtual bool isCopyingEnabled () { return true; }
 
+    void beginSavePosition (juce::Component * saver);
+    void endSavePosition (juce::Component * saver);
+    bool isSavingPositions() const { return currentlySavingPositions; }
+    
 protected:
     MagicGUIState& magicState;
 
     juce::UndoManager undo;
     std::unique_ptr<Stylesheet>        stylesheet;
 
+    // true when any gui item currently calls savePosition
+    bool currentlySavingPositions{ false };
+    juce::WeakReference<juce::Component> currentlySavingCaller;
+    
     //==============================================================================
 
     juce::Component::SafePointer<juce::Component> parent;

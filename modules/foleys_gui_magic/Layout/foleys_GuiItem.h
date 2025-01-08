@@ -73,7 +73,11 @@ public:
      */
     virtual void update() {}
     
-    void savePosition ();
+    /**
+     store size and position in configNode
+     */
+    virtual void savePosition ();
+
     /**
      Set colours in the wrapped Component to the value from the stylesheet and palette.
      */

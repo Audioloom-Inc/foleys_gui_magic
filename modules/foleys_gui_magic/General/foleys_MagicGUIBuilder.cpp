@@ -542,14 +542,15 @@ void MagicGUIBuilder::updateSelectedNode()
     listeners.call ([&] (Listener& l) { l.selectedItem (selectedNode); });
 }
 
-void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree target, juce::Point<int> targetPos, int index)
+void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree target, juce::Point<int> targetPos, int index, bool startUndoTransaction)
 {
     if (dragged == target)
         return;
 
     setEditMode (true);
     
-    undo.beginNewTransaction();
+    if (startUndoTransaction)
+        undo.beginNewTransaction();
 
     if (targetPos.x > 0 && targetPos.y > 0)
     {

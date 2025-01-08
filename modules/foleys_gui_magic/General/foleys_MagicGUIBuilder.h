@@ -283,13 +283,15 @@ public:
     
     /** */
     void updateSelectedNode ();
-    virtual void draggedItemOnto (juce::ValueTree dropped, juce::ValueTree target, juce::Point<int> targetPos = {}, int index = -1);
+    virtual void draggedItemOnto (juce::ValueTree dropped, juce::ValueTree target, juce::Point<int> targetPos = {}, int index = -1, bool startUndoTransaction = true);
     virtual bool canNodeBeDeleted (juce::ValueTree node);
     virtual bool isCopyingEnabled () { return true; }
 
     void beginSavePosition (juce::Component * saver);
     void endSavePosition (juce::Component * saver);
     bool isSavingPositions() const { return currentlySavingPositions; }
+    
+    GuiItem * getRootItem () const { return root.get(); }
     
 protected:
     MagicGUIState& magicState;

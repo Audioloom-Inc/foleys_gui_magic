@@ -47,6 +47,9 @@ namespace IDs
 ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
   : parent (props.first.get ()), builder (builderToControl), undo (builder.getUndoManager())
 {
+    // obviously needed
+    jassert (parent);
+
     setColour (backgroundColourId, findColour (juce::ResizableWindow::backgroundColourId));
     setColour (outlineColourId, juce::Colours::silver);
     setColour (textColourId, juce::Colours::white);

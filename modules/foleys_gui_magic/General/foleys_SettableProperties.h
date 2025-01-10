@@ -55,7 +55,8 @@ public:
 
         File,           /** custom styles */
         Asset,
-        MultiList
+        MultiList,
+        Font
     };
 
     // contrutcotr with all members below and default values for each

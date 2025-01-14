@@ -70,13 +70,16 @@ protected:
     void lookAndFeelChanged () override;
     bool isRefreshing () { return refreshing; }
 
+    virtual void removeClicked () {}
+
+    void internalRefresh ();
+    
 private:
     void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged,
                                    const juce::Identifier& changedProperty) override;
     
     // true during call to refresh
     bool refreshing{ false };
-    void internalRefresh ();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StylePropertyComponent)
 };

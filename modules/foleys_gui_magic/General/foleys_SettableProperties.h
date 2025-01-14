@@ -56,7 +56,8 @@ public:
         File,           /** custom styles */
         Asset,
         MultiList,
-        Font
+        Font,
+        Draggable
     };
 
     // contrutcotr with all members below and default values for each
@@ -93,6 +94,8 @@ public:
     juce::String                                category {};
     juce::String                                description {};
     juce::String                                displayName {};
+    int                                         customFlags {};
+    juce::var                                   customInfo {};
 
     juce::String getDisplayName () const
     {
@@ -145,6 +148,16 @@ public:
     SettableProperty withDisplayName (const juce::String& newName)
     {
         return with (*this, &SettableProperty::displayName, newName);
+    }
+
+    SettableProperty withCustomFlags (int newFlags)
+    {
+        return with (*this, &SettableProperty::customFlags, newFlags);
+    }
+
+    SettableProperty withCustomInfo (juce::var newInfo)
+    {
+        return with (*this, &SettableProperty::customInfo, newInfo);
     }
 
     juce::StringArray getChoicesFromLambda () const

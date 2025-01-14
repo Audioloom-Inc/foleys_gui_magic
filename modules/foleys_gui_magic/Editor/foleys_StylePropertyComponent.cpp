@@ -91,6 +91,8 @@ StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, j
     {
         node.removeProperty (property, &builder.getUndoManager());
         internalRefresh();
+
+        removeClicked();
     };
 
     node.addListener (this);

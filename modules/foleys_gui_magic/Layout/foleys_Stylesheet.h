@@ -97,7 +97,7 @@ public:
      @param inherit if this is true, it will impact child nodes as well
      @param definedHere this is a hint for the editor where the property was actually set
      */
-    juce::var getStyleProperty (const juce::Identifier& name, const juce::ValueTree& node, bool inherit=true, juce::ValueTree* definedHere=nullptr) const;
+    juce::var getStyleProperty (const juce::Identifier& name, const juce::ValueTree& node, bool inherit=false, juce::ValueTree* definedHere=nullptr) const;
 
     /**
      Return the LookAndFeel for the node. Make sure never to remove a LookAndFeel, especially

@@ -158,7 +158,16 @@ void Stylesheet::updateStyleClasses()
 
 juce::var Stylesheet::getStyleProperty (const juce::Identifier& name, const juce::ValueTree& node, bool inherit, juce::ValueTree* definedHere) const
 {
-    if (inherit && node.hasProperty (name))
+    /** !!! 
+     *  major change here – inherit default value is now true!
+     * 
+     *  the former inherit was false by default and had an effect only on inheriting parameters from a parent stylesheet. 
+     *  now, when inherit is true, all parents will be searched.
+     * 
+     *  !!!
+     */
+
+    if (node.hasProperty (name))
     {
         if (definedHere)
             *definedHere = node;
@@ -166,7 +175,7 @@ juce::var Stylesheet::getStyleProperty (const juce::Identifier& name, const juce
         return node.getProperty (name);
     }
 
-    if (inherit && node.hasProperty (IDs::id) && node.getProperty (IDs::id).toString().isNotEmpty())
+    if (node.hasProperty (IDs::id) && node.getProperty (IDs::id).toString().isNotEmpty())
     {
         auto styleNode = currentStyle.getChildWithName (IDs::nodes);
         auto idNode = styleNode.getChildWithName (node.getProperty (IDs::id).toString());
@@ -210,22 +219,20 @@ juce::var Stylesheet::getStyleProperty (const juce::Identifier& name, const juce
         }
     }
 
-    if (inherit)
+    auto typeNode = currentStyle.getChildWithName (IDs::types).getChildWithName (node.getType());
+    if (typeNode.isValid() && typeNode.hasProperty (name))
     {
-        auto typeNode = currentStyle.getChildWithName (IDs::types).getChildWithName (node.getType());
-        if (typeNode.isValid() && typeNode.hasProperty (name))
-        {
-            if (definedHere)
-                *definedHere = typeNode;
+        if (definedHere)
+            *definedHere = typeNode;
 
-            return typeNode.getProperty (name);
-        }
+        return typeNode.getProperty (name);
     }
 
-    auto parent = node.getParent();
-    if (parent.isValid() && parent.getType() != IDs::magic)
-        if (auto val = getStyleProperty (name, parent, false, definedHere); ! val.isVoid ())
-            return val;
+    if (inherit)
+        if (auto parent = node.getParent(); parent.isValid() && parent.getType() != IDs::magic)
+            if (auto val = getStyleProperty (name, parent, inherit, definedHere); ! val.isVoid ())
+                return val;
+    
 
     if (definedHere)
         *definedHere = juce::ValueTree();

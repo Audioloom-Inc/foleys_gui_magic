@@ -316,15 +316,18 @@ void MagicGUIBuilder::registerJUCELookAndFeels()
     stylesheet->registerLookAndFeel ("Skeuomorphic", std::make_unique<Skeuomorphic>());
 }
 
-juce::var MagicGUIBuilder::getStyleProperty (const juce::Identifier& name, const juce::ValueTree& node) const
+juce::var MagicGUIBuilder::getStyleProperty (const juce::Identifier& name, const juce::ValueTree& node, bool inherit, juce::ValueTree * definedHere) const
 {
-    if (auto value = stylesheet->getStyleProperty (name, node); ! value.isVoid ())
+    if (auto value = stylesheet->getStyleProperty (name, node, inherit, definedHere); ! value.isVoid ())
         return value;
 
     // if (auto defaults = defaultProperties.find (node.getType()); defaults != defaultProperties.end ())
     //     for (auto property : defaults->second)
     //         if (property.name == name)
     //             return property.defaultValue;
+
+    if (definedHere)
+        *definedHere = {};
 
     return {};
 }

@@ -161,7 +161,7 @@ public:
      @param name the name of the property.
      @param node is the node in the DOM. This is used for inheritance by traversing upwards.
      */
-    juce::var getStyleProperty (const juce::Identifier& name, const juce::ValueTree& node) const;
+    juce::var getStyleProperty (const juce::Identifier& name, const juce::ValueTree& node, bool inherit = false, juce::ValueTree * definedHere = nullptr) const;
 
     /**
      This will go through all nodes and delete the reference to a class

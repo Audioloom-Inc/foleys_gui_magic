@@ -296,7 +296,7 @@ std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (ju
 
         for (auto colour : item->getColourNames ())
         {
-            properties.push_back ({ styleItem, colour, SettableProperty::PropertyType::Colour, {}, {}, {}, "Colours" });
+            properties.push_back (SettableProperty (styleItem, colour, SettableProperty::PropertyType::Colour).withCategory ("Colours"));
         }
     }
 
@@ -313,31 +313,34 @@ std::vector<SettableProperty> PropertiesEditor::createDecoratorProperties(const 
         };
     };
 
-    array.push_back ( { styleItem, IDs::visibility, SettableProperty::Choice, {}, builder.createPropertiesMenuLambda(), {}, category });
-    array.push_back ( { styleItem, IDs::caption, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::captionSize, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::captionColour, SettableProperty::Colour, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::captionPlacement, SettableProperty::Choice, {}, toMenuLambda (getAllKeyNames (makeJustificationsChoices ())), {}, category } );
-    array.push_back ( { styleItem, IDs::tooltip, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::accessibilityTitle, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::accessibility, SettableProperty::Toggle, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::accessibilityDescription, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::accessibilityHelpText, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::accessibilityFocusOrder, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::margin, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::padding, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::border, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::radius, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::borderColour, SettableProperty::Colour, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::backgroundColour, SettableProperty::Colour, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::tabCaption, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::tabColour, SettableProperty::Colour, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::lookAndFeel, SettableProperty::Choice, {}, toMenuLambda (builder.getStylesheet().getLookAndFeelNames()), {}, category } );
-    array.push_back ( { styleItem, IDs::backgroundImage, SettableProperty::Choice, {}, toMenuLambda (Resources::getResourceFileNames()), {}, category } );
-    array.push_back ( { styleItem, IDs::imagePlacement, SettableProperty::Choice, {}, toMenuLambda ({IDs::imageCentred, IDs::imageFill, IDs::imageStretch }), {}, category } );
-    array.push_back ( { styleItem, IDs::backgroundAlpha, SettableProperty::Text, {}, {}, {}, category } );
-    array.push_back ( { styleItem, IDs::backgroundGradient, SettableProperty::Gradient , {}, {}, {}, category } );
+    array.push_back ( { styleItem, IDs::visibility, SettableProperty::Choice, {}, builder.createPropertiesMenuLambda()});
+    array.push_back ( { styleItem, IDs::caption, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::captionSize, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::captionColour, SettableProperty::Colour} );
+    array.push_back ( { styleItem, IDs::captionPlacement, SettableProperty::Choice, {}, toMenuLambda (getAllKeyNames (makeJustificationsChoices ()))} );
+    array.push_back ( { styleItem, IDs::tooltip, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::accessibilityTitle, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::accessibility, SettableProperty::Toggle} );
+    array.push_back ( { styleItem, IDs::accessibilityDescription, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::accessibilityHelpText, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::accessibilityFocusOrder, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::margin, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::padding, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::border, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::radius, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::borderColour, SettableProperty::Colour} );
+    array.push_back ( { styleItem, IDs::backgroundColour, SettableProperty::Colour} );
+    array.push_back ( { styleItem, IDs::tabCaption, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::tabColour, SettableProperty::Colour} );
+    array.push_back ( { styleItem, IDs::lookAndFeel, SettableProperty::Choice, {}, toMenuLambda (builder.getStylesheet().getLookAndFeelNames())} );
+    array.push_back ( { styleItem, IDs::backgroundImage, SettableProperty::Choice, {}, toMenuLambda (Resources::getResourceFileNames())} );
+    array.push_back ( { styleItem, IDs::imagePlacement, SettableProperty::Choice, {}, toMenuLambda ({IDs::imageCentred, IDs::imageFill, IDs::imageStretch })} );
+    array.push_back ( { styleItem, IDs::backgroundAlpha, SettableProperty::Text} );
+    array.push_back ( { styleItem, IDs::backgroundGradient, SettableProperty::Gradient } );
 
+    for (auto& p : array)
+        p.category = category;
+        
     return array;
 }
 
@@ -345,21 +348,24 @@ std::vector<SettableProperty> PropertiesEditor::createFlexItemProperties(const j
 {
     std::vector<SettableProperty> properties;
 
-    properties.push_back ({ styleItem, IDs::posX, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::posY, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::posWidth, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::posHeight, SettableProperty::Number, {}, {}, {}, category });
+    properties.push_back ({ styleItem, IDs::posX, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::posY, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::posWidth, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::posHeight, SettableProperty::Number});
 
-    properties.push_back ({ styleItem, IDs::width, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::height, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::minWidth, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::minHeight, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::maxWidth, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::maxHeight, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::flexGrow, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::flexShrink, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::flexOrder, SettableProperty::Number, {}, {}, {}, category });
-    properties.push_back ({ styleItem, IDs::flexAlignSelf, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexAuto }), {}, category });
+    properties.push_back ({ styleItem, IDs::width, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::height, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::minWidth, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::minHeight, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::maxWidth, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::maxHeight, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::flexGrow, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::flexShrink, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::flexOrder, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::flexAlignSelf, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexAuto })});
+
+    for (auto& p : properties)
+        p.category = category;
 
     return properties;
 }
@@ -368,19 +374,22 @@ std::vector<SettableProperty> PropertiesEditor::createContainerProperties (const
 {
     std::vector<SettableProperty> properties;
 
-    properties.push_back ({ styleItem, IDs::display, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::contents, IDs::flexbox, IDs::tabbed }), {}, categoryName });
-    properties.push_back ({ styleItem, IDs::repaintHz, SettableProperty::Number, {}, {}, {}, categoryName });
-    properties.push_back ({ styleItem, IDs::scrollMode, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::noScroll, IDs::scrollHorizontal, IDs::scrollVertical, IDs::scrollBoth }), {}, categoryName });
-    properties.push_back ({ styleItem, IDs::tabHeight, SettableProperty::Number, {}, {}, {}, categoryName });
-    properties.push_back ({ styleItem, IDs::selectedTab, SettableProperty::Choice, {}, builder.createPropertiesMenuLambda (), {}, categoryName });
+    properties.push_back ({ styleItem, IDs::display, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::contents, IDs::flexbox, IDs::tabbed })});
+    properties.push_back ({ styleItem, IDs::repaintHz, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::scrollMode, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::noScroll, IDs::scrollHorizontal, IDs::scrollVertical, IDs::scrollBoth })});
+    properties.push_back ({ styleItem, IDs::tabHeight, SettableProperty::Number});
+    properties.push_back ({ styleItem, IDs::selectedTab, SettableProperty::Choice, {}, builder.createPropertiesMenuLambda ()});
 
-    properties.push_back ({ styleItem, IDs::flexDirection, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexDirRow, IDs::flexDirRowReverse, IDs::flexDirColumn, IDs::flexDirColumnReverse }), {}, categoryName });
-    properties.push_back ({ styleItem, IDs::flexWrap, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexNoWrap, IDs::flexWrapNormal, IDs::flexWrapReverse }), {}, categoryName });
-    properties.push_back ({ styleItem, IDs::flexAlignContent, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexSpaceAround, IDs::flexSpaceBetween }), {}, categoryName });
-    properties.push_back ({ styleItem, IDs::flexAlignItems, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter }), {}, categoryName });
-    properties.push_back ({ styleItem, IDs::flexJustifyContent, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexSpaceAround, IDs::flexSpaceBetween }), {}, categoryName });
+    properties.push_back ({ styleItem, IDs::flexDirection, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexDirRow, IDs::flexDirRowReverse, IDs::flexDirColumn, IDs::flexDirColumnReverse })});
+    properties.push_back ({ styleItem, IDs::flexWrap, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexNoWrap, IDs::flexWrapNormal, IDs::flexWrapReverse })});
+    properties.push_back ({ styleItem, IDs::flexAlignContent, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexSpaceAround, IDs::flexSpaceBetween })});
+    properties.push_back ({ styleItem, IDs::flexAlignItems, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStretch, IDs::flexStart, IDs::flexEnd, IDs::flexCenter })});
+    properties.push_back ({ styleItem, IDs::flexJustifyContent, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::flexStart, IDs::flexEnd, IDs::flexCenter, IDs::flexSpaceAround, IDs::flexSpaceBetween })});
 
-    properties.push_back ({ styleItem, IDs::focusContainerType, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::focusNone, IDs::focusContainer, IDs::focusKeyContainer }), {}, categoryName });
+    properties.push_back ({ styleItem, IDs::focusContainerType, SettableProperty::Choice, {}, builder.createChoicesMenuLambda ({ IDs::focusNone, IDs::focusContainer, IDs::focusKeyContainer })});
+
+    for (auto& p : properties)
+        p.category = categoryName;
 
     return properties;
 }
@@ -391,12 +400,15 @@ std::vector<SettableProperty> PropertiesEditor::createClassProperties (const juc
 
     auto media = styleItem.getOrCreateChildWithName (IDs::media, &undo);
 
-    properties.push_back ({ styleItem, IDs::recursive, SettableProperty::Toggle, {}, {}, {}, categoryName });
-    properties.push_back ({ styleItem, IDs::active, SettableProperty::Choice, {}, builder.createPropertiesMenuLambda(), {}, categoryName });
-    properties.push_back ({ media, IDs::minWidth, SettableProperty::Text , {}, {}, {}, categoryName}); 
-    properties.push_back ({ media, IDs::maxWidth, SettableProperty::Text , {}, {}, {}, categoryName}); 
-    properties.push_back ({ media, IDs::minHeight, SettableProperty::Text, {}, {}, {}, categoryName });
-    properties.push_back ({ media, IDs::maxHeight, SettableProperty::Text, {}, {}, {}, categoryName });
+    properties.push_back ({ styleItem, IDs::recursive, SettableProperty::Toggle});
+    properties.push_back ({ styleItem, IDs::active, SettableProperty::Choice, {}, builder.createPropertiesMenuLambda()});
+    properties.push_back ({ media, IDs::minWidth, SettableProperty::Text }); 
+    properties.push_back ({ media, IDs::maxWidth, SettableProperty::Text }); 
+    properties.push_back ({ media, IDs::minHeight, SettableProperty::Text});
+    properties.push_back ({ media, IDs::maxHeight, SettableProperty::Text});
+
+    for (auto& p : properties)
+        p.category = categoryName;
 
     return properties;
 }
@@ -406,27 +418,29 @@ std::vector<SettableProperty> PropertiesEditor::createNodeProperties (const juce
         
     std::vector<SettableProperty> properties;
 
-    properties.push_back ({ styleItem, IDs::id, SettableProperty::Text, {}, {}, {}, categoryName });
+    properties.push_back ({ styleItem, IDs::id, SettableProperty::Text});
 
     if (styleItem == builder.getGuiRootNode())
     {
-        properties.push_back ({ styleItem, IDs::resizable, SettableProperty::Toggle, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::resizeCorner, SettableProperty::Toggle, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::width, SettableProperty::Number, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::height, SettableProperty::Number, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::minWidth, SettableProperty::Number, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::maxWidth, SettableProperty::Number, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::minHeight, SettableProperty::Number, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::maxHeight, SettableProperty::Number, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::aspect, SettableProperty::Number, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::tooltipText, SettableProperty::Colour, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::tooltipBackground, SettableProperty::Colour, {}, {}, {}, categoryName });
-        properties.push_back ({ styleItem, IDs::tooltipOutline, SettableProperty::Colour, {}, {}, {}, categoryName });
+        properties.push_back ({ styleItem, IDs::resizable, SettableProperty::Toggle});
+        properties.push_back ({ styleItem, IDs::resizeCorner, SettableProperty::Toggle});
+        properties.push_back ({ styleItem, IDs::width, SettableProperty::Number});
+        properties.push_back ({ styleItem, IDs::height, SettableProperty::Number});
+        properties.push_back ({ styleItem, IDs::minWidth, SettableProperty::Number});
+        properties.push_back ({ styleItem, IDs::maxWidth, SettableProperty::Number});
+        properties.push_back ({ styleItem, IDs::minHeight, SettableProperty::Number});
+        properties.push_back ({ styleItem, IDs::maxHeight, SettableProperty::Number});
+        properties.push_back ({ styleItem, IDs::aspect, SettableProperty::Number});
+        properties.push_back ({ styleItem, IDs::tooltipText, SettableProperty::Colour});
+        properties.push_back ({ styleItem, IDs::tooltipBackground, SettableProperty::Colour});
+        properties.push_back ({ styleItem, IDs::tooltipOutline, SettableProperty::Colour});
+
+        properties.push_back ({ styleItem, IDs::backgroundColour, SettableProperty::Colour});
     }
     
     auto classNames = builder.getStylesheet().getAllClassesNames();
     // array.add (new MultiListPropertyComponent (styleItem.getPropertyAsValue (IDs::styleClass, &undo, true), IDs::styleClass.toString(), classNames));
-    properties.push_back ({ styleItem, IDs::styleClass, SettableProperty::MultiList, {}, [classNames](juce::ComboBox& box) { box.addItemList (classNames, 1); }, {}, categoryName });
+    properties.push_back ({ styleItem, IDs::styleClass, SettableProperty::MultiList, {}, [classNames](juce::ComboBox& box) { box.addItemList (classNames, 1); }});
 
     return properties;
 }

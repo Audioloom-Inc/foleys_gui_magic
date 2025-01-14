@@ -649,12 +649,8 @@ void GuiItem::itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSou
         return;
     }
 
-    auto node = juce::ValueTree::fromXml (dragSourceDetails.description.toString());
-    if (node.isValid() && magicBuilder.isFactoryName (node.getType ()))
-    {
-        magicBuilder.draggedItemOnto (node, configNode, dropPosition);
-        return;
-    }
+    if (auto node = juce::ValueTree::fromXml (dragSourceDetails.description.toString()); node.isValid())
+        return magicBuilder.draggedItemOnto (node, configNode, dropPosition);
 
     customItemDropAction (dragSourceDetails);
 }

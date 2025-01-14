@@ -59,26 +59,18 @@ public:
         Font,
         Draggable
     };
-
+    
     // contrutcotr with all members below and default values for each
     SettableProperty (juce::ValueTree nodeToUse,
                       juce::Identifier nameToUse,
                       PropertyType typeToUse,
                       juce::var defaultValueToUse = {},
-                      std::function<void(juce::ComboBox&)> menuCreationLambdaToUse = {},
-                      juce::StringArray allowedFileExtensionsToUse = {},
-                      juce::String categoryToUse = {},
-                      juce::String descriptionToUse = {},
-                      juce::String displayNameToUse = {})
+                      std::function<void(juce::ComboBox&)> menuCreationLambdaToUse = {})
       : node (nodeToUse),
         name (nameToUse),
         type (typeToUse),
         defaultValue (defaultValueToUse),
-        menuCreationLambda (menuCreationLambdaToUse),
-        allowedFileExtensions (allowedFileExtensionsToUse),
-        category (categoryToUse),
-        description (descriptionToUse),
-        displayName (displayNameToUse)
+        menuCreationLambda (menuCreationLambdaToUse)
     {
     }
 

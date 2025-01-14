@@ -61,7 +61,8 @@ namespace IDs
 
     static juce::Identifier shown        { "shown" };           // used to hide and show components instead of deleting them from the tree
     static juce::Identifier visibility   { "visibility" };      // this is used to hide the component when some given value changes
-
+    static juce::Identifier alphaWhenDisabled { "alpha-when-disabled" }; // this is used to set the alpha of the component when a parameter is disabled
+    
     static juce::Identifier caption      { "caption" };
     static juce::Identifier captionPlacement { "caption-placement" };
     static juce::Identifier captionColour { "caption-color" };

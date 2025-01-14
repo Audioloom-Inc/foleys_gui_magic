@@ -258,6 +258,7 @@ protected:
 
     void valueTreeParentChanged (juce::ValueTree&) override;
 
+    void enablementChanged () override;
 
     
     virtual void customResizeOperation (juce::Rectangle<int> delta) {}
@@ -343,7 +344,8 @@ private:
     void configurePosition (const juce::var& v, Position& p, double d);
     void handleAsyncUpdate () override;
     void updateVisibility ();
-
+    void updateAlpha ();
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiItem)
 };
 

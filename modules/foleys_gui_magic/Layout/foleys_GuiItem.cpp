@@ -148,9 +148,14 @@ void GuiItem::configureComponent()
     component->setHelpText (magicBuilder.getStyleProperty (IDs::accessibilityHelpText, configNode).toString());
     component->setExplicitFocusOrder (magicBuilder.getStyleProperty (IDs::accessibilityFocusOrder, configNode));
 
-    auto  visibilityNode = magicBuilder.getStyleProperty (IDs::visibility, configNode);
-    if (! visibilityNode.isVoid())
+    auto  visibilityNode = magicBuilder.getStyleProperty (IDs::visibility, configNode, true);
+    if (! visibilityNode.isVoid() && visibilityNode.isString () && visibilityNode.toString ().isNotEmpty())
         visibility.referTo (magicBuilder.getMagicState().getPropertyAsValue (visibilityNode.toString()));
+    else
+    {
+        visibility.referTo ({});
+        visibility = true;
+    }
 }
 
 void GuiItem::configureFlexBoxItem (const juce::ValueTree& node)
@@ -376,6 +381,11 @@ void GuiItem::valueTreeParentChanged (juce::ValueTree& treeThatChanged)
     }
 }
 
+void GuiItem::enablementChanged() 
+{
+    updateAlpha ();
+}
+
 void GuiItem::itemDragEnter (const juce::DragAndDropTarget::SourceDetails& details)
 {
     if (details.description.toString().startsWith (IDs::dragCC))
@@ -552,7 +562,19 @@ void GuiItem::updateVisibility()
 
     setVisible (visible);
 
-    setAlpha (hidden ? 0.4f : 1.f);
+    updateAlpha ();
+}
+
+void GuiItem::updateAlpha()
+{
+    if (isEditModeOn ())
+    {
+        setAlpha (shown && isEnabled () ? 1.f : 0.4f);
+    }
+    else
+    {
+        setAlpha (! shown ? 0.f : isEnabled () ? 1.f : (float)magicBuilder.getStyleProperty (IDs::alphaWhenDisabled, configNode, true));
+    }
 }
 
 void GuiItem::mouseDown (const juce::MouseEvent& event)

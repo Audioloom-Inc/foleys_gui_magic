@@ -65,14 +65,7 @@ public:
                       juce::Identifier nameToUse,
                       PropertyType typeToUse,
                       juce::var defaultValueToUse = {},
-                      std::function<void(juce::ComboBox&)> menuCreationLambdaToUse = {})
-      : node (nodeToUse),
-        name (nameToUse),
-        type (typeToUse),
-        defaultValue (defaultValueToUse),
-        menuCreationLambda (menuCreationLambdaToUse)
-    {
-    }
+                      std::function<void(juce::ComboBox&)> menuCreationLambdaToUse = {});
 
     // default copy ctor
     SettableProperty (const SettableProperty&) = default;
@@ -89,93 +82,25 @@ public:
     int                                         customFlags {};
     juce::var                                   customInfo {};
 
-    juce::String getDisplayName () const
-    {
-        if (displayName.isNotEmpty())
-            return displayName;
+    /** if displayName is not empty, this will return displayName otherwise name */
+    juce::String getDisplayName () const;
+    SettableProperty withNode (juce::ValueTree newNode) const;
+    SettableProperty withName (juce::Identifier newName) const;
+    SettableProperty withType (PropertyType newType) const;
+    SettableProperty withDefaultValue (juce::var newDefault) const;
+    SettableProperty withMenuCreationLambda (std::function<void(juce::ComboBox&)> newLambda) const;
+    SettableProperty withAllowedFileExtensions (juce::StringArray newExtensions) const;
+    SettableProperty withCategory (const juce::String& newCategory) const;
+    SettableProperty withDescription (const juce::String& desc);
+    SettableProperty withDisplayName (const juce::String& newName);
+    SettableProperty withCustomFlags (int newFlags);
+    SettableProperty withCustomInfo (juce::var newInfo);
 
-        return name.toString();
-    }
-
-    SettableProperty withNode (juce::ValueTree newNode) const
-    {
-        return with (*this, &SettableProperty::node, newNode);
-    }
-    
-    SettableProperty withName (juce::Identifier newName) const
-    {
-        return with (*this, &SettableProperty::name, newName);
-    }
-
-    SettableProperty withType (PropertyType newType) const
-    {
-        return with (*this, &SettableProperty::type, newType);
-    }
-
-    SettableProperty withDefaultValue (juce::var newDefault) const
-    {
-        return with (*this, &SettableProperty::defaultValue, newDefault);
-    }
-
-    SettableProperty withMenuCreationLambda (std::function<void(juce::ComboBox&)> newLambda) const
-    {
-        return with (*this, &SettableProperty::menuCreationLambda, newLambda);
-    }
-
-    SettableProperty withAllowedFileExtensions (juce::StringArray newExtensions) const
-    {
-        return with (*this, &SettableProperty::allowedFileExtensions, newExtensions);
-    }
-
-    SettableProperty withCategory (const juce::String& newCategory) const
-    {
-        return with (*this, &SettableProperty::category, newCategory);
-    }
-
-    SettableProperty withDescription (const juce::String& desc)
-    {
-        return with (*this, &SettableProperty::description, desc);
-    }
-
-    SettableProperty withDisplayName (const juce::String& newName)
-    {
-        return with (*this, &SettableProperty::displayName, newName);
-    }
-
-    SettableProperty withCustomFlags (int newFlags)
-    {
-        return with (*this, &SettableProperty::customFlags, newFlags);
-    }
-
-    SettableProperty withCustomInfo (juce::var newInfo)
-    {
-        return with (*this, &SettableProperty::customInfo, newInfo);
-    }
-
-    juce::StringArray getChoicesFromLambda () const
-    {
-        if (menuCreationLambda)
-        {
-            juce::ComboBox box;
-
-            juce::StringArray choices;
-            menuCreationLambda (box);
-            for (int i=0; i<box.getNumItems(); ++i)
-                choices.add (box.getItemText(i));
-
-            return choices;
-        }
-
-        return {};
-    }
+    juce::StringArray getChoicesFromLambda () const;
 
 private:
-    template <typename Member, typename Item>
-    static SettableProperty with (SettableProperty property, Member&& member, Item&& item)
-    {
-        property.*member = std::forward<Item> (item);
-        return property;
-    }
+    template <typename Member, typename Item>       
+    static SettableProperty with (SettableProperty property, Member&& member, Item&& item);
 };
 
 } // namespace foleys

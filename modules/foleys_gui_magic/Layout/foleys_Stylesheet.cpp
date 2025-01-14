@@ -159,9 +159,9 @@ void Stylesheet::updateStyleClasses()
 juce::var Stylesheet::getStyleProperty (const juce::Identifier& name, const juce::ValueTree& node, bool inherit, juce::ValueTree* definedHere) const
 {
     /** !!! 
-     *  major change here – inherit default value is now true!
+     *  major change here – inherit default value is now false!
      * 
-     *  the former inherit was false by default and had an effect only on inheriting parameters from a parent stylesheet. 
+     *  the former inherit was true by default but had an effect only on inheriting parameters from a parent stylesheet. 
      *  now, when inherit is true, all parents will be searched.
      * 
      *  !!!

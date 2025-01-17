@@ -71,6 +71,7 @@ private:
         juce::String getUniqueName() const override;
 
         bool mightContainSubItems() override;
+        void setIsAlwaysOpen (bool shouldBeOpen);
 
         void paintItem (juce::Graphics& g, int width, int height) override;
 
@@ -88,6 +89,7 @@ private:
         MagicGUIBuilder& builder;
         juce::ValueTree  itemNode;
 
+        bool alwaysOpen{ false };
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiTreeItem)
     };
 

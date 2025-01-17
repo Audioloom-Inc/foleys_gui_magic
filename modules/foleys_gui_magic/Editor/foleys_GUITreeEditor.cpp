@@ -76,6 +76,8 @@ void GUITreeEditor::setValueTree (const juce::ValueTree& refTree)
     if (tree.isValid())
     {
         rootItem = std::make_unique<GUITreeEditor::GuiTreeItem> (*this, builder, tree);
+        rootItem->setIsAlwaysOpen (true);
+
         treeView.setRootItem (rootItem.get());
     }
 
@@ -175,6 +177,14 @@ bool GUITreeEditor::GuiTreeItem::mightContainSubItems()
     return itemNode.getNumChildren() > 0;
 }
 
+void GUITreeEditor::GuiTreeItem::setIsAlwaysOpen (bool shouldBeOpen) 
+{
+    alwaysOpen = shouldBeOpen;
+    
+    if (shouldBeOpen)
+        setOpen (true);
+}
+
 void GUITreeEditor::GuiTreeItem::paintItem (juce::Graphics& g, int width, int height)
 {
     if (isSelected())
@@ -206,6 +216,9 @@ void GUITreeEditor::GuiTreeItem::paintItem (juce::Graphics& g, int width, int he
 
 void GUITreeEditor::GuiTreeItem::itemOpennessChanged (bool isNowOpen)
 {
+    if (! isNowOpen && alwaysOpen)
+        return setOpen (true);
+
     if (isNowOpen && getNumSubItems() == 0)
     {
         for (auto child : itemNode)

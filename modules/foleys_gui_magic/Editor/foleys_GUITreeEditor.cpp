@@ -260,5 +260,11 @@ void GUITreeEditor::GuiTreeItem::itemDropped (const juce::DragAndDropTarget::Sou
     }
 }
 
+void GUITreeEditor::GuiTreeItem::paintOpenCloseButton (juce::Graphics& g, const juce::Rectangle<float>& area, juce::Colour backgroundColour, bool isMouseOver) 
+{
+    if (! alwaysOpen)
+        return juce::TreeViewItem::paintOpenCloseButton (g, area, backgroundColour, isMouseOver);
+}
+
 
 } // namespace foleys

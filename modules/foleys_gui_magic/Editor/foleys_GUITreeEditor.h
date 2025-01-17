@@ -84,6 +84,8 @@ private:
 
         juce::ValueTree& getTree () { return itemNode; }
 
+        void paintOpenCloseButton (juce::Graphics&, const juce::Rectangle<float>& area, juce::Colour backgroundColour, bool isMouseOver) override;
+
     private:
         Component& owner;
         MagicGUIBuilder& builder;

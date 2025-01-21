@@ -46,7 +46,7 @@ StyleColourPropertyComponent::StyleColourPropertyComponent (MagicGUIBuilder& bui
     addAndMakeVisible (label.get());
 
     variables.setConnectedEdges (juce::TextButton::ConnectedOnLeft | juce::TextButton::ConnectedOnRight);
-    addAndMakeVisible (variables);
+    // addAndMakeVisible (variables);
 
     label->getTextValue().addListener (this);
     label->onTextChange = [&]
@@ -74,33 +74,7 @@ StyleColourPropertyComponent::StyleColourPropertyComponent (MagicGUIBuilder& bui
 
     mouseEvents.onMouseDown = [this](const juce::MouseEvent&)
     {
-        auto currentColour = juce::Colours::black;
-        if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
-        {
-            if (l->getText().isNotEmpty())
-            {
-                currentColour = builder.getStylesheet().getColour (l->getText());
-            }
-            else
-            {
-                if (auto* lookandfeel = builder.getStylesheet().getLookAndFeel (node))
-                {
-//                    auto id = builder.findColourId (node.getType(), property);
-//                    if (id >= 0)
-//                        currentColour = lookandfeel->findColour (id);
-                }
-            }
-        }
-
-        auto newColourPanel = std::make_unique<ColourPanel>(currentColour);
-        newColourPanel->addChangeListener (this);
-        newColourPanel->setSize (300, 500);
-        colourPanel = newColourPanel.get();
-#if JUCE_VERSION > 0x60001
-        juce::CallOutBox::launchAsynchronously (std::move (newColourPanel), getScreenBounds(), nullptr);
-#else
-        juce::CallOutBox::launchAsynchronously (newColourPanel.release(), getScreenBounds(), nullptr);
-#endif
+        showColourPicker ();
     };
 
     label->getTextValue().addListener (this);
@@ -169,6 +143,43 @@ void StyleColourPropertyComponent::getLookAndFeelColourFallback()
     }
 }
 
+void StyleColourPropertyComponent::showColourPicker()
+{
+    auto currentColour = juce::Colours::black;
+    if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
+    {
+        if (l->getText().isNotEmpty())
+        {
+            currentColour = builder.getStylesheet().getColour (l->getText());
+        }
+        else
+        {
+            if (auto* lookandfeel = builder.getStylesheet().getLookAndFeel (node))
+            {
+//                    auto id = builder.findColourId (node.getType(), property);
+//                    if (id >= 0)
+//                        currentColour = lookandfeel->findColour (id);
+            }
+        }
+    }
+
+    auto newColourPanel = std::make_unique<ColourPanel>(currentColour);
+    newColourPanel->addChangeListener (this);
+    newColourPanel->setSize (300, 500);
+    colourPanel = newColourPanel.get();
+#if JUCE_VERSION > 0x60001
+    juce::CallOutBox::launchAsynchronously (std::move (newColourPanel), getScreenBounds(), nullptr);
+#else
+    juce::CallOutBox::launchAsynchronously (newColourPanel.release(), getScreenBounds(), nullptr);
+#endif
+
+}
+
+void StyleColourPropertyComponent::mouseDown (const juce::MouseEvent&)
+{
+    showColourPicker ();
+}
+
 void StyleColourPropertyComponent::valueChanged (juce::Value& value)
 {
     auto colour = builder.getStylesheet().getColour (value.getValue().toString());
@@ -188,7 +199,7 @@ void StyleColourPropertyComponent::resized()
 {
     auto b = getLocalBounds().reduced (1).withLeft (getWidth() / 2);
     remove.setBounds (b.removeFromRight (getHeight()));
-    variables.setBounds (b.removeFromRight (getHeight()));
+    // variables.setBounds (b.removeFromRight (getHeight()));
 
     if (editor)
         editor->setBounds (b);

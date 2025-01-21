@@ -100,7 +100,12 @@ private:
 
     void getLookAndFeelColourFallback();
 
+    void mouseDown (const juce::MouseEvent&) override;
+    
+    void showColourPicker ();
+    
     MouseLambdas mouseEvents;
+
     juce::Component::SafePointer<ColourPanel> colourPanel;
     juce::TextButton variables {"V"};
 

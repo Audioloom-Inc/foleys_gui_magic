@@ -73,6 +73,7 @@ StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, S
 :
 StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
 {
+    customValueFunction = propertyToUse.customValueFunction;
     displayName = propertyToUse.getDisplayName();
 }
 

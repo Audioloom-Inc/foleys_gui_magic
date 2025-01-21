@@ -82,6 +82,11 @@ public:
     int                                         customFlags {};
     juce::var                                   customInfo {};
 
+    /** when you need a custom function after the property has been set, use this.
+     *  Only implemented for some style property compoennts.
+     */
+    std::function<void(const juce::var& newValue)>     customValueFunction {};
+
     /** if displayName is not empty, this will return displayName otherwise name */
     juce::String getDisplayName () const;
     SettableProperty withNode (juce::ValueTree newNode) const;
@@ -95,6 +100,7 @@ public:
     SettableProperty withDisplayName (const juce::String& newName);
     SettableProperty withCustomFlags (int newFlags);
     SettableProperty withCustomInfo (juce::var newInfo);
+    SettableProperty withCustomValueFunction (std::function<void(const juce::var& newValue)> newFunction);
 
     juce::StringArray getChoicesFromLambda () const;
 

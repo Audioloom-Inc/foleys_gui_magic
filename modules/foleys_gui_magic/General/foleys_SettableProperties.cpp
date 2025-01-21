@@ -78,6 +78,11 @@ SettableProperty SettableProperty::withCustomInfo (juce::var newInfo)
     return with (*this, &SettableProperty::customInfo, newInfo);
 }
 
+SettableProperty SettableProperty::withCustomValueFunction (std::function<void (const juce::var& newValue)> newFunction)
+{
+    return with (*this, &SettableProperty::customValueFunction, newFunction);
+}
+
 juce::StringArray SettableProperty::getChoicesFromLambda () const
 {
     if (menuCreationLambda)

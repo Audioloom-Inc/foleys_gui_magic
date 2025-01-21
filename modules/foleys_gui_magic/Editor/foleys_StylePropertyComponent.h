@@ -63,6 +63,8 @@ protected:
     juce::String        displayName;
     juce::ValueTree     node;
     juce::ValueTree     inheritedFrom;
+    
+    std::function<void(const juce::var& newValue)> customValueFunction;
 
     std::unique_ptr<juce::Component> editor;
     juce::TextButton    remove { "X" };

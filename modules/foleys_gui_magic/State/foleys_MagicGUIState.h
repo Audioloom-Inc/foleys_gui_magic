@@ -201,6 +201,24 @@ public:
         return identifiers;
     }
 
+    template <typename ObjectType>
+    juce::StringPairArray getObjectIDsAndNamesByType () const
+    {
+        juce::StringPairArray identifiers;
+        for (const auto& object : advertisedObjects)
+        {
+            if (auto type = dynamic_cast<ObjectType*>(object.second.get()))
+            {
+                auto identifier = object.first.toString ();
+                auto name = type->getName ();
+
+                identifiers.set (identifier, name);
+            }
+        }
+
+        return identifiers;   
+    }
+
     /**
      Return an object by objectID. The returned type needs to be specified as template parameter.
      If there is no object with that objectID, or the object is not of the selected type, this will return a nullptr.

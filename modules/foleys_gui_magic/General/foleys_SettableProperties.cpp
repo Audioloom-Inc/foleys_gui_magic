@@ -68,9 +68,14 @@ SettableProperty SettableProperty::withDisplayName (const juce::String& newName)
     return with (*this, &SettableProperty::displayName, newName);
 }
 
-SettableProperty SettableProperty::withCustomFlags (int newFlags)
+SettableProperty SettableProperty::withFlags (int newFlags)
 {
-    return with (*this, &SettableProperty::customFlags, newFlags);
+    return with (*this, &SettableProperty::flags, newFlags);
+}
+
+SettableProperty SettableProperty::withAdditionalFlags (int additionalFlags)
+{
+    return with (*this, &SettableProperty::flags, flags | additionalFlags);
 }
 
 SettableProperty SettableProperty::withCustomInfo (juce::var newInfo)
@@ -98,6 +103,16 @@ juce::StringArray SettableProperty::getChoicesFromLambda () const
     }
 
     return {};
+}
+
+bool SettableProperty::isAvailableInNormalView() const
+{
+    return (flags & NormalView) != 0;
+}
+
+bool SettableProperty::isAvailableInExpertView() const
+{
+    return (flags & ExpertView) != 0;
 }
 
 template <typename Member, typename Item>

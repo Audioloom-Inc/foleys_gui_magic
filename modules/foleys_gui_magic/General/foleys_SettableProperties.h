@@ -59,7 +59,16 @@ public:
         Font,
         Draggable
     };
-    
+     
+    enum Flags
+    {
+        NoFlags = 0,
+        NormalView = 1,
+        ExpertView = 1 << 1,
+        AllViews = NormalView | ExpertView,
+        AllFlags = ~NoFlags
+    };
+
     // contrutcotr with all members below and default values for each
     SettableProperty (juce::ValueTree nodeToUse,
                       juce::Identifier nameToUse,
@@ -79,7 +88,7 @@ public:
     juce::String                                category {};
     juce::String                                description {};
     juce::String                                displayName {};
-    int                                         customFlags {};
+    int                                         flags { AllViews };
     juce::var                                   customInfo {};
 
     /** when you need a custom function after the property has been set, use this.
@@ -98,12 +107,16 @@ public:
     SettableProperty withCategory (const juce::String& newCategory) const;
     SettableProperty withDescription (const juce::String& desc);
     SettableProperty withDisplayName (const juce::String& newName);
-    SettableProperty withCustomFlags (int newFlags);
+    SettableProperty withFlags (int newFlags);
+    SettableProperty withAdditionalFlags (int additionalFlags);
     SettableProperty withCustomInfo (juce::var newInfo);
     SettableProperty withCustomValueFunction (std::function<void(const juce::var& newValue)> newFunction);
 
     juce::StringArray getChoicesFromLambda () const;
 
+    bool isAvailableInNormalView () const;
+    bool isAvailableInExpertView () const;
+    
 private:
     template <typename Member, typename Item>       
     static SettableProperty with (SettableProperty property, Member&& member, Item&& item);

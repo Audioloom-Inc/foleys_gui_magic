@@ -579,6 +579,8 @@ void GuiItem::updateAlpha()
 
 void GuiItem::mouseDown (const juce::MouseEvent& event)
 {
+    magicBuilder.setSelectedNode (configNode);
+
     if (componentDragger)
     {
         magicBuilder.getUndoManager().beginNewTransaction ("Drag component position");
@@ -608,8 +610,6 @@ void GuiItem::mouseDrag (const juce::MouseEvent& event)
 
 void GuiItem::mouseUp (const juce::MouseEvent& event)
 {
-    if (! event.mouseWasDraggedSinceMouseDown())
-        magicBuilder.setSelectedNode (configNode);
 }
 
 bool GuiItem::isInterestedInDragSource (const juce::DragAndDropTarget::SourceDetails &)

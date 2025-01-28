@@ -138,6 +138,8 @@ void MagicGUIBuilder::updateStylesheet()
 
 void MagicGUIBuilder::clearGUI()
 {
+    setSelectedNode ({});
+    
     auto guiNode = getConfigTree().getOrCreateChildWithName (IDs::view, &undo);
     guiNode.removeAllChildren (&undo);
     guiNode.removeAllProperties (&undo);

@@ -267,6 +267,8 @@ public:
         /** */
         virtual void editModeToggled (bool editModeOn) {}
 
+        /** */
+        virtual void assetsChanged () {}
     };
 
     void addListener (Listener* listener) { listeners.add (listener); }

@@ -172,6 +172,8 @@ void MagicGUIBuilder::createGUI (juce::Component& parentToUse)
 
 void MagicGUIBuilder::updateComponents()
 {
+    juce::ScopedValueSetter svs{ currentlyUpdatingComponents, true };
+
     if (parent == nullptr)
         return;
 
@@ -189,6 +191,11 @@ void MagicGUIBuilder::updateComponents()
         root->setEditMode (editMode);
 
     listeners.call ([&] (Listener& l) { l.stateWasReloaded(); });
+}
+
+bool MagicGUIBuilder::isCurrentlyUpdatingComponents() const
+{
+    return currentlyUpdatingComponents;
 }
 
 void MagicGUIBuilder::updateLayout (juce::Rectangle<int> bounds)

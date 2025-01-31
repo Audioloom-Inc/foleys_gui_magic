@@ -124,6 +124,9 @@ public:
      */
     virtual void updateComponents();
 
+    /** true during call to updateComponents */
+    bool isCurrentlyUpdatingComponents () const;
+
     /**
      Recalculates the layout of all components
      */
@@ -305,6 +308,8 @@ protected:
     bool currentlySavingPositions{ false };
     juce::WeakReference<juce::Component> currentlySavingCaller;
     
+    bool currentlyUpdatingComponents{ false };
+
     //==============================================================================
 
     juce::Component::SafePointer<juce::Component> parent;

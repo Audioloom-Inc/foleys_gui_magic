@@ -78,7 +78,14 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
     {
         if (auto* c = dynamic_cast<juce::ComboBox*>(editor.get()))
         {
-            juce::var value = (bool)c->getProperties ()[IDs::useSelectedItemIdInComboBoxLambda] ? juce::var (c->getSelectedId()) : juce::var (c->getText());
+            const auto useSelectedItemId = (bool)c->getProperties ()[IDs::useSelectedItemIdInComboBoxLambda];
+            juce::var value = useSelectedItemId ? juce::var (c->getSelectedId()) : juce::var (c->getText());
+
+            if (! useSelectedItemId)
+                if (auto var = c->getProperties ()[juce::String ("ID_" + juce::String (c->getSelectedId ()))]; var.isString ())
+                    if (auto string = var.toString (); string.isNotEmpty ())
+                        value = var;
+
             node.setProperty (property, value, &builder.getUndoManager());
         }
 
@@ -126,9 +133,26 @@ void StyleChoicePropertyComponent::valueChanged (juce::Value&)
     if (auto* combo = dynamic_cast<juce::ComboBox*>(editor.get()))
     {
         if (combo->getProperties ()[IDs::useSelectedItemIdInComboBoxLambda])
+        {
             combo->setSelectedId (v.getIntValue (), juce::sendNotificationSync);
-        else if (combo->getText() != v)
-            combo->setText (v, juce::sendNotificationSync);
+        }
+        else
+        {
+            auto selectedId = [&](){
+                auto& properties = combo->getProperties ();
+                
+                for (auto& p : properties)
+                    if (p.value.toString () == v)
+                        return p.name.toString ().getTrailingIntValue ();
+
+                return 0;
+            } ();
+
+            if (selectedId != 0)
+                combo->setSelectedId (selectedId, juce::sendNotificationSync);
+            else if (combo->getText() != v)
+                combo->setText (v, juce::sendNotificationSync);
+        } 
     }
 
     if (property == IDs::lookAndFeel)

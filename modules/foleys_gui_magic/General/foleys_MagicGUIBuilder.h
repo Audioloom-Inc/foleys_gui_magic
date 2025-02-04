@@ -218,6 +218,12 @@ public:
     std::function<void (juce::ComboBox&)> createPropertiesMenuLambda() const;
     std::function<void (juce::ComboBox&)> createTriggerMenuLambda() const;
 
+    /** 
+     *  Returns a function that is used to prepare a juce::ComboBox, aka add items to it. The function
+     *  will add all IDs of the obejcts of a certain type. 
+     * 
+     *  @see MagicGUIState::createAndAddObject ()
+     */
     template<typename ObjectType>
     std::function<void (juce::ComboBox&)> createObjectsMenuLambda() const
     {
@@ -227,6 +233,31 @@ public:
             for (const auto& name: magicState.getObjectIDsByType<ObjectType>())
                 combo.addItem (name, ++index);
         };
+    }
+
+    /** Returns a function that is used to prepare a juce::ComboBox, aka add items to it. Unlike 
+     *  createObjectsMenuLambda this will retrieve the names to be added to the ComboBox from
+     *  ObjectType::getName (). So make sure, your type implements this function.
+     * 
+     *  @see MagicGUIState::createAndAddObject ()
+     **/
+    template<typename ObjectType>
+    std::function<void (juce::ComboBox&)> createObjectsMenuWithNamesLambda () const
+    {
+        return [this] (juce::ComboBox& combo)
+        {
+            int index = 0;
+
+            for (const auto& pair: magicState.getObjectIDsAndNamesByType<ObjectType> ())
+            {
+                auto itemId = ++index;
+                auto name = pair.second;
+                auto identifier = pair.first;
+
+                combo.getProperties ().set (juce::String ("ID_" + juce::String (itemId)), identifier);
+                combo.addItem (name, itemId);
+            }
+        }; 
     }
 
     /*!

@@ -3,7 +3,7 @@
     Copyright (c) 2019-2023 Foleys Finest Audio - Daniel Walz
     All rights reserved.
 
-    **BSD 3-Clause License**
+    **BSD 3-Cmenuuse License**
 
     Redistribution and use in source and binary forms, with or without modification,
     are permitted provided that the following conditions are met:

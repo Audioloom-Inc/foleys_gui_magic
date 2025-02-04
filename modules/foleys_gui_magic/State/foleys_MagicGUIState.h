@@ -209,10 +209,15 @@ public:
         return identifiers;
     }
 
+    /** 
+     Returns all identifiers with names of all objects, that can be casted to the given type.
+     
+     Note that the given type needs to implement getName() method.
+     */
     template <typename ObjectType>
-    juce::StringPairArray getObjectIDsAndNamesByType () const
+    juce::Array<std::pair<juce::String,juce::String>> getObjectIDsAndNamesByType () const
     {
-        juce::StringPairArray identifiers;
+        juce::Array<std::pair<juce::String,juce::String>> identifiers;
         for (const auto& object : advertisedObjects)
         {
             if (auto type = dynamic_cast<ObjectType*>(object.second.get()))
@@ -220,7 +225,7 @@ public:
                 auto identifier = object.first.toString ();
                 auto name = type->getName ();
 
-                identifiers.set (identifier, name);
+                identifiers.add ({identifier, name});
             }
         }
 

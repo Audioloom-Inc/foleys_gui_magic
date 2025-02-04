@@ -187,6 +187,14 @@ public:
         return pointerToReturn;
     }
 
+    void removeObject (const juce::Identifier& objectID)
+    {
+        if (auto * plot = dynamic_cast<MagicPlotSource*> (advertisedObjects[objectID].get()))
+            visualiserThread.removeTimeSliceClient (plot->getBackgroundJob());
+
+        advertisedObjects.erase (objectID);
+    }
+
     /**
      Returns all identifiers of objects, that can be casted to the given type.
      */

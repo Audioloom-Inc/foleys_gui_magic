@@ -555,7 +555,11 @@ void GuiItem::handleAsyncUpdate ()
 
 void GuiItem::updateVisibility()
 {
-    shown = getProperty (IDs::shown);
+    if (auto s = (bool)getProperty (IDs::shown); s != shown)
+    {
+        shown = s;
+        shownChanged ();
+    }
 
     auto hidden = ! shown && isEditModeOn ();
     auto visible = (bool)visibility.getValue() && (shown || hidden);

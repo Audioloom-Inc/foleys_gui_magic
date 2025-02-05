@@ -151,6 +151,11 @@ public:
     bool shouldBeVisible ();
 
     /**
+     Returns true when the component is shown in final product
+     */
+    bool isShowingInFinalProduct () const { return shown; }
+
+    /**
      Returns the layout type this item is managed by.
      */
     LayoutType getParentsLayoutType() const;
@@ -259,10 +264,13 @@ protected:
     void valueTreeParentChanged (juce::ValueTree&) override;
 
     void enablementChanged () override;
-
     
+    void updateVisibility ();
+
     virtual void customResizeOperation (juce::Rectangle<int> delta) {}
 
+    virtual void shownChanged () {}
+    
 private:
 
     class BorderDragger : public juce::ResizableBorderComponent
@@ -343,7 +351,6 @@ private:
 
     void configurePosition (const juce::var& v, Position& p, double d);
     void handleAsyncUpdate () override;
-    void updateVisibility ();
     void updateAlpha ();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiItem)

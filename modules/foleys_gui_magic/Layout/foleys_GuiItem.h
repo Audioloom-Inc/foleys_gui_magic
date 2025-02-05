@@ -241,6 +241,7 @@ public:
     
     void setBoundsForced (juce::Rectangle<int> rectangle);
     
+    void updateVisibility ();
 protected:
 
     juce::ValueTree configNode;
@@ -265,7 +266,6 @@ protected:
 
     void enablementChanged () override;
     
-    void updateVisibility ();
 
     virtual void customResizeOperation (juce::Rectangle<int> delta) {}
 

@@ -76,7 +76,8 @@ void ParameterManager::updateParameterMap()
     {
         for (auto* parameter : processor->getParameters())
             if (auto* withID = dynamic_cast<juce::RangedAudioParameter*>(parameter))
-                parameterLookup [withID->paramID] = withID;
+                if (! shouldParameterBeAddedToLookup || shouldParameterBeAddedToLookup (*withID))
+                    parameterLookup [withID->paramID] = withID;
     }
     else if (parameters)
     {

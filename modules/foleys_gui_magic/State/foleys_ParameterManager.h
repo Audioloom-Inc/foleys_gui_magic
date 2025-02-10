@@ -43,6 +43,9 @@ public:
     ParameterManager (juce::Array<juce::RangedAudioParameter*>& parameters);
     ParameterManager () = default;
     
+    // if set, this should return true for any parameter that should be added to the parameterLookup map.
+    std::function<bool(juce::RangedAudioParameter&)> shouldParameterBeAddedToLookup;
+
     juce::RangedAudioParameter* getParameter (const juce::String& paramID);
 
     juce::StringArray getParameterNames() const;

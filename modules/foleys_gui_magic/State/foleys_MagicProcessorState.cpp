@@ -92,6 +92,11 @@ juce::ValueTree MagicProcessorState::createDefaultGuiValueTree() const
     return magic;
 }
 
+foleys::ParameterManager& MagicProcessorState::getParameterManager()
+{
+    return parameters;
+}
+
 void MagicProcessorState::addParametersToMenu (const juce::AudioProcessorParameterGroup& group, juce::PopupMenu& menu, int& index) const
 {
     for (const auto& node : group)

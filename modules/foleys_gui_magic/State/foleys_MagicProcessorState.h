@@ -114,7 +114,7 @@ public:
      Returns a parameter for a parameter ID
      */
     juce::RangedAudioParameter* getParameter (const juce::String& paramID) override;
-    void updateParameterMap();
+    virtual void updateParameterMap();
 
     std::unique_ptr<juce::SliderParameterAttachment>   createAttachment (const juce::String& paramID, juce::Slider& slider) override;
     std::unique_ptr<juce::ComboBoxParameterAttachment> createAttachment (const juce::String& paramID, juce::ComboBox& combobox) override;
@@ -147,6 +147,9 @@ public:
      */
     juce::ValueTree createDefaultGuiValueTree () const override;
 
+    /** */
+    ParameterManager& getParameterManager ();
+    
 protected:
     virtual void processorAboutToBeReplaced () {}
     virtual void processorReplaced () {}

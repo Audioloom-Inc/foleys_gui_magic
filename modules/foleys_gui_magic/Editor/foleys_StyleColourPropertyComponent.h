@@ -49,7 +49,7 @@ public:
     StyleColourPropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse);
     ~StyleColourPropertyComponent() override;
 
-    void refresh() override;
+    void update() override;
     void resized() override;
 
 private:

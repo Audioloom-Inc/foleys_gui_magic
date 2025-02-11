@@ -55,7 +55,7 @@ StyleTextPropertyComponent::StyleTextPropertyComponent (MagicGUIBuilder& builder
     init ();
 }
 
-void StyleTextPropertyComponent::refresh()
+void StyleTextPropertyComponent::update()
 {
     const auto value = lookupValue();
 

@@ -63,23 +63,29 @@ protected:
     juce::String        displayName;
     juce::ValueTree     node;
     juce::ValueTree     inheritedFrom;
-    
+    juce::String        hint;
+
     std::function<void(const juce::var& newValue)> customValueFunction;
 
     std::unique_ptr<juce::Component> editor;
     juce::TextButton    remove { "X" };
+
+    virtual void removeClicked () {}
+    virtual bool showHint () const { return false; }
+    virtual void update () = 0;
+    
     void setEditor (std::unique_ptr<juce::Component> newEditor);
+    void refresh () override;
 
     void lookAndFeelChanged () override;
     bool isRefreshing () { return refreshing; }
-
-    virtual void removeClicked () {}
-
-    void internalRefresh ();
     
 private:
+    juce::Label infoLabel;
+    bool showPropertyTooltips{ false };
+    
     void valueTreePropertyChanged (juce::ValueTree& treeWhosePropertyHasChanged,
-                                   const juce::Identifier& changedProperty) override;
+        const juce::Identifier& changedProperty) override;
     
     // true during call to refresh
     bool refreshing{ false };

@@ -34,7 +34,6 @@
 #pragma once
 
 #include "foleys_StylePropertyComponent.h"
-
 namespace foleys
 {
 
@@ -45,7 +44,7 @@ public:
     StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, juce::StringArray choices);
     StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, std::function<void(juce::ComboBox&)> menuCreationLambda);
 
-    void refresh() override;
+    void update() override;
 
 private:
     void initialiseComboBox (bool editable);

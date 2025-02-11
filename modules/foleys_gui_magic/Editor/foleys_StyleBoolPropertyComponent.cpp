@@ -61,7 +61,7 @@ StyleBoolPropertyComponent::StyleBoolPropertyComponent (MagicGUIBuilder& builder
     editor = std::move (toggle);
 }
 
-void StyleBoolPropertyComponent::refresh()
+void StyleBoolPropertyComponent::update()
 {
     const auto value = lookupValue();
 

@@ -90,7 +90,7 @@ StyleColourPropertyComponent::~StyleColourPropertyComponent()
         colourPanel->removeChangeListener (this);
 }
 
-void StyleColourPropertyComponent::refresh()
+void StyleColourPropertyComponent::update()
 {
     const auto value = lookupValue();
 

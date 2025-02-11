@@ -82,7 +82,7 @@ StyleGradientPropertyComponent::~StyleGradientPropertyComponent()
         colourPanel->removeChangeListener (this);
 }
 
-void StyleGradientPropertyComponent::refresh()
+void StyleGradientPropertyComponent::update()
 {
     const auto value = lookupValue();
 

@@ -46,7 +46,7 @@ public:
     StyleGradientPropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty  propertyToUse, juce::ValueTree& nodeToUse);
     ~StyleGradientPropertyComponent() override;
 
-    void refresh() override;
+    void update() override;
     void resized() override;
 
 private:

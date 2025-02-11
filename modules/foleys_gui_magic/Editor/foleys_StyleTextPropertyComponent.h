@@ -44,7 +44,7 @@ public:
     StyleTextPropertyComponent (MagicGUIBuilder& builderToUse, juce::Identifier propertyToUse, juce::ValueTree& nodeToUse);
     StyleTextPropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty& propertyToUse, juce::ValueTree& nodeToUse);
 
-    void refresh() override;
+    void update() override;
     void init ();
 
 private:

@@ -43,7 +43,7 @@ class StyleBoolPropertyComponent  : public StylePropertyComponent
 public:
     StyleBoolPropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty& propertyToUse, juce::ValueTree& nodeToUse);
 
-    void refresh() override;
+    void update() override;
 
 private:
 

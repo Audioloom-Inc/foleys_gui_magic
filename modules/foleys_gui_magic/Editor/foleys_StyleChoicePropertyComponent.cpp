@@ -98,7 +98,7 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
     proxy.addListener (this);
 }
 
-void StyleChoicePropertyComponent::refresh()
+void StyleChoicePropertyComponent::update()
 {
     const auto value = lookupValue();
 

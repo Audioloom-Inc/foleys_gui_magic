@@ -56,7 +56,8 @@ public:
 
     ~MouseLambdas() override
     {
-        listenedComponent->removeMouseListener (this);
+        if (listenedComponent)
+            listenedComponent->removeMouseListener (this);
     }
 
     void mouseDown (const juce::MouseEvent& event) override

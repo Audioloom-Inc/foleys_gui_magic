@@ -83,7 +83,7 @@ StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
     
     addChildComponent (&infoLabel);
     infoLabel.setText ("info", juce::dontSendNotification);
-    infoLabel.setFont (juce::FontOptions (10.f).withStyle (juce::Font::italic));
+    infoLabel.setFont (juce::FontOptions (12.f).withStyle ("italic"));
     infoLabel.setJustificationType (juce::Justification::centred);
 }
 

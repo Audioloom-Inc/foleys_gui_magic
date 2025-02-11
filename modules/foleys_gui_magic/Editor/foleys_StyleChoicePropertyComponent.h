@@ -45,6 +45,9 @@ public:
     StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, std::function<void(juce::ComboBox&)> menuCreationLambda);
 
     void update() override;
+    
+protected:
+    bool showHint () const override;
 
 private:
     void initialiseComboBox (bool editable);

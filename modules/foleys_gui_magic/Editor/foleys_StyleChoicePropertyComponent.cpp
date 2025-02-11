@@ -122,6 +122,14 @@ void StyleChoicePropertyComponent::update()
     repaint();
 }
 
+bool StyleChoicePropertyComponent::showHint() const
+{
+    if (auto box = dynamic_cast<juce::ComboBox*> (editor.get()))
+        return box->getNumItems () <= 0;
+
+    return false;
+}
+
 void StyleChoicePropertyComponent::valueChanged (juce::Value&)
 {
     if (updating)

@@ -75,6 +75,16 @@ StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
 {
     customValueFunction = propertyToUse.customValueFunction;
     displayName = propertyToUse.getDisplayName();
+    
+    hint = propertyToUse.hint;
+
+    if (hint.isNotEmpty ())
+        infoLabel.setTooltip (hint);
+    
+    addChildComponent (&infoLabel);
+    infoLabel.setText ("info", juce::dontSendNotification);
+    infoLabel.setFont (juce::FontOptions (10.f).withStyle (juce::Font::italic));
+    infoLabel.setJustificationType (juce::Justification::centred);
 }
 
 StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, juce::Identifier propertyToUse, juce::ValueTree& nodeToUse)
@@ -110,18 +120,21 @@ juce::var StylePropertyComponent::lookupValue()
 
     const auto& s = builder.getStylesheet();
 
-    if (node == inheritedFrom)
-        setTooltip ({});
-    else if (inheritedFrom.isValid() == false)
-        setTooltip ("default");
-    else if (s.isClassNode (inheritedFrom))
-        setTooltip ("Class: " + inheritedFrom.getType().toString() + " (double-click)");
-    else if (s.isTypeNode (inheritedFrom))
-        setTooltip ("Type: " + inheritedFrom.getType().toString() + " (double-click)");
-    else if (s.isIdNode (inheritedFrom))
-        setTooltip ("Node: " + inheritedFrom.getType().toString() + " (double-click)");
-    else
-        setTooltip (inheritedFrom.getType().toString() + " (double-click)");
+    if (showPropertyTooltips)
+    {
+        if (node == inheritedFrom)
+            setTooltip ({});
+        else if (inheritedFrom.isValid() == false)
+            setTooltip ("default");
+        else if (s.isClassNode (inheritedFrom))
+            setTooltip ("Class: " + inheritedFrom.getType().toString() + " (double-click)");
+        else if (s.isTypeNode (inheritedFrom))
+            setTooltip ("Type: " + inheritedFrom.getType().toString() + " (double-click)");
+        else if (s.isIdNode (inheritedFrom))
+            setTooltip ("Node: " + inheritedFrom.getType().toString() + " (double-click)");
+        else
+            setTooltip (inheritedFrom.getType().toString() + " (double-click)");
+    }
 
     remove.setEnabled (node == inheritedFrom);
 
@@ -147,8 +160,11 @@ void StylePropertyComponent::resized()
 {
     auto b = getLocalBounds().reduced (1).withLeft (getWidth() / 2);
     remove.setBounds (b.removeFromRight (getHeight()));
+    
     if (editor)
         editor->setBounds (b);
+
+    infoLabel.setBounds (b);
 }
 
 juce::ValueTree StylePropertyComponent::getInheritedFrom() const
@@ -182,6 +198,11 @@ void StylePropertyComponent::refresh ()
         
     juce::ScopedValueSetter<bool> flag (refreshing, true);
     update ();
+
+    if (editor)
+        editor->setVisible (! showHint ());
+
+    infoLabel.setVisible (showHint ());    
 }
 
 } // namespace foleys

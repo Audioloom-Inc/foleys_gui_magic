@@ -68,6 +68,11 @@ SettableProperty SettableProperty::withDisplayName (const juce::String& newName)
     return with (*this, &SettableProperty::displayName, newName);
 }
 
+SettableProperty SettableProperty::withHint (const juce::String& newHint)
+{
+    return with (*this, &SettableProperty::hint, newHint);
+}
+
 SettableProperty SettableProperty::withFlags (int newFlags)
 {
     return with (*this, &SettableProperty::flags, newFlags);

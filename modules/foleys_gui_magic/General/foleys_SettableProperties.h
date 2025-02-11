@@ -88,6 +88,7 @@ public:
     juce::String                                category {};
     juce::String                                description {};
     juce::String                                displayName {};
+    juce::String                                hint {};
     int                                         flags { AllViews };
     juce::var                                   customInfo {};
 
@@ -107,6 +108,7 @@ public:
     SettableProperty withCategory (const juce::String& newCategory) const;
     SettableProperty withDescription (const juce::String& desc);
     SettableProperty withDisplayName (const juce::String& newName);
+    SettableProperty withHint (const juce::String& newHint);
     SettableProperty withFlags (int newFlags);
     SettableProperty withAdditionalFlags (int additionalFlags);
     SettableProperty withCustomInfo (juce::var newInfo);

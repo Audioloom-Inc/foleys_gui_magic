@@ -156,6 +156,11 @@ juce::ValueTree StylePropertyComponent::getInheritedFrom() const
     return inheritedFrom;
 }
 
+void StylePropertyComponent::setEditor (std::unique_ptr<juce::Component> newEditor) 
+{
+    editor = std::move (newEditor);
+}
+
 void StylePropertyComponent::lookAndFeelChanged()
 {
     remove.setColour (juce::TextButton::buttonColourId, findColour (ToolBox::removeButtonColourId, true));

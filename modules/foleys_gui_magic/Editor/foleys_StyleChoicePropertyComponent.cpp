@@ -93,7 +93,7 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
             refresh();
     };
 
-    editor = std::move (combo);
+    setEditor (std::move (combo));
 
     proxy.addListener (this);
 }

@@ -68,6 +68,7 @@ protected:
 
     std::unique_ptr<juce::Component> editor;
     juce::TextButton    remove { "X" };
+    void setEditor (std::unique_ptr<juce::Component> newEditor);
 
     void lookAndFeelChanged () override;
     bool isRefreshing () { return refreshing; }

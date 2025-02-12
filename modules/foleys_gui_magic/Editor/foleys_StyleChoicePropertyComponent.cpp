@@ -53,6 +53,22 @@ StyleChoicePropertyComponent::StyleChoicePropertyComponent (MagicGUIBuilder& bui
     initialiseComboBox (false);
 }
 
+int StyleChoicePropertyComponent::getIdToSelect (juce::ComboBox& combo, const juce::String& value)
+{
+    auto& properties = combo.getProperties ();
+    
+    // directly stored selected ids
+    if (properties[IDs::useSelectedItemIdInComboBoxLambda])
+        return value.getIntValue ();
+
+    // stored an identifier with an identifier
+    for (auto& p : properties)
+        if (p.value.toString () == value)
+            return p.name.toString ().getTrailingIntValue ();
+
+    return 0;
+}
+
 void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
 {
     auto combo = std::make_unique<juce::ComboBox>();
@@ -112,10 +128,12 @@ void StyleChoicePropertyComponent::update()
         {
             proxy.referTo (proxy);
 
-            if (combo->getProperties ()[IDs::useSelectedItemIdInComboBoxLambda])
-                combo->setSelectedId ((int)value);
+            auto vString = value.toString ();
+
+            if (auto selectedId = getIdToSelect (*combo, vString); selectedId != 0)
+                combo->setSelectedId (selectedId);
             else
-                combo->setText (value.toString(), juce::dontSendNotification);
+                combo->setText (vString, juce::dontSendNotification);
         }
     }
 
@@ -139,28 +157,11 @@ void StyleChoicePropertyComponent::valueChanged (juce::Value&)
     auto v = proxy.getValue().toString();
 
     if (auto* combo = dynamic_cast<juce::ComboBox*>(editor.get()))
-    {
-        if (combo->getProperties ()[IDs::useSelectedItemIdInComboBoxLambda])
-        {
-            combo->setSelectedId (v.getIntValue (), juce::sendNotificationSync);
-        }
-        else
-        {
-            auto selectedId = [&](){
-                auto& properties = combo->getProperties ();
-                
-                for (auto& p : properties)
-                    if (p.value.toString () == v)
-                        return p.name.toString ().getTrailingIntValue ();
-
-                return 0;
-            } ();
-
-            if (selectedId != 0)
-                combo->setSelectedId (selectedId, juce::sendNotificationSync);
-            else if (combo->getText() != v)
-                combo->setText (v, juce::sendNotificationSync);
-        } 
+    {    
+        if (auto selectedId = getIdToSelect (*combo, v); selectedId != 0)
+            combo->setSelectedId (selectedId, juce::sendNotificationSync);
+        else if (combo->getText () != v)
+            combo->setText (v, juce::sendNotificationSync);
     }
 
     if (property == IDs::lookAndFeel)

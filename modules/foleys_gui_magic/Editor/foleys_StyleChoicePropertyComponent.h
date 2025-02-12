@@ -50,9 +50,11 @@ protected:
     bool showHint () const override;
 
 private:
+    int  getIdToSelect (juce::ComboBox&, const juce::String& value);
+    
     void initialiseComboBox (bool editable);
-
     void valueChanged (juce::Value& value) override;
+    
 
     juce::StringArray               choices;
     std::function<void(juce::ComboBox&)> menuCreationLambda;

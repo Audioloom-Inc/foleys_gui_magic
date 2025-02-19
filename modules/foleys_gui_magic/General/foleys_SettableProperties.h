@@ -92,7 +92,8 @@ public:
     int                                         flags { AllViews };
     juce::var                                   customInfo {};
 
-    /** when you need a custom function after the property has been set, use this.
+    /** when you need a custom function to set the property.
+     * 
      *  Only implemented for some style property compoennts.
      */
     std::function<void(const juce::var& newValue)>     customValueFunction {};

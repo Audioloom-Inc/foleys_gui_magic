@@ -53,7 +53,17 @@ StyleBoolPropertyComponent::StyleBoolPropertyComponent (MagicGUIBuilder& builder
             return;
 
         if (auto* t = dynamic_cast<juce::ToggleButton*>(editor.get()))
-            node.setProperty (property, t->getToggleState(), &builder.getUndoManager());
+        {
+            if (customValueFunction)
+            {
+                customValueFunction (t->getToggleState());
+            }
+            else
+            {
+                node.setProperty (property, t->getToggleState(), &builder.getUndoManager());
+            }
+
+        }
 
         refresh();
     };

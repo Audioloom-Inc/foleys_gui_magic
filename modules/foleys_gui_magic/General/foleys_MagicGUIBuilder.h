@@ -95,11 +95,19 @@ public:
      */
     GuiItem* findGuiItemWithId (const juce::String& name);
 
+    /** */
+    GuiItem* findGuiItemOfType (const juce::Identifier& type);
+
+    /** */
+    juce::ValueTree findNodeOfSameType (const juce::ValueTree& data);
+
     /**
      Seeks recursively for a GuiItem
      */
     GuiItem* findGuiItem (const juce::ValueTree& node);
 
+    /** */
+    juce::Array<GuiItem*> findGuiItemsOfType (const juce::Identifier& type);
 
     /**
      Seeks recursively for a GuiItem with a certain property
@@ -110,6 +118,11 @@ public:
      Seeks recursively for a node with a certain property
      */
     juce::ValueTree findNodeWithProperty (const juce::Identifier& property, const juce::var& value);
+
+    /**
+     Seek for all nodes with a certain type
+     */
+    juce::Array<juce::ValueTree> findNodesOfType (const juce::Identifier& type);
 
     /**
      This selects the stylesheet node and sets it to the Stylesheet.

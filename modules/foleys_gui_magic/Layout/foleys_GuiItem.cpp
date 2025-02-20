@@ -88,6 +88,14 @@ GuiItem* GuiItem::findGuiItemWithId (const juce::String& name)
     return nullptr;
 }
 
+GuiItem* GuiItem::findGuiItemOfType (const juce::Identifier& type)
+{
+    if (configNode.getType () == type)
+        return this;
+
+    return nullptr;
+}
+
 void GuiItem::updateInternal()
 {
     auto& stylesheet = magicBuilder.getStylesheet();
@@ -420,6 +428,12 @@ GuiItem* GuiItem::findGuiItemWithProperty (const juce::Identifier& property, con
         return this;
 
     return nullptr;
+}
+
+juce::Array<GuiItem*> GuiItem::findGuiItemsOfType (const juce::Identifier& type)
+{
+    if (configNode.getType () == type)
+        return { this };
 }
 
 void GuiItem::paintOverChildren (juce::Graphics& g)

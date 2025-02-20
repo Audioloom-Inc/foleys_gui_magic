@@ -105,8 +105,13 @@ std::unique_ptr<GuiItem> MagicGUIBuilder::createGuiItem (const juce::ValueTree& 
     auto factory = factories.find (node.getType());
     if (factory != factories.end())
     {
+        bool firstOfType = findGuiItemOfType (node.getType ()) == nullptr;
         auto item = factory->second (*this, node);
         item->init ();
+        
+        if (firstOfType)
+            item->initFirstOfType ();
+
         item->updateInternal();
         return item;
     }
@@ -242,12 +247,55 @@ GuiItem* MagicGUIBuilder::findGuiItemWithId (const juce::String& name)
     return nullptr;
 }
 
+GuiItem* MagicGUIBuilder::findGuiItemOfType (const juce::Identifier& type)
+{
+    if (root)
+        return root->findGuiItemOfType (type);
+
+    return nullptr;
+}
+
+juce::ValueTree MagicGUIBuilder::findNodeOfSameType (const juce::ValueTree& data)
+{
+    if (! data.isValid ())
+        return {};
+
+    auto rootNode = getGuiRootNode ();
+    if (! rootNode.isValid ())
+        return {};
+
+    std::function<juce::ValueTree(const juce::ValueTree&)> find = [&](const juce::ValueTree& node) -> juce::ValueTree
+    {
+        if (node != data && node.getType() == data.getType())
+            return node;
+
+        for (auto child : node)
+        {
+            auto result = find(child);
+            if (result.isValid())
+                return result;
+        }
+
+        return {};
+    };
+
+    return find(rootNode);
+}
+
 GuiItem* MagicGUIBuilder::findGuiItem (const juce::ValueTree& node)
 {
     if (node.isValid() && root)
         return root->findGuiItem (node);
 
     return nullptr;
+}
+
+juce::Array<GuiItem*> MagicGUIBuilder::findGuiItemsOfType (const juce::Identifier& type)
+{
+    if (root)
+        return root->findGuiItemsOfType (type);
+
+    return {};
 }
 
 GuiItem* MagicGUIBuilder::findGuiItemWithProperty (const juce::Identifier& property, const juce::var& value)

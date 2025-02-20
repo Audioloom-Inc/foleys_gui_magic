@@ -124,6 +124,12 @@ public:
      */
     GuiItem* findGuiItemWithId (const juce::String& name) override;
 
+    /** */
+    GuiItem* findGuiItemOfType (const juce::Identifier& type) override;
+
+    /** */
+    juce::Array<GuiItem*> findGuiItemsOfType (const juce::Identifier& type) override;
+    
     /**
      Seeks recursively for a GuiItem
      */

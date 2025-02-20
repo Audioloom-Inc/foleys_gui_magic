@@ -180,6 +180,31 @@ GuiItem* Container::findGuiItemWithId (const juce::String& name)
     return nullptr;
 }
 
+GuiItem* Container::findGuiItemOfType (const juce::Identifier& type)
+{
+    if (configNode.getType() == type)
+        return this;
+
+    for (auto& child : children)
+        if (auto* item = child->findGuiItemOfType (type))
+            return item;
+
+    return nullptr;
+}
+
+juce::Array<GuiItem*> Container::findGuiItemsOfType (const juce::Identifier& type)
+{
+    juce::Array<GuiItem*> items;
+
+    if (configNode.getType() == type)
+        items.add (this);
+
+    for (auto& child : children)
+        items.addArray (child->findGuiItemsOfType (type));
+
+    return items;
+}
+
 GuiItem* Container::findGuiItem (const juce::ValueTree& node)
 {
     if (node == configNode)

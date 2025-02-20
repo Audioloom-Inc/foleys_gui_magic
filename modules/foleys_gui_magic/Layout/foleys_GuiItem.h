@@ -119,6 +119,9 @@ public:
      */
     virtual GuiItem* findGuiItemWithId (const juce::String& name);
 
+    /** */
+    virtual GuiItem* findGuiItemOfType (const juce::Identifier& type);
+
     /**
      Reread properties from the config ValueTree
      */
@@ -198,6 +201,9 @@ public:
      */
     virtual GuiItem* findGuiItemWithProperty (const juce::Identifier& property, const juce::var& value);
 
+    /** */
+    virtual juce::Array<GuiItem*> findGuiItemsOfType (const juce::Identifier& type);
+
     /**
      This method sets the GUI in edit mode, that allows to drag the components around.
      */
@@ -207,6 +213,9 @@ public:
     /**  
     */
     virtual void init ();
+    
+    /** */
+    virtual void initFirstOfType () {}
 
     /**
      */

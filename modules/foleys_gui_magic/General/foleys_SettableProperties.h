@@ -91,7 +91,8 @@ public:
     juce::String                                hint {};
     int                                         flags { AllViews };
     juce::var                                   customInfo {};
-
+    bool                                        settable{ true };
+    
     /** when you need a custom function to set the property.
      * 
      *  Only implemented for some style property compoennts.

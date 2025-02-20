@@ -47,26 +47,33 @@ StyleBoolPropertyComponent::StyleBoolPropertyComponent (MagicGUIBuilder& builder
 
     addAndMakeVisible (toggle.get());
 
-    toggle->onClick = [&]
+    if (propertyToUse.settable)
     {
-        if (isRefreshing ())
-            return;
-
-        if (auto* t = dynamic_cast<juce::ToggleButton*>(editor.get()))
+        toggle->onClick = [&]
         {
-            if (customValueFunction)
+            if (isRefreshing ())
+                return;
+    
+            if (auto* t = dynamic_cast<juce::ToggleButton*>(editor.get()))
             {
-                customValueFunction (t->getToggleState());
+                if (customValueFunction)
+                {
+                    customValueFunction (t->getToggleState());
+                }
+                else
+                {
+                    node.setProperty (property, t->getToggleState(), &builder.getUndoManager());
+                }
+    
             }
-            else
-            {
-                node.setProperty (property, t->getToggleState(), &builder.getUndoManager());
-            }
-
-        }
-
-        refresh();
-    };
+    
+            refresh();
+        };
+    }
+    else
+    {
+        toggle->setEnabled (false);
+    }
 
     editor = std::move (toggle);
 }

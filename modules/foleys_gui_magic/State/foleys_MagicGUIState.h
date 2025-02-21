@@ -59,6 +59,12 @@ class MagicGUIState
         explicit ErasedObject(Ts &&... ts) : ToErase{std::forward<Ts>(ts)...} {}
     };
 
+    template <typename ReferencedType> class ReferencedObject : public ObjectBase {
+    public:
+        explicit ReferencedObject(ReferencedType &object) : object{object} {}
+        ReferencedType &object;
+    };
+
     template <typename T, typename... Ts>
     std::unique_ptr<ErasedObject<T>> makeErased(Ts &&... t) {
       return std::make_unique<ErasedObject<T>>(std::forward<Ts>(t)...);
@@ -187,12 +193,30 @@ public:
         return pointerToReturn;
     }
 
+    template <typename T>
+    void addObject (const juce::Identifier& objectID, T* object)
+    {
+        createAndAddObject<ReferencedObject> (objectID, *object);
+    }
+
     void removeObject (const juce::Identifier& objectID)
     {
         if (auto * plot = dynamic_cast<MagicPlotSource*> (advertisedObjects[objectID].get()))
             visualiserThread.removeTimeSliceClient (plot->getBackgroundJob());
 
         advertisedObjects.erase (objectID);
+    }
+
+    template <typename ObjectType>
+    ObjectType* getObject (ObjectBase * object) const
+    {
+        if (auto o = dynamic_cast<ObjectType*>(object))
+            return o;
+
+        if (auto r = dynamic_cast<ReferencedObject<ObjectType>*>(object))
+            return &r->object;
+
+        return nullptr;
     }
 
     /**
@@ -203,7 +227,7 @@ public:
     {
         juce::StringArray identifiers;
         for (const auto& object : advertisedObjects)
-            if (dynamic_cast<ObjectType*>(object.second.get()))
+            if (getObject<ObjectType> (object.second.get()))
                 identifiers.add (object.first.toString());
 
         return identifiers;
@@ -220,7 +244,7 @@ public:
         juce::Array<std::pair<juce::String,juce::String>> identifiers;
         for (const auto& object : advertisedObjects)
         {
-            if (auto type = dynamic_cast<ObjectType*>(object.second.get()))
+            if (auto type = getObject<ObjectType>(object.second.get()))
             {
                 auto identifier = object.first.toString ();
                 auto name = type->getName ();
@@ -243,7 +267,7 @@ public:
     {
         const auto& object = advertisedObjects.find (objectID);
         if (object != advertisedObjects.cend())
-            return dynamic_cast<ObjectType*>(object->second.get());
+            return getObject<ObjectType>(object->second.get ());
 
         return nullptr;
     }

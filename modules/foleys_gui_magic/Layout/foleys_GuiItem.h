@@ -156,7 +156,7 @@ public:
     /**
      Returns true when the component is shown in final product
      */
-    bool isShowingInFinalProduct () const { return shown; }
+    bool isShowingInFinalProduct () const { return visibleInFinalProduct; }
 
     /**
      Returns the layout type this item is managed by.
@@ -277,8 +277,6 @@ protected:
     
 
     virtual void customResizeOperation (juce::Rectangle<int> delta) {}
-
-    virtual void shownChanged () {}
     
 private:
 
@@ -345,7 +343,7 @@ private:
     void configureComponent();
 
     juce::Value     visibility { true };
-    bool            shown{ true };
+    bool            visibleInFinalProduct{ true };
     bool            hidden{ false };
     bool            initializing{ false };
 
@@ -360,8 +358,41 @@ private:
 
     void configurePosition (const juce::var& v, Position& p, double d);
     void handleAsyncUpdate () override;
-    void updateAlpha ();
     
+    friend class DisappearingHelper;
+    class DisappearingHelper : public juce::MouseListener, public juce::Timer
+    {
+    public:
+        DisappearingHelper (foleys::GuiItem& item);
+        ~DisappearingHelper () override;
+
+        void show ();
+        void hide ();
+    
+        void setEnabled (bool enabled);
+        bool isEnabled () const;
+
+        bool isCurrentlyAnimating () const;
+
+    private:
+        bool enabled{ false };
+
+        foleys::GuiItem& item;
+        juce::ComponentAnimator& anim;
+        
+        const int hideDelayInMs{ 500 };
+        const int animTimeInMs{ 200 };
+
+        bool showing{ false };
+        bool preventFadeout ();
+        bool checkComponent (Component * comp) const;
+
+        void timerCallback () override;
+
+        void mouseEnter (const juce::MouseEvent& event) override;
+        void mouseExit (const juce::MouseEvent& event) override;
+    } disappearingHelper{ *this };
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiItem)
 };
 

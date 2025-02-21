@@ -283,7 +283,7 @@ void GuiItem::updateLayout()
 
 bool GuiItem::shouldBeVisible()
 {
-    return visibility.getValue() && (shown || isEditModeOn ());
+    return visibility.getValue() && (visibleInFinalProduct || isEditModeOn ());
 }
 
 
@@ -318,7 +318,9 @@ void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const 
         init ();
     else if (property == foleys::IDs::parameter)
         updateParameterConnection (getProperty (IDs::parameter));
-    else if (property == foleys::IDs::shown)
+    else if (property == foleys::IDs::visibleInFinalProduct)
+        updateVisibility ();
+    else if (property == foleys::IDs::disappearing)
         updateVisibility ();
     else
         propertyChanged (property);
@@ -391,7 +393,7 @@ void GuiItem::valueTreeParentChanged (juce::ValueTree& treeThatChanged)
 
 void GuiItem::enablementChanged() 
 {
-    updateAlpha ();
+    updateVisibility ();
 }
 
 void GuiItem::itemDragEnter (const juce::DragAndDropTarget::SourceDetails& details)
@@ -569,30 +571,26 @@ void GuiItem::handleAsyncUpdate ()
 
 void GuiItem::updateVisibility()
 {
-    if (auto s = (bool)getProperty (IDs::shown); s != shown)
-    {
-        shown = s;
-        shownChanged ();
-    }
-
-    auto hidden = ! shown && isEditModeOn ();
-    auto visible = (bool)visibility.getValue() && (shown || hidden);
-
+    visibleInFinalProduct = (bool)getProperty (IDs::visibleInFinalProduct);
+    
+    const auto disappearingSet = (bool)getProperty (IDs::disappearing);
+    const auto hiddenInFinalProduct = ! visibleInFinalProduct;
+    const auto hideNow = hiddenInFinalProduct && ! isEditModeOn ();
+    const auto visible = (bool)visibility.getValue() && (! hideNow);
+    const auto disappearingEnabled = isEnabled () && ! isEditModeOn () && visible && disappearingSet;
+    
     setVisible (visible);
 
-    updateAlpha ();
-}
-
-void GuiItem::updateAlpha()
-{
     if (isEditModeOn ())
     {
-        setAlpha (shown && isEnabled () ? 1.f : 0.4f);
+        setAlpha (visibleInFinalProduct && isEnabled () ? 1.f : 0.4f);
     }
     else
     {
-        setAlpha (! shown ? 0.f : isEnabled () ? 1.f : (float)magicBuilder.getStyleProperty (IDs::alphaWhenDisabled, configNode, true));
+        setAlpha (! visibleInFinalProduct ? 0.f : isEnabled () ? 1.f : disappearingSet ? 0.f : (float)magicBuilder.getStyleProperty (IDs::alphaWhenDisabled, configNode, true));
     }
+
+    disappearingHelper.setEnabled (disappearingEnabled);
 }
 
 void GuiItem::mouseDown (const juce::MouseEvent& event)
@@ -692,5 +690,103 @@ juce::ValueTree GuiItem::getNode() const
 {
     return configNode;
 }
+
+//==============================================================================
+
+//==============================================================================
+//==============================================================================
+GuiItem::DisappearingHelper::DisappearingHelper(foleys::GuiItem &item)
+: item (item)
+, anim (juce::Desktop::getInstance ().getAnimator ())
+{
+}
+
+GuiItem::DisappearingHelper::~DisappearingHelper()
+{
+    juce::Desktop::getInstance ().removeGlobalMouseListener (this);
+    stopTimer ();
+}
+
+void GuiItem::DisappearingHelper::show()
+{
+    stopTimer ();
+    anim.cancelAnimation (&item, false);
+    anim.fadeIn (&item, animTimeInMs);
+}
+
+void GuiItem::DisappearingHelper::hide()
+{
+    startTimer (hideDelayInMs);
+}
+
+void GuiItem::DisappearingHelper::setEnabled(bool enabled)
+{
+    this->enabled = enabled;
+
+    if (enabled)
+    {
+        juce::Desktop::getInstance ().addGlobalMouseListener (this);
+        
+        if (! preventFadeout ())
+            item.setAlpha (0.f);
+    }
+    else
+    {
+        juce::Desktop::getInstance ().removeGlobalMouseListener (this);
+        stopTimer ();
+    }
+}
+
+bool GuiItem::DisappearingHelper::isEnabled() const
+{
+    return enabled;
+}
+
+bool GuiItem::DisappearingHelper::isCurrentlyAnimating() const
+{
+    return anim.isAnimating (&item);
+}
+
+bool GuiItem::DisappearingHelper::preventFadeout()
+{
+    if (checkComponent (juce::Desktop::getInstance ().getMainMouseSource ().getComponentUnderMouse ()))
+        return true;
+
+    if (item.isEditModeOn ())
+        return true;
+
+    return false;
+}
+
+void GuiItem::DisappearingHelper::timerCallback()
+{
+    stopTimer ();
+
+    if (! preventFadeout ())
+        anim.fadeOut (&item, animTimeInMs);
+}
+
+void GuiItem::DisappearingHelper::mouseEnter(const juce::MouseEvent &event)
+{
+    if (checkComponent (event.originalComponent))
+        show ();
+}
+
+void GuiItem::DisappearingHelper::mouseExit(const juce::MouseEvent & event)
+{
+    if (checkComponent (event.originalComponent))
+        hide ();
+}
+
+bool GuiItem::DisappearingHelper::checkComponent(Component *c) const
+{
+    if (c != nullptr)
+        if (auto parentItem = c->findParentComponentOfClass<GuiItem> ())
+            return parentItem->getNode ()[IDs::parameter].toString () == item.getNode ()[IDs::parameter].toString ();
+
+    return false;
+}
+
+
 
 }  // namespace foleys

@@ -456,7 +456,7 @@ juce::var MagicGUIBuilder::getPropertyDefaultValue (juce::Identifier property, j
                 if (pDefault.name == property)
                     return pDefault.defaultValue;
                     
-    if (property == IDs::shown)
+    if (property == IDs::visibleInFinalProduct)
         return true;
 
     // flexbox

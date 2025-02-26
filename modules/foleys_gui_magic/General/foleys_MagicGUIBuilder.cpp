@@ -179,6 +179,10 @@ void MagicGUIBuilder::updateComponents()
 {
     juce::ScopedValueSetter svs{ currentlyUpdatingComponents, true };
 
+    // deselect the current node to avoid dangling pointers
+    auto selected = getSelectedNode();
+    setSelectedNode ({});
+
     if (parent == nullptr)
         return;
 
@@ -196,6 +200,9 @@ void MagicGUIBuilder::updateComponents()
         root->setEditMode (editMode);
 
     listeners.call ([&] (Listener& l) { l.stateWasReloaded(); });
+
+    if (selectedNode.isValid ())
+        setSelectedNode (selectedNode);
 }
 
 bool MagicGUIBuilder::isCurrentlyUpdatingComponents() const

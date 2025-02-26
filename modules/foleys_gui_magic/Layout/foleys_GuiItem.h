@@ -88,6 +88,9 @@ public:
      */
     virtual std::vector<SettableProperty> getSettableProperties() const { return {}; }
 
+    /** */
+    std::vector<SettableProperty> getSettablePropertiesInit ();
+
     /**
      For each factory you can register a translation table, which will forward the colours from the
      Stylesheet to the Components.

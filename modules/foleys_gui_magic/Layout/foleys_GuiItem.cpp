@@ -55,6 +55,12 @@ GuiItem::~GuiItem()
     magicBuilder.getStylesheet().removeListener (this);
 }
 
+std::vector<SettableProperty> GuiItem::getSettablePropertiesInit()
+{
+    juce::ScopedValueSetter<bool> setter (initializing, true);
+    return getSettableProperties();
+}
+
 void GuiItem::setColourTranslation (std::vector<std::pair<juce::String, int>> mapping)
 {
     colourTranslation = mapping;

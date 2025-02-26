@@ -321,7 +321,7 @@ juce::ValueTree MagicGUIBuilder::findNodeWithProperty (const juce::Identifier& p
     return {};
 }
 
-void MagicGUIBuilder::registerFactory (juce::Identifier type, std::unique_ptr<GuiItem> (*factory) (MagicGUIBuilder& builder, const juce::ValueTree&))
+void MagicGUIBuilder::registerFactory (juce::Identifier type, std::unique_ptr<GuiItem> (*factory) (MagicGUIBuilder& builder, const juce::ValueTree&), bool isUserFactory)
 {
     if (factories.find (type) != factories.cend())
     {
@@ -336,18 +336,26 @@ void MagicGUIBuilder::registerFactory (juce::Identifier type, std::unique_ptr<Gu
     auto temp = factory (*this, juce::ValueTree (type));
     jassert (temp);
 
-    defaultProperties[type] = temp->getSettableProperties();
+    defaultProperties[type] = temp->getSettablePropertiesInit();
+
+    factoryNames.add (type.toString());
+
+    if (isUserFactory)
+        userFactoryNames.add (type.toString());
 }
 
 juce::StringArray MagicGUIBuilder::getFactoryNames() const
 {
     juce::StringArray names { IDs::view.toString() };
 
-    names.ensureStorageAllocated (int (factories.size()));
-    for (const auto& f: factories)
-        names.add (f.first.toString());
+    names.addArray (factoryNames);
 
     return names;
+}
+
+juce::StringArray MagicGUIBuilder::getUserFactoryNames() const
+{
+    return userFactoryNames;
 }
 
 bool MagicGUIBuilder::isFactoryName (const juce::Identifier& name) const

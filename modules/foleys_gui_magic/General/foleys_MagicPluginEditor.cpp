@@ -62,7 +62,7 @@ MagicPluginEditor::MagicPluginEditor (MagicProcessorState& stateToUse, std::uniq
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     if (!guiTree.isValid() && processorState.getValueTree().isValid())
-        processorState.getValueTree().addChild (builder->getConfigTree(), -1, nullptr);
+        processorState.getValueTree().addChild (builder->getGuiTree(), -1, nullptr);
 
     builder->attachToolboxToWindow (*this);
 #endif

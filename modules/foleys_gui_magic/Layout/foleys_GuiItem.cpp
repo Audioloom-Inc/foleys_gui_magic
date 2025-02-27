@@ -76,9 +76,9 @@ juce::StringArray GuiItem::getColourNames() const
     return names;
 }
 
-juce::var GuiItem::getProperty (const juce::Identifier& property)
+juce::var GuiItem::getProperty (const juce::Identifier& property, bool inherit)
 {
-    return magicBuilder.getStyleProperty (property, configNode);
+    return magicBuilder.getStyleProperty (property, configNode, inherit);
 }
 
 MagicGUIState& GuiItem::getMagicState()

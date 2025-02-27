@@ -66,6 +66,7 @@ public:
         NormalView = 1,
         ExpertView = 1 << 1,
         AllViews = NormalView | ExpertView,
+        InheritFromParents = 1 << 2,
         AllFlags = ~NoFlags
     };
 

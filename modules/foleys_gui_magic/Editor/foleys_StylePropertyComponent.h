@@ -64,7 +64,8 @@ protected:
     juce::ValueTree     node;
     juce::ValueTree     inheritedFrom;
     juce::String        hint;
-
+    bool                inheritFromParents;
+    
     std::function<void(const juce::var& newValue)> customValueFunction;
 
     std::unique_ptr<juce::Component> editor;

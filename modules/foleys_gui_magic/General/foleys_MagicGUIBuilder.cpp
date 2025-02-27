@@ -57,13 +57,13 @@ MagicGUIBuilder::MagicGUIBuilder (MagicGUIState& state, std::unique_ptr<Styleshe
         stylesheet = std::make_unique<Stylesheet> (*this);
 
     updateStylesheet();
-    getConfigTree().addListener (this);
+    getGuiTree().addListener (this);
     getEditorTree().addListener (this);
 }
 
 MagicGUIBuilder::~MagicGUIBuilder()
 {
-    getConfigTree().removeListener (this);
+    getGuiTree().removeListener (this);
     getEditorTree().removeListener (this);
     
     masterReference.clear();
@@ -74,7 +74,7 @@ Stylesheet& MagicGUIBuilder::getStylesheet()
     return *stylesheet.get ();
 }
 
-juce::ValueTree& MagicGUIBuilder::getConfigTree()
+juce::ValueTree& MagicGUIBuilder::getGuiTree()
 {
     return magicState.getGuiTree();
 }
@@ -86,7 +86,7 @@ juce::ValueTree& MagicGUIBuilder::getEditorTree()
 
 juce::ValueTree MagicGUIBuilder::getGuiRootNode()
 {
-    return getConfigTree().getOrCreateChildWithName (IDs::view, &undo);
+    return getGuiTree().getOrCreateChildWithName (IDs::view, &getUndoManager ());
 }
 
 std::unique_ptr<GuiItem> MagicGUIBuilder::createGuiItem (const juce::ValueTree& node)
@@ -122,9 +122,9 @@ std::unique_ptr<GuiItem> MagicGUIBuilder::createGuiItem (const juce::ValueTree& 
 
 void MagicGUIBuilder::updateStylesheet()
 {
-    auto stylesNode = getConfigTree().getOrCreateChildWithName (IDs::styles, &undo);
+    auto stylesNode = getGuiTree().getOrCreateChildWithName (IDs::styles, &getUndoManager ());
     if (stylesNode.getNumChildren() == 0)
-        stylesNode.appendChild (DefaultGuiTrees::createDefaultStylesheet(), &undo);
+        stylesNode.appendChild (DefaultGuiTrees::createDefaultStylesheet(), &getUndoManager ());
 
     auto selectedName = stylesNode.getProperty (IDs::selected, {}).toString();
     if (selectedName.isNotEmpty())
@@ -145,9 +145,9 @@ void MagicGUIBuilder::clearGUI()
 {
     setSelectedNode ({});
     
-    auto guiNode = getConfigTree().getOrCreateChildWithName (IDs::view, &undo);
-    guiNode.removeAllChildren (&undo);
-    guiNode.removeAllProperties (&undo);
+    auto guiNode = getGuiTree().getOrCreateChildWithName (IDs::view, &getUndoManager ());
+    guiNode.removeAllChildren (&getUndoManager ());
+    guiNode.removeAllProperties (&getUndoManager ());
 
     updateComponents();
 }
@@ -412,7 +412,7 @@ void MagicGUIBuilder::removeStyleClassReferences (juce::ValueTree tree, const ju
         auto       strings   = juce::StringArray::fromTokens (tree.getProperty (IDs::styleClass).toString(), separator, "");
         strings.removeEmptyStrings (true);
         strings.removeString (name);
-        tree.setProperty (IDs::styleClass, strings.joinIntoString (separator), &undo);
+        tree.setProperty (IDs::styleClass, strings.joinIntoString (separator), &getUndoManager ());
     }
 
     for (auto child: tree)
@@ -625,22 +625,22 @@ void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree 
     setEditMode (true);
     
     if (startUndoTransaction)
-        undo.beginNewTransaction();
+        getUndoManager ().beginNewTransaction();
 
     if (targetPos.x > 0 && targetPos.y > 0)
     {
-        dragged.setProperty (IDs::posX, targetPos.x, &undo);
-        dragged.setProperty (IDs::posY, targetPos.y, &undo);
+        dragged.setProperty (IDs::posX, targetPos.x, &getUndoManager ());
+        dragged.setProperty (IDs::posY, targetPos.y, &getUndoManager ());
     }
     
     auto targetParent  = target.getParent();
     auto draggedParent = dragged.getParent();
 
     if (draggedParent.isValid())
-        draggedParent.removeChild (dragged, &undo);
+        draggedParent.removeChild (dragged, &getUndoManager ());
 
     if (target.getType() == IDs::view)
-        target.addChild (dragged, index, &undo);
+        target.addChild (dragged, index, &getUndoManager ());
     else
     {
         if (targetParent.isValid() != false && index < 0)
@@ -653,10 +653,10 @@ void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree 
         const auto targetX = (int)target.getProperty (IDs::posX, 0);
         const auto targetY = (int)target.getProperty (IDs::posY, 0);
 
-        dragged.setProperty (IDs::posX, posX + targetX, &undo);
-        dragged.setProperty (IDs::posY, posY + targetY, &undo);
+        dragged.setProperty (IDs::posX, posX + targetX, &getUndoManager ());
+        dragged.setProperty (IDs::posY, posY + targetY, &getUndoManager ());
 
-        targetParent.addChild (dragged, index, &undo);
+        targetParent.addChild (dragged, index, &getUndoManager ());
     }
 }
 

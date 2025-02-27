@@ -92,6 +92,13 @@ PropertiesEditor::PropertiesEditor (MagicGUIBuilder& builderToEdit)
         }
 
     };
+
+    builderToEdit.getGuiTree ().addListener (this);
+}
+
+PropertiesEditor::~PropertiesEditor() 
+{
+    builder.getGuiTree ().removeListener (this);    
 }
 
 void PropertiesEditor::setStyle (juce::ValueTree styleToEdit)

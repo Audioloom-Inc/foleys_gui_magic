@@ -279,7 +279,7 @@ bool ToolBox::saveGUI (const juce::File& xmlFile)
 
     if (auto stream = temp.getFile().createOutputStream())
     {
-        auto saved = stream->writeString (builder.getConfigTree().toXmlString());
+        auto saved = stream->writeString (builder.getGuiTree().toXmlString());
         stream.reset();
 
         if (saved)

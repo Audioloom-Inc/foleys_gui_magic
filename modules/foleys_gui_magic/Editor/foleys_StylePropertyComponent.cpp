@@ -85,6 +85,7 @@ StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
     infoLabel.setText ("info", juce::dontSendNotification);
     infoLabel.setFont (juce::FontOptions (12.f).withStyle ("italic"));
     infoLabel.setJustificationType (juce::Justification::centred);
+    inheritFromParents = (propertyToUse.flags & SettableProperty::InheritFromParents) != 0;
 }
 
 StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, juce::Identifier propertyToUse, juce::ValueTree& nodeToUse)
@@ -116,7 +117,7 @@ StylePropertyComponent::~StylePropertyComponent()
 
 juce::var StylePropertyComponent::lookupValue()
 {
-    const auto value = builder.getStylesheet().getStyleProperty (property, node, true, &inheritedFrom);
+    const auto value = builder.getStylesheet().getStyleProperty (property, node, inheritFromParents, &inheritedFrom);
 
     const auto& s = builder.getStylesheet();
 

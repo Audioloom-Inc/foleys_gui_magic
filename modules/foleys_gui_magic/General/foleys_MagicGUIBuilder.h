@@ -78,7 +78,7 @@ public:
     /**
      Grants access to the main XML, that holds all information.
      */
-    juce::ValueTree& getConfigTree();
+    juce::ValueTree& getGuiTree();
 
     /**
      */
@@ -294,7 +294,7 @@ public:
     
     MagicGUIState& getMagicState();
 
-    juce::UndoManager& getUndoManager();
+    virtual juce::UndoManager& getUndoManager();
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     void attachToolboxToWindow (juce::Component& window);

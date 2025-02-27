@@ -112,7 +112,7 @@ public:
     /**
      Look up a value through the DOM and CSS
      */
-    juce::var getProperty (const juce::Identifier& property);
+    juce::var getProperty (const juce::Identifier& property, bool inherit = false);
 
     MagicGUIState& getMagicState();
 

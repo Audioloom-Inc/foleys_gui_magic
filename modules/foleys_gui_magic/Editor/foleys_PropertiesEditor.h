@@ -46,7 +46,8 @@ class PropertiesEditor  : public ToolBoxContentComponent,
 {
 public:
     PropertiesEditor (MagicGUIBuilder& builder);
-
+    ~PropertiesEditor() override;
+    
     enum ComboIDs : int
     {
         TypeEdit=1000,

@@ -458,10 +458,16 @@ bool ToolBox::keyPressed (const juce::KeyPress& key)
         if (selected.isValid())
         {
             auto p = selected.getParent();
-            if (p.isValid() && builder.canNodeBeDeleted (selected))
+            if (p.isValid())
             {
-                undo.beginNewTransaction ("Delete " + selected.getType().toString());
-                p.removeChild (selected, &undo);
+                if (auto guiItem = builder.findGuiItem (selected))
+                {
+                    if (guiItem->canBeDeleted ())
+                    {
+                        undo.beginNewTransaction ("Delete " + selected.getType().toString());
+                        p.removeChild (selected, &undo);
+                    }
+                }
             }
         }
 

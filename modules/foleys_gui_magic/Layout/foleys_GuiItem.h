@@ -250,6 +250,9 @@ public:
     
     juce::ValueTree getNode () const;
     
+    virtual bool canBeDeleted () const;
+
+    virtual bool inheritFromParents () const { return false; }
     
     void setBoundsForced (juce::Rectangle<int> rectangle);
     

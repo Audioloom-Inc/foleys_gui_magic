@@ -133,7 +133,7 @@ void GuiItem::updateColours()
 
     for (auto& pair : colourTranslation)
     {
-        auto colour = magicBuilder.getStyleProperty (pair.first, configNode).toString();
+        auto colour = magicBuilder.getStyleProperty (pair.first, configNode, inheritFromParents ()).toString();
         if (colour.isNotEmpty())
             component->setColour (pair.second, magicBuilder.getStylesheet().getColour (colour));
         else
@@ -695,6 +695,11 @@ bool GuiItem::isRoot() const
 juce::ValueTree GuiItem::getNode() const
 {
     return configNode;
+}
+
+bool GuiItem::canBeDeleted() const
+{
+    return ! isRoot ();
 }
 
 //==============================================================================

@@ -601,6 +601,9 @@ void GuiItem::updateVisibility()
 
 void GuiItem::mouseDown (const juce::MouseEvent& event)
 {
+    if (event.mods.isRightButtonDown ())
+        return;
+        
     magicBuilder.setSelectedNode (configNode);
 
     if (componentDragger)

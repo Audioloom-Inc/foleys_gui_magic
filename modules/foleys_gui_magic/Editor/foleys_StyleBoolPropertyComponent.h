@@ -50,5 +50,14 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StyleBoolPropertyComponent)
 };
 
+class StyleActionPropertyComponent : public StylePropertyComponent
+{
+public:
+    StyleActionPropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty& propertyToUse, juce::ValueTree& nodeToUse);
+    void update () override {}
+    
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StyleActionPropertyComponent)
+};
 
 } // namespace foleys

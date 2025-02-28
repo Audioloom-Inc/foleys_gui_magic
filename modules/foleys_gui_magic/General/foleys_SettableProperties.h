@@ -57,7 +57,8 @@ public:
         Asset,
         MultiList,
         Font,
-        Draggable
+        Draggable,
+        Action          /*< A button to trigger an action  */
     };
      
     enum Flags
@@ -79,7 +80,8 @@ public:
 
     // default copy ctor
     SettableProperty (const SettableProperty&) = default;
-
+    
+    
     juce::ValueTree                             node {};
     juce::Identifier                            name {};
     PropertyType                                type {};

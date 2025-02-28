@@ -99,4 +99,21 @@ void StyleBoolPropertyComponent::update()
 }
 
 
-} // namespace foleys
+StyleActionPropertyComponent::StyleActionPropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty& propertyToUse, juce::ValueTree& nodeToUse)
+:
+StylePropertyComponent (builderToUse, propertyToUse, nodeToUse)
+{
+    // need a function
+    jassert (customValueFunction);
+
+    auto button = std::make_unique<juce::TextButton> (propertyToUse.getDisplayName ());
+    addAndMakeVisible (button.get());
+    button->onClick = [&](){
+        if (customValueFunction)
+            customValueFunction ({});
+    };
+
+    editor = std::move (button);
+}
+
+}  // namespace foleys

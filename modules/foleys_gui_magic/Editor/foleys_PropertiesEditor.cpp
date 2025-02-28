@@ -301,9 +301,9 @@ std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (ju
             properties.push_back (other);
         }
 
-        for (auto colour : item->getColourNames ())
+        for (auto colour : item->getColourTranslation ())
         {
-            properties.push_back (SettableProperty (styleItem, colour, SettableProperty::PropertyType::Colour).withCategory ("Colours"));
+            properties.push_back (colour.toSettableProperty (styleItem));
         }
     }
 

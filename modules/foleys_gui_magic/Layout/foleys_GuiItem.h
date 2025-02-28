@@ -96,11 +96,16 @@ public:
      Stylesheet to the Components.
      */
     void setColourTranslation (std::vector<std::pair<juce::String, int>> mapping);
+    void setColourTranslation (const juce::String& identifier, const int& colourId, const juce::Colour& defaultColour = juce::Colour (0), const juce::String& displayName = {}, const juce::String& category = {});
 
     /**
      Return the names of configurable colours
      */
     juce::StringArray getColourNames() const;
+
+    /** */
+    juce::StringArray getColourDisplayNames () const;
+    juce::String getColourDisplayName (const juce::String& colourId) const;
 
     /**
      Returns the parameterID that is controlled from this component.
@@ -257,6 +262,30 @@ public:
     void setBoundsForced (juce::Rectangle<int> rectangle);
     
     void updateVisibility ();
+
+
+    struct ColourTranslation
+    {
+        juce::String identifier{ };
+        int colourId{ };
+        juce::String displayName{ };
+        juce::Colour defaultColour{ };
+        juce::String category{ };
+
+        juce::String getDisplayName () const { if (displayName.isNotEmpty ()) return displayName; return identifier; }
+        SettableProperty toSettableProperty (juce::ValueTree node) const
+        {
+            SettableProperty p{ node, identifier, SettableProperty::Colour };
+            p.defaultValue = defaultColour.toString ();
+            p.category = category;
+            p.displayName = displayName;
+
+            return p;
+        }
+    };
+
+    juce::HashMap<juce::String, ColourTranslation> & getColourTranslation () { return colourTranslation; }
+
 protected:
 
     juce::ValueTree configNode;
@@ -265,7 +294,8 @@ protected:
 
     juce::FlexItem  flexItem { juce::FlexItem (*this).withFlex (1.0f) };
 
-    std::vector<std::pair<juce::String, int>> colourTranslation;
+
+    juce::HashMap<juce::String, ColourTranslation> colourTranslation;
 
     void valueChanged (juce::Value& source) override;
 

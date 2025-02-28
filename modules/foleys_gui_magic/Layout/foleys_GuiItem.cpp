@@ -63,7 +63,12 @@ std::vector<SettableProperty> GuiItem::getSettablePropertiesInit()
 
 void GuiItem::setColourTranslation (std::vector<std::pair<juce::String, int>> mapping)
 {
-    colourTranslation = mapping;
+    jassertfalse; // This function is deprecated, use addColourTranslation instead
+}
+
+void GuiItem::setColourTranslation (const juce::String& identifier, const int& colourId, const juce::Colour& defaultColour, const juce::String& displayName,  const juce::String& category)
+{
+    colourTranslation.getReference (identifier) = { identifier, colourId, displayName, defaultColour, category };
 }
 
 juce::StringArray GuiItem::getColourNames() const
@@ -71,9 +76,23 @@ juce::StringArray GuiItem::getColourNames() const
     juce::StringArray names;
 
     for (const auto& pair : colourTranslation)
-        names.addIfNotAlreadyThere (pair.first);
+        names.addIfNotAlreadyThere (pair.identifier);
 
     return names;
+}
+
+juce::StringArray GuiItem::getColourDisplayNames() const
+{
+    juce::StringArray names;
+    for (auto colour : colourTranslation)
+        names.add (colour.getDisplayName ());
+
+    return names;
+}
+
+juce::String GuiItem::getColourDisplayName (const juce::String& colourId) const
+{
+    return colourTranslation[colourId].getDisplayName ();
 }
 
 juce::var GuiItem::getProperty (const juce::Identifier& property, bool inherit)
@@ -131,13 +150,16 @@ void GuiItem::updateColours()
     if (component == nullptr)
         return;
 
-    for (auto& pair : colourTranslation)
+    for (auto pair : colourTranslation)
     {
-        auto colour = magicBuilder.getStyleProperty (pair.first, configNode, inheritFromParents ()).toString();
+        auto colour = magicBuilder.getStyleProperty (pair.identifier, configNode, inheritFromParents ()).toString();
+        
         if (colour.isNotEmpty())
-            component->setColour (pair.second, magicBuilder.getStylesheet().getColour (colour));
+            component->setColour (pair.colourId, magicBuilder.getStylesheet().getColour (colour));
+        else if (pair.defaultColour.getAlpha () > 0.f)
+            component->setColour (pair.colourId, pair.defaultColour);
         else
-            component->removeColour (pair.second);
+            component->removeColour (pair.colourId);
     }
 }
 

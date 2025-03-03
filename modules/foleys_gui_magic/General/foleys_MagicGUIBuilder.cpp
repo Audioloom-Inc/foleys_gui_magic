@@ -175,6 +175,13 @@ void MagicGUIBuilder::createGUI (juce::Component& parentToUse)
     updateComponents();
 }
 
+std::unique_ptr<juce::Component> MagicGUIBuilder::createGui()
+{
+    std::unique_ptr<juce::Component> gui = std::make_unique<juce::Component>();
+    createGUI (*gui);
+    return gui;
+}
+
 void MagicGUIBuilder::updateComponents()
 {
     juce::ScopedValueSetter svs{ currentlyUpdatingComponents, true };

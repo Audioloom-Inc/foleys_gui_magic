@@ -70,6 +70,9 @@ public:
      */
     void createGUI (juce::Component& parent);
 
+    /** */
+    std::unique_ptr<juce::Component> createGui ();
+
     /**
      Grant access to the stylesheet to look up visual and layout properties
      */

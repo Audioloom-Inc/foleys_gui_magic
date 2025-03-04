@@ -128,6 +128,8 @@ public:
 
     static juce::PropertiesFile::Options getApplicationPropertyStorage();
 
+    virtual void deleteItem (foleys::GuiItem* guiItem);
+
 protected:
     enum Timers : int
     {

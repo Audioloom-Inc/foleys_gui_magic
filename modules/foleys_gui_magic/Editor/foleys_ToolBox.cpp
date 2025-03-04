@@ -455,21 +455,12 @@ bool ToolBox::keyPressed (const juce::KeyPress& key)
     if (key.isKeyCode (juce::KeyPress::backspaceKey) || key.isKeyCode (juce::KeyPress::deleteKey))
     {
         auto selected = builder.getSelectedNode();
+
         if (selected.isValid())
-        {
-            auto p = selected.getParent();
-            if (p.isValid())
-            {
+            if (auto p = selected.getParent(); p.isValid())
                 if (auto guiItem = builder.findGuiItem (selected))
-                {
                     if (guiItem->canBeDeleted ())
-                    {
-                        undo.beginNewTransaction ("Delete " + selected.getType().toString());
-                        p.removeChild (selected, &undo);
-                    }
-                }
-            }
-        }
+                        deleteItem (guiItem);
 
         return true;
     }
@@ -653,6 +644,18 @@ juce::PropertiesFile::Options ToolBox::getApplicationPropertyStorage()
     options.filenameSuffix      = ".settings";
     options.osxLibrarySubFolder = "Application Support";
     return options;
+}
+
+void ToolBox::deleteItem (foleys::GuiItem* guiItem) 
+{
+    if (! guiItem)
+        return;
+
+    auto item = guiItem->getNode();
+    auto parent = item.getParent();
+
+    undo.beginNewTransaction ("Delete " + item.getType().toString());
+    parent.removeChild (item, &undo);
 }
 
 }  // namespace foleys

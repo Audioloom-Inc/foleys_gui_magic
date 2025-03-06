@@ -39,16 +39,22 @@ namespace foleys
 StyleChoicePropertyComponent::StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse,
                                                             SettableProperty propertyToUse,
                                                             juce::ValueTree& nodeToUse,
-                                                            juce::StringArray choicesToUse)
-  : StylePropertyComponent (builderToUse, propertyToUse, nodeToUse),
-    choices (choicesToUse)
+                                                            juce::StringArray choicesToUse,
+                                                            bool multiChoice)
+: StyleChoicePropertyComponent (builderToUse, propertyToUse, nodeToUse, builderToUse.createChoicesMenuLambda (choicesToUse))
 {
     initialiseComboBox (false);
 }
 
-StyleChoicePropertyComponent::StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, std::function<void(juce::ComboBox&)> lambdaToUse)
-  : StylePropertyComponent (builderToUse, propertyToUse, nodeToUse),
-    menuCreationLambda (lambdaToUse)
+StyleChoicePropertyComponent::StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, 
+                                                            SettableProperty propertyToUse, 
+                                                            juce::ValueTree& nodeToUse, 
+                                                            std::function<void(juce::ComboBox&)> lambdaToUse,
+                                                            bool multiChoice)
+                                                              
+: StylePropertyComponent (builderToUse, propertyToUse, nodeToUse)
+, menuCreationLambda (lambdaToUse)
+, multiChoice (multiChoice)
 {
     initialiseComboBox (false);
 }
@@ -71,10 +77,50 @@ int StyleChoicePropertyComponent::getIdToSelect (juce::ComboBox& combo, const ju
 
 void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
 {
-    auto combo = std::make_unique<juce::ComboBox>();
+    // ensure that the lambda is called before the popup is shown
+    class Combo : public juce::ComboBox 
+    {
+    public:
+        Combo (std::function<void(juce::ComboBox&)> lambda, bool multiChoice) : lambda (lambda), multiChoice (multiChoice) {}
+        void showPopup () override
+        { 
+            if (lambda) lambda (*this); 
+
+            auto& menu = *getRootMenu ();
+            
+            if (! multiChoice || menu.getNumItems () <= 0)
+                return juce::ComboBox::showPopup (); 
+
+            auto& lf = getLookAndFeel ();
+            menu.setLookAndFeel (&lf);
+            menu.showMenuAsync (juce::PopupMenu::Options ().withTargetComponent (this).withItemThatMustBeVisible (lastClicked), [&, weakThis = juce::WeakReference (this)](int clicked){
+                if (! weakThis)
+                    return;
+
+                lastClicked = clicked;
+
+                // ensure that menuActive is false
+                if (clicked == 0)
+                    return hidePopup ();
+
+                // reopen popup
+                juce::MessageManager::callAsync ([weakThis] () { if (weakThis) weakThis->showPopup (); });
+            });
+        }
+    
+    private:
+        std::function<void(juce::ComboBox&)> lambda;
+        bool multiChoice;
+        int lastClicked = 0;
+
+        JUCE_DECLARE_WEAK_REFERENCEABLE (Combo)
+    };
+
+    bool useLambda = choices.isEmpty ();
+    auto combo = std::make_unique<Combo>(useLambda ? menuCreationLambda : 0, multiChoice);
     combo->setEditableText (editable);
 
-    if (! choices.isEmpty())
+    if (! useLambda)
     {
         int index = 0;
         for (const auto& name : choices)
@@ -177,5 +223,4 @@ void StyleChoicePropertyComponent::valueChanged (juce::Value&)
     }
 }
 
-
-} // namespace foleys
+}

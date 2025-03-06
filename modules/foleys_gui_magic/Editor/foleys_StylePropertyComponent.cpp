@@ -54,6 +54,9 @@ juce::PropertyComponent* StylePropertyComponent::createComponent (MagicGUIBuilde
     if (property.type == SettableProperty::Choice)
         return new StyleChoicePropertyComponent (builder, property, node, property.menuCreationLambda);
 
+    if (property.type == SettableProperty::MultiChoice)
+        return new StyleChoicePropertyComponent (builder, property, node, property.menuCreationLambda, true);
+
     if (property.type == SettableProperty::Gradient)
         return new StyleGradientPropertyComponent (builder, property, node);
 

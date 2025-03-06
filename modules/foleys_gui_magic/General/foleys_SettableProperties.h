@@ -58,7 +58,8 @@ public:
         MultiList,
         Font,
         Draggable,
-        Action          /*< A button to trigger an action  */
+        Action,          /*< A button to trigger an action  */
+        MultiChoice      /*< A list of choices that can be selected */
     };
      
     enum Flags

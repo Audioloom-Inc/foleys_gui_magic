@@ -41,8 +41,8 @@ class StyleChoicePropertyComponent  : public StylePropertyComponent,
                                       private juce::Value::Listener
 {
 public:
-    StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, juce::StringArray choices);
-    StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, std::function<void(juce::ComboBox&)> menuCreationLambda);
+    StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, juce::StringArray choices, bool multiChoice = false);
+    StyleChoicePropertyComponent (MagicGUIBuilder& builderToUse, SettableProperty propertyToUse, juce::ValueTree& nodeToUse, std::function<void(juce::ComboBox&)> menuCreationLambda, bool multiChoice = false);
 
     void update() override;
     
@@ -59,9 +59,8 @@ private:
     juce::StringArray               choices;
     std::function<void(juce::ComboBox&)> menuCreationLambda;
     juce::Value                     proxy;
-
     bool                            updating = false;
-
+    bool                            multiChoice = false;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StyleChoicePropertyComponent)
 };
 

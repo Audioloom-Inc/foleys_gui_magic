@@ -44,7 +44,7 @@ RootItem::RootItem (MagicGUIBuilder& builder, juce::ValueTree node)
 
 void RootItem::updateColours()
 {
-    auto text = magicBuilder.getStyleProperty (IDs::tooltipText, configNode);
+    auto text = magicBuilder.getStyleProperty (IDs::tooltipTextColour, configNode);
     if (! text.isVoid())
         tooltip.getLookAndFeel().setColour (juce::TooltipWindow::textColourId, Stylesheet::parseColour (text));
     auto background = magicBuilder.getStyleProperty (IDs::tooltipBackground, configNode);

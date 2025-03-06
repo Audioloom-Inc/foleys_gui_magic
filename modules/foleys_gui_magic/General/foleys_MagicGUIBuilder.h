@@ -63,7 +63,7 @@ public:
     /**
      Create a node from the description
      */
-    std::unique_ptr<GuiItem> createGuiItem (const juce::ValueTree& node);
+    virtual std::unique_ptr<GuiItem> createGuiItem (const juce::ValueTree& node);
 
     /**
      This triggers the rebuild of the GUI with setting the parent component

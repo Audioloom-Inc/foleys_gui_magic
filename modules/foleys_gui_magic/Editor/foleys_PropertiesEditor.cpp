@@ -438,7 +438,7 @@ std::vector<SettableProperty> PropertiesEditor::createNodeProperties (const juce
         properties.push_back ({ styleItem, IDs::minHeight, SettableProperty::Number});
         properties.push_back ({ styleItem, IDs::maxHeight, SettableProperty::Number});
         properties.push_back ({ styleItem, IDs::aspect, SettableProperty::Number});
-        properties.push_back ({ styleItem, IDs::tooltipText, SettableProperty::Colour});
+        properties.push_back ({ styleItem, IDs::tooltipTextColour, SettableProperty::Colour});
         properties.push_back ({ styleItem, IDs::tooltipBackground, SettableProperty::Colour});
         properties.push_back ({ styleItem, IDs::tooltipOutline, SettableProperty::Colour});
 

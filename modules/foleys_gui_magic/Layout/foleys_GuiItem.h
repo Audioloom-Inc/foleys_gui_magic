@@ -395,6 +395,8 @@ private:
     void configurePosition (const juce::var& v, Position& p, double d);
     void handleAsyncUpdate () override;
     
+    void updateTooltip ();
+    
     friend class DisappearingHelper;
     class DisappearingHelper : public juce::MouseListener, public juce::Timer
     {

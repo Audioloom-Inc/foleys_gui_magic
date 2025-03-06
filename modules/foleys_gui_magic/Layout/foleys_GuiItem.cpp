@@ -350,6 +350,8 @@ void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const 
         updateVisibility ();
     else if (property == foleys::IDs::disappearing)
         updateVisibility ();
+    else if (property == foleys::IDs::tooltipTextColour)
+        configureComponent ();
     else
         propertyChanged (property);
 

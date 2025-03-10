@@ -84,9 +84,13 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
         Combo (std::function<void(juce::ComboBox&)> lambda, bool multiChoice) : lambda (lambda), multiChoice (multiChoice) {}
         void showPopup () override
         { 
-            if (lambda) lambda (*this); 
-
             auto& menu = *getRootMenu ();
+            
+            if (lambda) 
+            {
+                menu.clear ();
+                lambda (*this); 
+            }
             
             if (! multiChoice || menu.getNumItems () <= 0)
                 return juce::ComboBox::showPopup (); 
@@ -148,7 +152,8 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
                     if (auto string = var.toString (); string.isNotEmpty ())
                         value = var;
 
-            node.setProperty (property, value, &builder.getUndoManager());
+            if (! value.isString () || value.toString ().isNotEmpty ())
+                node.setProperty (property, value, &builder.getUndoManager());
         }
 
         if (safeThis)

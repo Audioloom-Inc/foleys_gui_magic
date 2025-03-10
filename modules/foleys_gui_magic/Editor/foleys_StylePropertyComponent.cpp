@@ -162,13 +162,18 @@ void StylePropertyComponent::paint (juce::Graphics& g)
 
 void StylePropertyComponent::resized()
 {
-    auto b = getLocalBounds().reduced (1).withLeft (getWidth() / 2);
-    remove.setBounds (b.removeFromRight (getHeight()));
+    auto right = getLocalBounds ().reduced (1);
+    auto left = right.removeFromLeft (getWidth() / 2);
+
+    remove.setBounds (right.removeFromRight (getHeight()).reduced (1));
     
     if (editor)
-        editor->setBounds (b);
+        editor->setBounds (right);
 
-    infoLabel.setBounds (b);
+    for (auto e : extraEditors)
+        e->setBounds (left.removeFromRight (getHeight()).reduced (1));
+
+    infoLabel.setBounds (left);
 }
 
 juce::ValueTree StylePropertyComponent::getInheritedFrom() const
@@ -179,6 +184,11 @@ juce::ValueTree StylePropertyComponent::getInheritedFrom() const
 void StylePropertyComponent::setEditor (std::unique_ptr<juce::Component> newEditor) 
 {
     editor = std::move (newEditor);
+}
+
+void StylePropertyComponent::addExtraEditor (std::unique_ptr<juce::Component> newEditor) 
+{
+    extraEditors.add (newEditor.release());
 }
 
 void StylePropertyComponent::lookAndFeelChanged()

@@ -69,6 +69,8 @@ protected:
     std::function<void(const juce::var& newValue)> customValueFunction;
 
     std::unique_ptr<juce::Component> editor;
+    juce::OwnedArray<juce::Component> extraEditors;
+
     juce::TextButton    remove { "X" };
 
     virtual void removeClicked () {}
@@ -76,6 +78,8 @@ protected:
     virtual void update () = 0;
     
     void setEditor (std::unique_ptr<juce::Component> newEditor);
+    void addExtraEditor (std::unique_ptr<juce::Component> newEditor);
+
     void refresh () override;
 
     void lookAndFeelChanged () override;

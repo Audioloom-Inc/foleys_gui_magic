@@ -641,18 +641,21 @@ void GuiItem::mouseDrag (const juce::MouseEvent& event)
 {
     if (componentDragger)
     {
-        if (event.mouseWasDraggedSinceMouseDown() && event.mods.isShiftDown ())
+        if (event.mouseWasDraggedSinceMouseDown())
         {
-            // prevent any calls to drag the component until next mouse up
-            setDraggable (false);
-
-            auto* container = juce::DragAndDropContainer::findParentDragContainerFor (this);
-            container->startDragging (getDragSourceDescription (event), this);
-        }
-        else
-        {
-            componentDragger->dragComponent (this, event, nullptr);
-            triggerAsyncUpdate ();
+            if (event.mods.isShiftDown ())
+            {
+                // prevent any calls to drag the component until next mouse up
+                setDraggable (false);
+    
+                auto* container = juce::DragAndDropContainer::findParentDragContainerFor (this);
+                container->startDragging (getDragSourceDescription (event), this);
+            }
+            else
+            {
+                componentDragger->dragComponent (this, event, nullptr);
+                triggerAsyncUpdate ();
+            }
         }
     }
 }

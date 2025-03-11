@@ -311,7 +311,6 @@ protected:
 
     void enablementChanged () override;
     
-
     virtual void customResizeOperation (juce::Rectangle<int> delta) {}
     
 private:
@@ -397,24 +396,50 @@ private:
     
     void updateTooltip ();
     
-    friend class DisappearingHelper;
-    class DisappearingHelper : public juce::MouseListener
+    /** create an animator th */
+    virtual juce::ValueAnimatorBuilder createAnimatorBuilder (bool on) { return {}; }
+    
+    /** by default returns a set containing only return value of createAnimatorBuilder */
+    virtual juce::AnimatorSetBuilder createAnimatorSetBuilder (bool on);
+
+    /**  */
+    virtual bool hasCustomAnimator () const { return false; }
+
+    friend class AnimationHelper;
+    class AnimationHelper : public juce::MouseListener
     {
     public:
-        DisappearingHelper (foleys::GuiItem& item);
-        ~DisappearingHelper () override;
+        AnimationHelper (foleys::GuiItem& item);
+        ~AnimationHelper () override;
 
         void show ();
         void hide ();
     
+        void createCustomAnimators (bool on);
+
         void setEnabled (bool enabled);
         bool isEnabled () const;
 
+        void setDisappearingEnabled (bool enabled);
+        bool isDisappearingEnabled () const;
+
+        void setCustomAnimatorsEnabled (bool enabled);
+        bool isCustomAnimatorsEnabled () const;
+
     private:
         bool enabled{ false };
+        bool disappearingEnabled{ false };
+        bool customAnimatorsEnabled{ false };
+
+        void attachOrDetachGlobalMouseListener ();
 
         foleys::GuiItem& item;
-        juce::Animator fader = juce::ValueAnimatorBuilder ().build ();
+        
+        #define DefaultAnimator juce::ValueAnimatorBuilder ().build ()
+        
+        juce::Animator fader = DefaultAnimator;
+        juce::Animator customAnimator = DefaultAnimator;
+
         juce::VBlankAnimatorUpdater animatorUpdater{ &item };
         
         const int hideDelayInMs{ 500 };
@@ -426,7 +451,7 @@ private:
 
         void mouseEnter (const juce::MouseEvent& event) override;
         void mouseExit (const juce::MouseEvent& event) override;
-    } disappearingHelper{ *this };
+    } animationHelper{ *this };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiItem)
 };

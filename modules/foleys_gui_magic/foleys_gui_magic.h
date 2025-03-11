@@ -39,7 +39,7 @@
     description:   This module allows to create GUI with a drag and drop editor
     dependencies:  juce_core, juce_audio_basics, juce_audio_devices, juce_audio_formats,
                    juce_audio_utils, juce_audio_processors, juce_gui_basics, juce_dsp,
-                   juce_cryptography
+                   juce_cryptography juce_animation
 
     website:       https://foleysfinest.com/
     license:       BSD V2 3-clause
@@ -83,6 +83,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_cryptography/juce_cryptography.h>
 #include <juce_dsp/juce_dsp.h>
+#include <juce_animation/juce_animation.h>
 
 #if JUCE_MODULE_AVAILABLE_juce_opengl && FOLEYS_ENABLE_OPEN_GL_CONTEXT
 #include <juce_opengl/juce_opengl.h>

@@ -398,7 +398,7 @@ private:
     void updateTooltip ();
     
     friend class DisappearingHelper;
-    class DisappearingHelper : public juce::MouseListener, public juce::Timer
+    class DisappearingHelper : public juce::MouseListener
     {
     public:
         DisappearingHelper (foleys::GuiItem& item);
@@ -410,22 +410,19 @@ private:
         void setEnabled (bool enabled);
         bool isEnabled () const;
 
-        bool isCurrentlyAnimating () const;
-
     private:
         bool enabled{ false };
 
         foleys::GuiItem& item;
-        juce::ComponentAnimator& anim;
+        juce::Animator fader = juce::ValueAnimatorBuilder ().build ();
+        juce::VBlankAnimatorUpdater animatorUpdater{ &item };
         
         const int hideDelayInMs{ 500 };
         const int animTimeInMs{ 200 };
 
         bool showing{ false };
         bool preventFadeout ();
-        bool checkComponent (Component * comp) const;
-
-        void timerCallback () override;
+        bool checkComponent (Component * comp, bool returnTrueForThis) const;
 
         void mouseEnter (const juce::MouseEvent& event) override;
         void mouseExit (const juce::MouseEvent& event) override;

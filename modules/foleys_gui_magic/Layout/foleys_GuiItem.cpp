@@ -738,26 +738,33 @@ bool GuiItem::canBeDeleted() const
 //==============================================================================
 GuiItem::DisappearingHelper::DisappearingHelper(foleys::GuiItem &item)
 : item (item)
-, anim (juce::Desktop::getInstance ().getAnimator ())
 {
 }
 
 GuiItem::DisappearingHelper::~DisappearingHelper()
 {
     juce::Desktop::getInstance ().removeGlobalMouseListener (this);
-    stopTimer ();
 }
 
 void GuiItem::DisappearingHelper::show()
 {
-    stopTimer ();
-    anim.cancelAnimation (&item, false);
-    anim.fadeIn (&item, animTimeInMs);
+    fader = juce::ValueAnimatorBuilder ().withValueChangedCallback ([&, start = item.getAlpha (), end = 1.f](float value) {
+        item.setAlpha (juce::jmap (value, 0.0f, 1.0f, start, end));
+    }).withDurationMs (animTimeInMs).build ();
+    
+    animatorUpdater.addAnimator (fader);
+    fader.start ();
 }
 
 void GuiItem::DisappearingHelper::hide()
 {
-    startTimer (hideDelayInMs);
+    fader = juce::ValueAnimatorBuilder ().withValueChangedCallback ([&, start = item.getAlpha (), end = 0.f](float value) {
+        item.setAlpha (juce::jmap (value, 0.0f, 1.0f, start, end));
+    }).withDurationMs (animTimeInMs).build ();
+
+    animatorUpdater.addAnimator (fader);
+
+    juce::Timer::callAfterDelay (200, [weak = fader.makeWeak ()]() { if (auto s = weak.lock ()) s->start (); });
 }
 
 void GuiItem::DisappearingHelper::setEnabled(bool enabled)
@@ -774,7 +781,7 @@ void GuiItem::DisappearingHelper::setEnabled(bool enabled)
     else
     {
         juce::Desktop::getInstance ().removeGlobalMouseListener (this);
-        stopTimer ();
+        fader = juce::ValueAnimatorBuilder ().build ();
     }
 }
 
@@ -783,14 +790,9 @@ bool GuiItem::DisappearingHelper::isEnabled() const
     return enabled;
 }
 
-bool GuiItem::DisappearingHelper::isCurrentlyAnimating() const
-{
-    return anim.isAnimating (&item);
-}
-
 bool GuiItem::DisappearingHelper::preventFadeout()
 {
-    if (checkComponent (juce::Desktop::getInstance ().getMainMouseSource ().getComponentUnderMouse ()))
+    if (checkComponent (juce::Desktop::getInstance ().getMainMouseSource ().getComponentUnderMouse (), true))
         return true;
 
     if (item.isEditModeOn ())
@@ -799,31 +801,26 @@ bool GuiItem::DisappearingHelper::preventFadeout()
     return false;
 }
 
-void GuiItem::DisappearingHelper::timerCallback()
+void GuiItem::DisappearingHelper::mouseEnter(const juce::MouseEvent &event )
 {
-    stopTimer ();
-
-    if (! preventFadeout ())
-        anim.fadeOut (&item, animTimeInMs);
-}
-
-void GuiItem::DisappearingHelper::mouseEnter(const juce::MouseEvent &event)
-{
-    if (checkComponent (event.originalComponent))
-        show ();
+    if (auto c = event.originalComponent)
+        if (checkComponent (c, true))
+            if (! item.isParentOf (c) || item.getAlpha () > 0.f)
+                show ();
 }
 
 void GuiItem::DisappearingHelper::mouseExit(const juce::MouseEvent & event)
 {
-    if (checkComponent (event.originalComponent))
+    if (checkComponent (event.originalComponent, true))
         hide ();
 }
 
-bool GuiItem::DisappearingHelper::checkComponent(Component *c) const
+bool GuiItem::DisappearingHelper::checkComponent(Component *c, bool returnTrueForThis) const
 {
     if (c != nullptr)
         if (auto parentItem = c->findParentComponentOfClass<GuiItem> ())
-            return parentItem->getNode ()[IDs::parameter].toString () == item.getNode ()[IDs::parameter].toString ();
+            if (returnTrueForThis || ! (c == &item && item.isParentOf (c)))
+                return parentItem->getNode ()[IDs::parameter].toString () == item.getNode ()[IDs::parameter].toString ();
 
     return false;
 }

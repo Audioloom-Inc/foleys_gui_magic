@@ -95,7 +95,12 @@ juce::String GuiItem::getColourDisplayName (const juce::String& colourId) const
     return colourTranslation[colourId].getDisplayName ();
 }
 
-juce::var GuiItem::getProperty (const juce::Identifier& property, bool inherit)
+// juce::var GuiItem::getProperty (const juce::Identifier& property, bool inherit)
+// {
+//     return magicBuilder.getStyleProperty (property, configNode, inherit);
+// }
+
+juce::var GuiItem::getProperty (const juce::Identifier& property, bool inherit) const
 {
     return magicBuilder.getStyleProperty (property, configNode, inherit);
 }
@@ -774,8 +779,9 @@ void GuiItem::AnimationHelper::hide()
     }).withDurationMs (animTimeInMs).build ();
 
     animatorUpdater.addAnimator (fader);
+    lastHideAnimator = fader.makeWeak ();
 
-    juce::Timer::callAfterDelay (200, [weak = fader.makeWeak ()]() { if (auto s = weak.lock ()) s->start (); });
+    startTimer (hideDelayInMs);
 }
 
 void GuiItem::AnimationHelper::createCustomAnimators(bool on)
@@ -830,6 +836,14 @@ bool GuiItem::AnimationHelper::isCustomAnimatorsEnabled() const
     return customAnimatorsEnabled;
 }
 
+bool GuiItem::hitTest (int x, int y)
+{
+    if (isEditModeOn ())
+        return true;
+
+    return getClientBounds ().contains (x, y);
+}
+
 void GuiItem::AnimationHelper::attachOrDetachGlobalMouseListener() 
 {
     juce::Desktop::getInstance ().removeGlobalMouseListener (this);
@@ -839,7 +853,7 @@ void GuiItem::AnimationHelper::attachOrDetachGlobalMouseListener()
             juce::Desktop::getInstance ().addGlobalMouseListener (this);
 }
 
-bool GuiItem::AnimationHelper::preventFadeout()
+bool GuiItem::AnimationHelper::preventFadeout() const
 {
     if (checkComponent (juce::Desktop::getInstance ().getMainMouseSource ().getComponentUnderMouse (), true))
         return true;
@@ -847,7 +861,7 @@ bool GuiItem::AnimationHelper::preventFadeout()
     if (item.isEditModeOn ())
         return true;
 
-    return false;
+    return item.preventFadeout ();
 }
 
 void GuiItem::AnimationHelper::mouseEnter(const juce::MouseEvent &event )
@@ -872,6 +886,17 @@ void GuiItem::AnimationHelper::mouseExit(const juce::MouseEvent & event)
     if (customAnimatorsEnabled)
         if (checkComponent (event.eventComponent, false))
             createCustomAnimators (false);
+}
+
+void GuiItem::AnimationHelper::timerCallback() 
+{
+    if (! preventFadeout ())
+    {
+        if (auto s = lastHideAnimator.lock ()) 
+            s->start ();
+            
+        stopTimer ();
+    }
 }
 
 bool GuiItem::AnimationHelper::checkComponent(Component *c, bool returnTrueForThis) const

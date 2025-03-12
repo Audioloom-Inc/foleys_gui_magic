@@ -117,7 +117,8 @@ public:
     /**
      Look up a value through the DOM and CSS
      */
-    juce::var getProperty (const juce::Identifier& property, bool inherit = false);
+    // juce::var getProperty (const juce::Identifier& property, bool inherit = false);
+    juce::var getProperty (const juce::Identifier& property, bool inherit = false) const;
 
     MagicGUIState& getMagicState();
 
@@ -313,6 +314,9 @@ protected:
     
     virtual void customResizeOperation (juce::Rectangle<int> delta) {}
     
+    /** override this to prevent a potential fade out, e.g. when a text editor is open or something like this. */
+    virtual bool preventFadeout () const { return false; }
+
 private:
 
     class BorderDragger : public juce::ResizableBorderComponent
@@ -405,8 +409,11 @@ private:
     /**  */
     virtual bool hasCustomAnimator () const { return false; }
 
+    /** in non edit mode this only returns true for the client bounds */
+    virtual bool hitTest (int x, int y) override;
+    
     friend class AnimationHelper;
-    class AnimationHelper : public juce::MouseListener
+    class AnimationHelper : public juce::MouseListener, public juce::Timer
     {
     public:
         AnimationHelper (foleys::GuiItem& item);
@@ -425,7 +432,7 @@ private:
 
         void setCustomAnimatorsEnabled (bool enabled);
         bool isCustomAnimatorsEnabled () const;
-
+        
     private:
         bool enabled{ false };
         bool disappearingEnabled{ false };
@@ -438,6 +445,8 @@ private:
         #define DefaultAnimator juce::ValueAnimatorBuilder ().build ()
         
         juce::Animator fader = DefaultAnimator;
+        juce::Animator::Weak lastHideAnimator;
+
         juce::Animator customAnimator = DefaultAnimator;
 
         juce::VBlankAnimatorUpdater animatorUpdater{ &item };
@@ -446,11 +455,15 @@ private:
         const int animTimeInMs{ 200 };
 
         bool showing{ false };
-        bool preventFadeout ();
+        bool preventFadeout () const;
         bool checkComponent (Component * comp, bool returnTrueForThis) const;
 
         void mouseEnter (const juce::MouseEvent& event) override;
         void mouseExit (const juce::MouseEvent& event) override;
+
+        // checks if the component can be hidden and the current hide animation is still available
+        void timerCallback () override;
+
     } animationHelper{ *this };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuiItem)

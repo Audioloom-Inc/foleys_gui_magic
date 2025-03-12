@@ -38,26 +38,39 @@
 namespace foleys
 {
 
-class MouseLambdas : public juce::MouseListener
+class MouseLambdas : public juce::MouseListener, public juce::ComponentListener
 {
 public:
     MouseLambdas() = default;
 
-    void attachTo (juce::Component* component)
+    void attachTo (juce::Component* component, bool getChildEvents = false)
     {
-        if (listenedComponent)
-            listenedComponent->removeMouseListener (this);
+        clear ();
+        addComponent (component, getChildEvents);
+    }
 
-        listenedComponent = component;
+    void addComponent (juce::Component* component, bool getChildEvents = false)
+    {
+        listenedComponents.add (component);
+        component->addMouseListener (this, getChildEvents);
+        component->addComponentListener (this);
+    }
 
-        if (listenedComponent)
-            listenedComponent->addMouseListener (this, false);
+    void removeComponent (juce::Component* component)
+    {
+        listenedComponents.removeFirstMatchingValue (component);
+        component->removeMouseListener (this);
+        component->removeComponentListener (this);
+    }
+    
+    bool isAttached (juce::Component* component) const
+    {
+        return listenedComponents.contains (component);
     }
 
     ~MouseLambdas() override
     {
-        if (listenedComponent)
-            listenedComponent->removeMouseListener (this);
+        clear ();
     }
 
     void mouseDown (const juce::MouseEvent& event) override
@@ -78,12 +91,63 @@ public:
             onMouseDoubleClick (event);
     }
 
+    void mouseEnter (const juce::MouseEvent& event) override
+    {
+        if (onMouseEnter)
+            onMouseEnter (event);
+    }
+
+    void mouseExit (const juce::MouseEvent& event) override
+    {
+        if (onMouseExit)
+            onMouseExit (event);
+    }
+
+    void mouseMove (const juce::MouseEvent& event) override
+    {
+        if (onMouseMove)
+            onMouseMove (event);
+    }
+
+    void mouseDrag (const juce::MouseEvent& event) override
+    {
+        if (onMouseDrag)
+            onMouseDrag (event);
+    }
+
+    const juce::Array<juce::Component::SafePointer<juce::Component>>& getComponents() const
+    {
+        return listenedComponents;
+    }
+    
+    std::function<void(const juce::MouseEvent&)> onMouseEnter;
+    std::function<void(const juce::MouseEvent&)> onMouseExit;
+    std::function<void(const juce::MouseEvent&)> onMouseMove;
+    std::function<void(const juce::MouseEvent&)> onMouseDrag;
     std::function<void(const juce::MouseEvent&)> onMouseDown;
     std::function<void(const juce::MouseEvent&)> onMouseUp;
     std::function<void(const juce::MouseEvent&)> onMouseDoubleClick;
 
 private:
-    juce::Component::SafePointer<juce::Component> listenedComponent;
+    juce::Array<juce::Component::SafePointer<juce::Component>> listenedComponents;
+
+    void clear ()
+    {
+        for (auto& c : listenedComponents)
+        {
+            if (! c) continue;
+            
+            c->removeMouseListener (this);
+            c->removeComponentListener (this);
+        }
+        
+        listenedComponents.clear ();
+    }
+
+    void componentBeingDeleted (juce::Component& component) override
+    {
+        removeComponent (&component);
+    }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MouseLambdas)
 };

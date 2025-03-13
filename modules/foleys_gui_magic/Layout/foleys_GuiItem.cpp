@@ -537,7 +537,7 @@ void GuiItem::setDraggable (bool selected)
         borderDragger->onDragging = [&]
         {
             customResizeOperation (borderDragger->getDeltaBounds ());
-            triggerAsyncUpdate ();
+            // triggerAsyncUpdate ();
         };
         borderDragger->onDragEnd = [&]
         {

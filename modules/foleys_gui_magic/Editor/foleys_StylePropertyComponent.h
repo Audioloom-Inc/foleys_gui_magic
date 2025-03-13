@@ -66,7 +66,7 @@ protected:
     juce::String        hint;
     bool                inheritFromParents;
     
-    std::function<void(const juce::var& newValue)> customValueFunction;
+    CustomValueFunction customValueFunction;
 
     std::unique_ptr<juce::Component> editor;
     juce::OwnedArray<juce::Component> extraEditors;

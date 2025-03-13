@@ -56,15 +56,11 @@ StyleBoolPropertyComponent::StyleBoolPropertyComponent (MagicGUIBuilder& builder
     
             if (auto* t = dynamic_cast<juce::ToggleButton*>(editor.get()))
             {
-                if (customValueFunction)
-                {
-                    customValueFunction (t->getToggleState());
-                }
-                else
-                {
-                    node.setProperty (property, t->getToggleState(), &builder.getUndoManager());
-                }
-    
+                const auto state = t->getToggleState();
+
+                customValueFunction.process (state, [&, state](){
+                    node.setProperty (property, state, &builder.getUndoManager());
+                });
             }
     
             refresh();
@@ -104,13 +100,12 @@ StyleActionPropertyComponent::StyleActionPropertyComponent (MagicGUIBuilder& bui
 StylePropertyComponent (builderToUse, propertyToUse, nodeToUse)
 {
     // need a function
-    jassert (customValueFunction);
+    jassert (customValueFunction.isValid ());
 
     auto button = std::make_unique<juce::TextButton> (propertyToUse.getDisplayName ());
     addAndMakeVisible (button.get());
     button->onClick = [&](){
-        if (customValueFunction)
-            customValueFunction ({});
+        customValueFunction.process (true, 0);
     };
 
     editor = std::move (button);

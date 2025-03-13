@@ -88,9 +88,9 @@ SettableProperty SettableProperty::withCustomInfo (juce::var newInfo)
     return with (*this, &SettableProperty::customInfo, newInfo);
 }
 
-SettableProperty SettableProperty::withCustomValueFunction (std::function<void (const juce::var& newValue)> newFunction)
+SettableProperty SettableProperty::withCustomValueFunction (std::function<void (const juce::var& newValue)> newFunction, bool setValueBeforeCallingFunction, bool setValueAfterCallingFunction)
 {
-    return with (*this, &SettableProperty::customValueFunction, newFunction);
+    return with (*this, &SettableProperty::customValueFunction, CustomValueFunction (newFunction, setValueBeforeCallingFunction, setValueAfterCallingFunction));
 }
 
 juce::StringArray SettableProperty::getChoicesFromLambda () const

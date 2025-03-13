@@ -33,9 +33,10 @@
 
 #pragma once
 
+#include "foleys_CustomValueFunction.h"
+
 namespace foleys
 {
-
 
 /**
  A SettableProperty is a value that can be selected by the designer and will be
@@ -101,7 +102,7 @@ public:
      * 
      *  Only implemented for some style property compoennts.
      */
-    std::function<void(const juce::var& newValue)>     customValueFunction {};
+    CustomValueFunction     customValueFunction {};
 
     /** if displayName is not empty, this will return displayName otherwise name */
     juce::String getDisplayName () const;
@@ -118,7 +119,7 @@ public:
     SettableProperty withFlags (int newFlags);
     SettableProperty withAdditionalFlags (int additionalFlags);
     SettableProperty withCustomInfo (juce::var newInfo);
-    SettableProperty withCustomValueFunction (std::function<void(const juce::var& newValue)> newFunction);
+    SettableProperty withCustomValueFunction (std::function<void(const juce::var& newValue)> newFunction, bool setValueBeforeCallingFunction = true, bool setValueAfterCallingFunction = false);
 
     juce::StringArray getChoicesFromLambda () const;
 

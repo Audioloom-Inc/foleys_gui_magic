@@ -670,7 +670,6 @@ void GuiItem::mouseDrag (const juce::MouseEvent& event)
             else
             {
                 componentDragger->dragComponent (this, event, nullptr);
-                triggerAsyncUpdate ();
             }
         }
     }
@@ -678,6 +677,7 @@ void GuiItem::mouseDrag (const juce::MouseEvent& event)
 
 void GuiItem::mouseUp (const juce::MouseEvent& event)
 {
+    triggerAsyncUpdate ();
 }
 
 bool GuiItem::isInterestedInDragSource (const juce::DragAndDropTarget::SourceDetails &)

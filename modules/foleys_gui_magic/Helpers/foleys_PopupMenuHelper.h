@@ -81,4 +81,32 @@ static inline juce::NamedValueSet makeJustificationsChoices()
     return choices.choices;
 }
 
+static inline juce::NamedValueSet makeRectanglePlacementChoices ()
+{
+    struct Choices
+    {
+        juce::NamedValueSet choices;
+        Choices ()
+        {
+            /** Flag values that can be combined and used in the constructor. */
+            choices.set ("xLeft", juce::RectanglePlacement::xLeft);
+            choices.set ("xRight", juce::RectanglePlacement::xRight);
+            choices.set ("xMid", juce::RectanglePlacement::xMid);
+            choices.set ("yTop", juce::RectanglePlacement::yTop);
+            choices.set ("yBottom", juce::RectanglePlacement::yBottom);
+            choices.set ("yMid", juce::RectanglePlacement::yMid);
+            choices.set ("stretchToFit", juce::RectanglePlacement::stretchToFit);
+            choices.set ("fillDestination", juce::RectanglePlacement::fillDestination);
+            choices.set ("onlyReduceInSize", juce::RectanglePlacement::onlyReduceInSize);
+            choices.set ("onlyIncreaseInSize", juce::RectanglePlacement::onlyIncreaseInSize);
+            choices.set ("doNotResize", juce::RectanglePlacement::doNotResize);
+            choices.set ("centred", juce::RectanglePlacement::centred);
+        }
+    };
+
+    static Choices choices;
+    return choices.choices;
 }
+
+
+} // namespace foleys

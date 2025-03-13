@@ -193,7 +193,7 @@ protected:
     void editModeToggled (bool editModeOn) override;
 
     void handleAsyncUpdate() override;
-
+    
     template<typename... MethodArgs, typename... Args>
     void call (void (ToolBoxContentComponent::*callbackFunction) (MethodArgs...), Args&&... args) const
     {
@@ -202,6 +202,8 @@ protected:
                 (c->*callbackFunction) (args...);
     }
 
+    std::unique_ptr<ToolBoxLookAndFeel> toolBoxLaf;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ToolBox)
 };
 

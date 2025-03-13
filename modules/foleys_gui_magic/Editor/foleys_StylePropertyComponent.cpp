@@ -152,11 +152,11 @@ void StylePropertyComponent::paint (juce::Graphics& g)
 {
     auto b = getLocalBounds().reduced (1).withWidth (getWidth() / 2);
 
-    g.fillAll (findColour (ToolBox::backgroundColourId, true));
-    g.setColour (findColour (ToolBox::outlineColourId, true));
+    g.fillAll (findColour (ToolBox::backgroundColourId));
+    g.setColour (findColour (ToolBox::outlineColourId));
     g.drawHorizontalLine (0, 0.0f, static_cast<float>(getRight()));
     g.drawHorizontalLine (getBottom() - 1, 0.0f, static_cast<float>(getRight()));
-    g.setColour (node == inheritedFrom ? findColour (ToolBox::textColourId, true) : findColour (ToolBox::disabledTextColourId, true));
+    g.setColour (node == inheritedFrom ? findColour (ToolBox::textColourId) : findColour (ToolBox::disabledTextColourId));
     g.drawFittedText (displayName, b, juce::Justification::left, 1);
 }
 

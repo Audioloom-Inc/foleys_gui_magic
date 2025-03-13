@@ -144,6 +144,7 @@
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
 
+#include "Editor/foleys_ToolBoxLookAndFeel.h"
 #include "Editor/foleys_ToolBox.h"
 #include "Editor/foleys_GUITreeEditor.h"
 #include "Editor/foleys_PropertiesEditor.h"

@@ -50,12 +50,8 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
     // obviously needed
     jassert (parent);
 
-    setColour (backgroundColourId, findColour (juce::ResizableWindow::backgroundColourId));
-    setColour (outlineColourId, juce::Colours::silver);
-    setColour (textColourId, juce::Colours::white);
-    setColour (disabledTextColourId, juce::Colours::grey);
-    setColour (removeButtonColourId, juce::Colours::darkred);
-    setColour (selectedBackgroundColourId, juce::Colours::darkorange);    
+    toolBoxLaf = std::make_unique<ToolBoxLookAndFeel> ();
+    setLookAndFeel (toolBoxLaf.get ());
 
     addContentComponent (new GUITreeEditor (builder), "Tree");
     addContentComponent (new PropertiesEditor (builder), "Inspector");
@@ -143,6 +139,8 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
 
 ToolBox::~ToolBox()
 {
+    setLookAndFeel (nullptr);
+    
     juce::Desktop::getInstance ().removeGlobalMouseListener (this);
 
     builder.removeListener (this);

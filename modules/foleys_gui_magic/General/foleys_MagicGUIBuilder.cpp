@@ -594,8 +594,8 @@ bool MagicGUIBuilder::isEditModeOn() const
 
 void MagicGUIBuilder::setSelectedNode (const juce::ValueTree& node)
 {
-    if (selectedNode != node)
-    {
+    if (selectedNode != node)    {
+
         if (auto* item = findGuiItem (selectedNode))
             item->setDraggable (false);
 
@@ -603,8 +603,9 @@ void MagicGUIBuilder::setSelectedNode (const juce::ValueTree& node)
 
         listeners.call ([node] (Listener& l) { l.selectedItem (node); });
 
-        if (auto* item = findGuiItem (selectedNode); item && ! item->isRoot ())
-            item->setDraggable (true);
+        if (isEditModeOn ())
+            if (auto* item = findGuiItem (selectedNode); item && ! item->isRoot ())
+                item->setDraggable (true);
 
         if (parent != nullptr)
             parent->repaint();

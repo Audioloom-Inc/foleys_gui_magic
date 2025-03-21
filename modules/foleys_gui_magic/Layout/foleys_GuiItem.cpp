@@ -256,8 +256,11 @@ void GuiItem::configurePosition (const juce::ValueTree& node)
 {
     configurePosition (magicBuilder.getStyleProperty (IDs::posX, node), posX, 0.0);
     configurePosition (magicBuilder.getStyleProperty (IDs::posY, node), posY, 0.0);
-    configurePosition (magicBuilder.getStyleProperty (IDs::posWidth, node), posWidth, 100.0);
-    configurePosition (magicBuilder.getStyleProperty (IDs::posHeight, node), posHeight, 100.0);
+
+    auto defaultSize = getDefaultSize ();
+
+    configurePosition (magicBuilder.getStyleProperty (IDs::posWidth, node), posWidth, defaultSize.getWidth ());
+    configurePosition (magicBuilder.getStyleProperty (IDs::posHeight, node), posHeight, defaultSize.getHeight ());
 }
 
 void GuiItem::configurePosition (const juce::var& v, Position& p, double d)

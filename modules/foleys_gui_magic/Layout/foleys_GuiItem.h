@@ -287,6 +287,8 @@ public:
 
     juce::HashMap<juce::String, ColourTranslation> & getColourTranslation () { return colourTranslation; }
 
+    virtual juce::Rectangle<int> getDefaultSize () const { return { 100, 100 }; }
+
 protected:
 
     juce::ValueTree configNode;

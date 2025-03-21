@@ -131,4 +131,6 @@ private:
     static SettableProperty with (SettableProperty property, Member&& member, Item&& item);
 };
 
+using SettableProperties = std::vector<SettableProperty>;
+
 } // namespace foleys

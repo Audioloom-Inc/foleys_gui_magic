@@ -114,6 +114,9 @@ public:
      */
     virtual juce::String getControlledParameterID (juce::Point<int>) { return {}; }
 
+    /** */
+    virtual int getControlledParameterIndex (juce::Point<int>) { return -1; }
+
     /**
      Look up a value through the DOM and CSS
      */

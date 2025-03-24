@@ -116,6 +116,11 @@ public:
     juce::RangedAudioParameter* getParameter (const juce::String& paramID) override;
     virtual void updateParameterMap();
 
+    /**
+     * Returns the index of a parameter if added current parameters map. otherwise -1
+     */
+    int getParameterIndex (const juce::String& paramID);
+
     std::unique_ptr<juce::SliderParameterAttachment>   createAttachment (const juce::String& paramID, juce::Slider& slider) override;
     std::unique_ptr<juce::ComboBoxParameterAttachment> createAttachment (const juce::String& paramID, juce::ComboBox& combobox) override;
     std::unique_ptr<juce::ButtonParameterAttachment>   createAttachment (const juce::String& paramID, juce::Button& button) override;

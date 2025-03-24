@@ -125,6 +125,15 @@ void MagicProcessorState::updateParameterMap()
     parameters.updateParameterMap();
 }
 
+int MagicProcessorState::getParameterIndex (const juce::String& paramID)
+{
+    if (auto parameter = getParameter (paramID))
+        if (processor)
+            return processor->getParameters().indexOf (parameter);
+
+    return -1;
+}
+
 std::unique_ptr<juce::SliderParameterAttachment> MagicProcessorState::createAttachment (const juce::String& paramID, juce::Slider& slider)
 {
     if (auto* parameter = getParameter (paramID))

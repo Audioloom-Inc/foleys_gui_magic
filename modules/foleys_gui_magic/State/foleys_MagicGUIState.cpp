@@ -131,6 +131,11 @@ juce::ValueTree& MagicGUIState::getGuiTree()
     return guiValueTree;
 }
 
+const juce::ValueTree& MagicGUIState::getGuiTree() const
+{
+    return guiValueTree;
+}
+
 juce::ValueTree& MagicGUIState::getValueTree()
 {
     return state;

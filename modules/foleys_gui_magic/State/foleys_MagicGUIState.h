@@ -99,7 +99,8 @@ public:
      Grants access to the gui tree. This is returned as reference so you are able to connect listeners to it.
      */
     juce::ValueTree& getGuiTree();
-
+    const juce::ValueTree& getGuiTree() const;
+    
     /**
      Grants acces to the state tree that currently holds the exposed properties root. when FOLEYS_SHOW_GUI_EDITOR_PALLETTE is enabled, the guitree is added as a child.
 

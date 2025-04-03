@@ -526,6 +526,9 @@ juce::var MagicGUIBuilder::getPropertyDefaultValue (juce::Identifier property, j
     if (property == IDs::borderColour || property == IDs::captionColour)
         return juce::Colours::silver.toString();
 
+    if (property == IDs::alphaWhenDisabled)
+        return 0.7f;
+        
     return {};
 }
 

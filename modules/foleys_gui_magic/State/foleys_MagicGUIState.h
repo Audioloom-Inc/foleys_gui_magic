@@ -157,7 +157,7 @@ public:
     /**
      Returns a property as value inside the ValueTreeState. The nodes are a colon separated list, the last component is the property name
      */
-    juce::Value getPropertyAsValue (const juce::String& pathToProperty);
+    virtual juce::Value getPropertyAsValue (const juce::String& pathToProperty);
 
     /**
      Populates a menu with properties found in the persistent ValueTree

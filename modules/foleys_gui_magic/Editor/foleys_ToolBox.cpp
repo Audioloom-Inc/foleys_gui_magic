@@ -651,6 +651,8 @@ void ToolBox::deleteItem (foleys::GuiItem* guiItem)
     if (! guiItem)
         return;
 
+    guiItem->aboutToBeDeletedByUser ();
+    
     auto item = guiItem->getNode();
     auto parent = item.getParent();
 

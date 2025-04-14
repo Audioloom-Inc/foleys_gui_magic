@@ -261,6 +261,8 @@ public:
     
     virtual bool canBeDeleted () const;
 
+    virtual void aboutToBeDeletedByUser () {}
+
     virtual bool inheritFromParents () const { return false; }
     
     void setBoundsForced (juce::Rectangle<int> rectangle);

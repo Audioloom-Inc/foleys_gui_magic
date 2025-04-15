@@ -361,7 +361,7 @@ void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const 
     else if (property == foleys::IDs::tooltipTextColour)
         configureComponent ();
     else
-        propertyChanged (property);
+        propertyChangedInternal (property);
 
     // ongoing calls here ...
     if (treeThatChanged == configNode)
@@ -517,7 +517,7 @@ void GuiItem::init()
         if (p.name == foleys::IDs::parameter)
             updateParameterConnection (getProperty (IDs::parameter));
         else
-            propertyChanged (p.name);
+            propertyChangedInternal (p.name);
     }
 
     animationHelper.setCustomAnimatorsEnabled (hasCustomAnimator ());
@@ -734,6 +734,16 @@ bool GuiItem::isSelected() const
 bool GuiItem::isInitializing() const
 {
     return initializing;
+}
+
+bool GuiItem::isTemplate() const
+{
+    return ! configNode.getParent ().isValid ();
+}
+
+bool GuiItem::isTemplateOrInitializing() const
+{
+    return isTemplate () || isInitializing ();
 }
 
 bool GuiItem::isRoot() const

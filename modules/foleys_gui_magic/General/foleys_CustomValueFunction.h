@@ -21,11 +21,15 @@ struct CustomValueFunction
     /** indicates that the value should be set after this function is called */
     bool setValueAfterCallingFunction{ false };
 
+    /** the function will be triggered async. setValueBeforeCalling function should always be true for this */
+    bool triggerAsync{ false };
+
     CustomValueFunction& operator= (const CustomValueFunction& other)
     {
         function = other.function;
         setValueBeforeCallingFunction = other.setValueBeforeCallingFunction;
         setValueAfterCallingFunction = other.setValueAfterCallingFunction;
+        triggerAsync = other.triggerAsync;
 
         return *this;
     }
@@ -54,13 +58,18 @@ struct CustomValueFunction
 
         if (setValueBeforeCallingFunction && setValueFunction)
             setValueFunction();
+        
+        if (triggerAsync)
+            juce::MessageManager::callAsync ([f = function, newValue] () { f (newValue); });
+        else
+            function (newValue);
 
-        function (newValue);
+        // when async the value will always be set before the function is called
+        jassert (! (setValueAfterCallingFunction && triggerAsync));
 
         if (setValueAfterCallingFunction && setValueFunction)
             setValueFunction();
     }
 };
-
 
 }

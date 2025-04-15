@@ -125,7 +125,7 @@ public:
                 layoutListeners.call (&StyleListener::sliderStyleChanged, *this, getSliderStyle ());
     }
 
-    void setFilmStrip (juce::Image& image)
+    void setFilmStrip (const juce::Image& image)
     {
         filmStrip = image;
     }

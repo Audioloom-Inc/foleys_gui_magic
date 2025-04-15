@@ -251,7 +251,10 @@ public:
     bool isSelected () const;
     
     bool isInitializing () const;
-    
+    bool isTemplate () const;
+    bool isTemplateOrInitializing () const;
+
+            
     MagicGUIBuilder& magicBuilder;
 
     bool isRoot () const;
@@ -323,6 +326,9 @@ protected:
     
     /** override this to prevent a potential fade out, e.g. when a text editor is open or something like this. */
     virtual bool preventFadeout () const { return false; }
+
+    /** */
+    virtual void propertyChangedInternal (const juce::Identifier& property) { propertyChanged (property); }
 
 private:
 

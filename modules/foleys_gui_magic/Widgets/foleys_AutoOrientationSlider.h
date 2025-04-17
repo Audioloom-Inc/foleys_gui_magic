@@ -82,20 +82,25 @@ public:
         }
         else
         {
-            auto index = juce::roundToInt ((numImages - 1) * valueToProportionOfLength (getValue()));
+            auto proportion = valueToProportionOfLength (getValue());
+            
+            if (flipped)
+                proportion = 1.0f - proportion;
+
+            auto index = juce::roundToInt ((numImages - 1) * proportion);
             auto knobArea = getLookAndFeel().getSliderLayout(*this).sliderBounds;
 
             if (horizontalFilmStrip)
             {
                 auto w = filmStrip.getWidth() / numImages;
-                g.drawImage (filmStrip, knobArea.getX(), knobArea.getY(), knobArea.getWidth(), knobArea.getHeight(),
-                             index * w, 0, w, filmStrip.getHeight());
+                auto clipped = filmStrip.getClippedImage ({ index * w, 0, w, filmStrip.getHeight() });
+                g.drawImage (clipped, knobArea.toFloat (), juce::RectanglePlacement::centred);
             }
             else
             {
                 auto h = filmStrip.getHeight() / numImages;
-                g.drawImage (filmStrip, knobArea.getX(), knobArea.getY(), knobArea.getWidth(), knobArea.getHeight(),
-                             0, index * h, filmStrip.getWidth(), h);
+                auto clipped = filmStrip.getClippedImage ({ 0, index * h, filmStrip.getWidth(), h });
+                g.drawImage (clipped, knobArea.toFloat (), juce::RectanglePlacement::centred);
             }
         }
     }
@@ -125,9 +130,10 @@ public:
                 layoutListeners.call (&StyleListener::sliderStyleChanged, *this, getSliderStyle ());
     }
 
-    void setFilmStrip (const juce::Image& image)
+    void setFilmStrip (const juce::Image& image, bool flipped = false)
     {
         filmStrip = image;
+        this->flipped = flipped;
     }
 
     void setNumImages (int num, bool horizontal)
@@ -192,6 +198,7 @@ private:
     juce::Image filmStrip;
     int         numImages = 0;
     bool        horizontalFilmStrip = false;
+    bool        flipped = false;
 
     juce::ListenerList<StyleListener> layoutListeners;
 

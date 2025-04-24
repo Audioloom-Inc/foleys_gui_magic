@@ -50,7 +50,7 @@ protected:
     bool showHint () const override;
 
 private:
-    int  getIdToSelect (juce::ComboBox&, const juce::String& value);
+    std::pair<bool,int>  getIdToSelect (juce::ComboBox&, const juce::String& value);
     
     void initialiseComboBox (bool editable);
     void valueChanged (juce::Value& value) override;

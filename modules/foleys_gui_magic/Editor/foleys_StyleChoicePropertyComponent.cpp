@@ -59,20 +59,20 @@ StyleChoicePropertyComponent::StyleChoicePropertyComponent (MagicGUIBuilder& bui
     initialiseComboBox (false);
 }
 
-int StyleChoicePropertyComponent::getIdToSelect (juce::ComboBox& combo, const juce::String& value)
+std::pair<bool, int> StyleChoicePropertyComponent::getIdToSelect (juce::ComboBox& combo, const juce::String& value)
 {
     auto& properties = combo.getProperties ();
     
     // directly stored selected ids
     if (properties[IDs::useSelectedItemIdInComboBoxLambda])
-        return value.getIntValue ();
+        return { true, value.getIntValue () };
 
     // stored an identifier with an identifier
     for (auto& p : properties)
         if (p.value.toString () == value)
-            return p.name.toString ().getTrailingIntValue ();
+            return { true, p.name.toString ().getTrailingIntValue () };
 
-    return 0;
+    return { false, 0 };
 }
 
 void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
@@ -181,8 +181,8 @@ void StyleChoicePropertyComponent::update()
 
             auto vString = value.toString ();
 
-            if (auto selectedId = getIdToSelect (*combo, vString); selectedId != 0)
-                combo->setSelectedId (selectedId);
+            if (auto selectedId = getIdToSelect (*combo, vString); selectedId.first == true)
+                combo->setSelectedId (selectedId.second);
             else
                 combo->setText (vString, juce::dontSendNotification);
         }
@@ -209,8 +209,8 @@ void StyleChoicePropertyComponent::valueChanged (juce::Value&)
 
     if (auto* combo = dynamic_cast<juce::ComboBox*>(editor.get()))
     {    
-        if (auto selectedId = getIdToSelect (*combo, v); selectedId != 0)
-            combo->setSelectedId (selectedId, juce::sendNotificationSync);
+        if (auto selectedId = getIdToSelect (*combo, v); selectedId.first == true)
+            combo->setSelectedId (selectedId.second, juce::sendNotificationSync);
         else if (combo->getText () != v)
             combo->setText (v, juce::sendNotificationSync);
     }

@@ -293,7 +293,8 @@ std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (ju
             if (other.name == IDs::parameter)
                 continue;
                 
-            other.node = styleItem;   
+            if (other.node.getType () == styleItem.getType ())
+                other.node = styleItem;
 
             if (other.category.isEmpty())
                 other.category = node.getType ().toString();

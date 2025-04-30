@@ -337,7 +337,7 @@ public:
     const juce::ValueTree& getSelectedNode() const;
     
     /** */
-    void updateSelectedNode ();
+    void updateSelectedNode (bool async = false);
     virtual void draggedItemOnto (juce::ValueTree dropped, juce::ValueTree target, juce::Point<int> targetPos = {}, int index = -1, bool startUndoTransaction = true);
     virtual bool canNodeBeDeleted (juce::ValueTree node);
     virtual bool isCopyingEnabled () { return true; }

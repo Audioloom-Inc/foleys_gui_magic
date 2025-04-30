@@ -620,12 +620,17 @@ const juce::ValueTree& MagicGUIBuilder::getSelectedNode() const
     return selectedNode;
 }
 
-void MagicGUIBuilder::updateSelectedNode() 
+void MagicGUIBuilder::updateSelectedNode(bool async) 
 {
     if (blockSelectedNodeUpdates)
         return;
     
-    listeners.call ([&] (Listener& l) { l.selectedItem (selectedNode); });
+    const auto func = [&, weak = juce::WeakReference (this)] () { if (! weak) return; listeners.call ([&] (Listener& l) { l.selectedItem (selectedNode); }); };
+    
+    if (async)
+        juce::MessageManager::callAsync (func);
+    else
+        func ();
 }
 
 void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree target, juce::Point<int> targetPos, int index, bool startUndoTransaction)

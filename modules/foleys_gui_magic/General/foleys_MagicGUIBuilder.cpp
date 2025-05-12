@@ -345,6 +345,9 @@ void MagicGUIBuilder::registerFactory (juce::Identifier type, std::unique_ptr<Gu
 
     defaultProperties[type] = temp->getSettablePropertiesInit();
 
+    if (auto tempNode = temp->getTemplateNode (); tempNode.isValid ())
+        templateNodes[type] = tempNode.toXmlString ();
+        
     factoryNames.add (type.toString());
 
     if (isUserFactory)
@@ -697,6 +700,22 @@ void MagicGUIBuilder::endSavePosition (juce::Component * saver)
         currentlySavingPositions = false;
         currentlySavingCaller = nullptr;
     }
+}
+
+juce::ValueTree MagicGUIBuilder::getTemplateNode (const juce::Identifier& type) const
+{
+    if (auto xml = getTemplateNodeAsXmlString (type); ! xml.isEmpty ())
+        return juce::ValueTree::fromXml (xml);
+
+    return {};
+}
+
+juce::String MagicGUIBuilder::getTemplateNodeAsXmlString (const juce::Identifier& type) const
+{
+    if (auto i = templateNodes.find (type); i != templateNodes.end ())
+        return i->second;
+
+    return {};
 }
 
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE

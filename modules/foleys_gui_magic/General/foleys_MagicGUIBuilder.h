@@ -348,6 +348,10 @@ public:
     
     GuiItem * getRootItem () const { return root.get(); }
     
+    /** if registered and available this will return a new template ValueTree for the given type */
+    juce::ValueTree getTemplateNode (const juce::Identifier& type) const;
+    juce::String getTemplateNodeAsXmlString (const juce::Identifier& type) const;
+
 protected:
     MagicGUIState& magicState;
 
@@ -372,7 +376,8 @@ protected:
 
     std::map<juce::Identifier, std::unique_ptr<GuiItem> (*) (MagicGUIBuilder& builder, const juce::ValueTree&)> factories;
     std::map<juce::Identifier, std::vector<SettableProperty>> defaultProperties;
-    
+    std::map<juce::Identifier, juce::String> templateNodes;
+
     juce::StringArray factoryNames, userFactoryNames;
     
     juce::ListenerList<Listener> listeners;

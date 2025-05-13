@@ -156,7 +156,7 @@ public:
     /**
      Register a factory for Components to be available in the GUI editor. If you need a reference to the application, you can capture that in the factory lambda.
      */
-    void registerFactory (juce::Identifier type, std::unique_ptr<GuiItem> (*factory) (MagicGUIBuilder& builder, const juce::ValueTree&), bool isUserFactory = true);
+    void registerFactory (juce::Identifier type, std::unique_ptr<GuiItem> (*factory) (MagicGUIBuilder& builder, const juce::ValueTree&), bool isUserFactory = true, const juce::String& displayName = {});
 
     /**
      With that method you can register your custom LookAndFeel class and apply it to different components.
@@ -214,8 +214,8 @@ public:
     juce::StringArray getFactoryNames() const;
 
     /** */
-    juce::StringArray getUserFactoryNames () const;
-
+    juce::StringPairArray getUserFactoryIdsAndNames () const;
+    
     /**
      returns true when a factory with this name has been registered
      */
@@ -373,12 +373,22 @@ protected:
     std::unique_ptr<GuiItem> root;
 
     std::unique_ptr<juce::Component> overlayDialog;
+    
+    using FactoryFunction = std::unique_ptr<GuiItem> (*) (MagicGUIBuilder& builder, const juce::ValueTree&);
+    struct FactoryDescription
+    {
+        juce::String identifier{ "" };
+        juce::String displayName{ "" };
+        bool isUserFactory{ false };
+        FactoryFunction factory{ nullptr };
+        
+        std::vector<SettableProperty> defaultProperties;
+        juce::String templateXml{ };
 
-    std::map<juce::Identifier, std::unique_ptr<GuiItem> (*) (MagicGUIBuilder& builder, const juce::ValueTree&)> factories;
-    std::map<juce::Identifier, std::vector<SettableProperty>> defaultProperties;
-    std::map<juce::Identifier, juce::String> templateNodes;
+        juce::String getName () const { if (displayName.isNotEmpty()) return displayName; return identifier; }
+    };
 
-    juce::StringArray factoryNames, userFactoryNames;
+    std::map<juce::Identifier, FactoryDescription> factoryDescriptions;
     
     juce::ListenerList<Listener> listeners;
     bool                         editMode = false;

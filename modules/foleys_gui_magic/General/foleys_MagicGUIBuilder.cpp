@@ -102,11 +102,13 @@ std::unique_ptr<GuiItem> MagicGUIBuilder::createGuiItem (const juce::ValueTree& 
         return item;
     }
 
-    auto factory = factories.find (node.getType());
-    if (factory != factories.end())
+    
+    if (auto factory = factoryDescriptions.find (node.getType()); factory != factoryDescriptions.end())
     {
+        auto& description = factory->second;
         bool firstOfType = findGuiItemOfType (node.getType ()) == nullptr;
-        auto item = factory->second (*this, node);
+        auto item = description.factory (*this, node);
+        
         item->init ();
         
         if (firstOfType)
@@ -328,49 +330,57 @@ juce::ValueTree MagicGUIBuilder::findNodeWithProperty (const juce::Identifier& p
     return {};
 }
 
-void MagicGUIBuilder::registerFactory (juce::Identifier type, std::unique_ptr<GuiItem> (*factory) (MagicGUIBuilder& builder, const juce::ValueTree&), bool isUserFactory)
+void MagicGUIBuilder::registerFactory (juce::Identifier type, std::unique_ptr<GuiItem> (*factory) (MagicGUIBuilder& builder, const juce::ValueTree&), bool isUserFactory, const juce::String& displayName)
 {
-    if (factories.find (type) != factories.cend())
+    if (factoryDescriptions.find (type) != factoryDescriptions.cend())
     {
-        // You tried to add two factories with the same type name!
+        // You tried to add two factoryDescriptions with the same type name!
         // That cannot work, the second factory will be ignored.
         jassertfalse;
         return;
     }
 
-    factories[type] = factory;
+    FactoryDescription description;
+    description.identifier = type.toString();
+    description.displayName = displayName;
+    description.isUserFactory = isUserFactory;
+    description.factory = factory;
     
     auto temp = factory (*this, juce::ValueTree (type));
     jassert (temp);
-
-    defaultProperties[type] = temp->getSettablePropertiesInit();
-
+    
+    description.defaultProperties = temp->getSettablePropertiesInit();
+    
     if (auto tempNode = temp->getTemplateNode (); tempNode.isValid ())
-        templateNodes[type] = tempNode.toXmlString ();
-        
-    factoryNames.add (type.toString());
+        description.templateXml = tempNode.toXmlString ();
 
-    if (isUserFactory)
-        userFactoryNames.add (type.toString());
+    factoryDescriptions[type] = description;
 }
 
 juce::StringArray MagicGUIBuilder::getFactoryNames() const
 {
     juce::StringArray names { IDs::view.toString() };
 
-    names.addArray (factoryNames);
+    for (auto& description : factoryDescriptions)
+        names.add (description.second.identifier);
 
     return names;
 }
 
-juce::StringArray MagicGUIBuilder::getUserFactoryNames() const
+juce::StringPairArray MagicGUIBuilder::getUserFactoryIdsAndNames() const
 {
-    return userFactoryNames;
+    juce::StringPairArray names;
+
+    for (auto& description : factoryDescriptions)
+        if (description.second.isUserFactory)
+            names.set (description.second.identifier, description.second.getName ());
+
+    return names;
 }
 
 bool MagicGUIBuilder::isFactoryName (const juce::Identifier& name) const
 {
-    return getFactoryNames ().contains (name.toString ());
+    return factoryDescriptions.find (name) != factoryDescriptions.cend();
 }
 
 std::unique_ptr<GuiItem> MagicGUIBuilder::createRootItem (const juce::ValueTree& node)
@@ -476,10 +486,11 @@ std::function<void (juce::ComboBox&)> MagicGUIBuilder::createTriggerMenuLambda()
 juce::var MagicGUIBuilder::getPropertyDefaultValue (juce::Identifier property, juce::Identifier type) const
 {
     if (! type.isNull ())
-        if (auto defaults = defaultProperties.find (type); defaults != defaultProperties.end ())
-            for (auto pDefault : defaults->second)
-                if (pDefault.name == property)
-                    return pDefault.defaultValue;
+        if (auto description = factoryDescriptions.find (type); description != factoryDescriptions.end ())
+            if (auto& defaults = description->second.defaultProperties; defaults.size () > 0)
+                for (auto pDefault : defaults)
+                    if (pDefault.name == property)
+                        return pDefault.defaultValue;
                     
     if (property == IDs::visibleInFinalProduct)
         return true;
@@ -712,9 +723,10 @@ juce::ValueTree MagicGUIBuilder::getTemplateNode (const juce::Identifier& type) 
 
 juce::String MagicGUIBuilder::getTemplateNodeAsXmlString (const juce::Identifier& type) const
 {
-    if (auto i = templateNodes.find (type); i != templateNodes.end ())
-        return i->second;
-
+    if (auto description = factoryDescriptions.find (type); description != factoryDescriptions.end ())
+        if (auto xml = description->second.templateXml; ! xml.isEmpty ())
+            return xml;
+            
     return {};
 }
 

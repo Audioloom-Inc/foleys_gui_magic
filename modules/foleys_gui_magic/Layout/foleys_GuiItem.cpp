@@ -499,6 +499,8 @@ void GuiItem::setEditMode (bool shouldEdit)
         component->setInterceptsMouseClicks (!shouldEdit, !shouldEdit);
 
     updateVisibility ();
+
+    editModeChanged (shouldEdit);
 }
 
 bool GuiItem::isEditModeOn () const

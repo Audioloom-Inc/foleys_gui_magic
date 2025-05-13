@@ -333,6 +333,8 @@ protected:
     /** */
     virtual void propertyChangedInternal (const juce::Identifier& property) { propertyChanged (property); }
 
+    /** */
+    virtual void editModeChanged (bool shouldEdit) {}
 private:
 
     class BorderDragger : public juce::ResizableBorderComponent

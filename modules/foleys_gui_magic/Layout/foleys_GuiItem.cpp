@@ -76,7 +76,8 @@ juce::StringArray GuiItem::getColourNames() const
     juce::StringArray names;
 
     for (const auto& pair : colourTranslation)
-        names.addIfNotAlreadyThere (pair.identifier);
+        if (revealColourToUser (pair.identifier))
+            names.addIfNotAlreadyThere (pair.identifier);
 
     return names;
 }
@@ -85,7 +86,8 @@ juce::StringArray GuiItem::getColourDisplayNames() const
 {
     juce::StringArray names;
     for (auto colour : colourTranslation)
-        names.add (colour.getDisplayName ());
+        if (revealColourToUser (colour.identifier))
+            names.add (getColourDisplayName (colour.identifier));
 
     return names;
 }
@@ -93,6 +95,11 @@ juce::StringArray GuiItem::getColourDisplayNames() const
 juce::String GuiItem::getColourDisplayName (const juce::String& colourId) const
 {
     return colourTranslation[colourId].getDisplayName ();
+}
+
+bool GuiItem::revealColourToUser (const juce::String& colourId) const
+{
+    return true;
 }
 
 // juce::var GuiItem::getProperty (const juce::Identifier& property, bool inherit)

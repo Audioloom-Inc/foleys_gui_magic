@@ -304,7 +304,14 @@ std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (ju
 
         for (auto colour : item->getColourTranslation ())
         {
-            properties.push_back (colour.toSettableProperty (styleItem));
+            if (item->revealColourToUser (colour.identifier))
+            {
+                auto prop = colour.toSettableProperty (styleItem);
+                prop.displayName = item->getColourDisplayName (colour.identifier);
+
+                properties.push_back (prop);
+            }
+
         }
     }
 

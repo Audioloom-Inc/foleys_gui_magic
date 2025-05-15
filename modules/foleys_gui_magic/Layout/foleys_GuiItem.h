@@ -108,8 +108,9 @@ public:
 
     /** */
     juce::StringArray getColourDisplayNames () const;
-    juce::String getColourDisplayName (const juce::String& colourId) const;
-
+    virtual juce::String getColourDisplayName (const juce::String& colourId) const;
+    virtual bool revealColourToUser (const juce::String& colourId) const;
+    
     /**
      Returns the parameterID that is controlled from this component.
      To allow multiple return values depending of the position where the drop arrived

@@ -519,14 +519,30 @@ void GuiItem::init()
 {
     juce::ScopedValueSetter<bool> setter (initializing, true);
 
-    auto properties = getSettableProperties ();
-
-    for (auto p : properties)
+    // property names
+    auto propertyNames = [&]()
     {
-        if (p.name == foleys::IDs::parameter)
-            updateParameterConnection (getProperty (IDs::parameter));
+        juce::StringArray names;
+        
+        for (auto p : getSettableProperties ())
+            names.add (p.name.toString ());
+
+        for (int i = 0; i < configNode.getNumProperties (); ++i)
+            if (auto name = configNode.getPropertyName (i).toString (); name.isNotEmpty())
+                names.addIfNotAlreadyThere (name);
+
+        return names;
+    }();
+
+    if (auto parameter = getProperty (IDs::parameter); parameter.isString ())
+        updateParameterConnection (parameter.toString ());
+    
+    for (auto p : propertyNames)
+    {
+        if (p == foleys::IDs::parameter.toString ())
+        continue;
         else
-            propertyChangedInternal (p.name);
+            propertyChangedInternal (p);
     }
 
     animationHelper.setCustomAnimatorsEnabled (hasCustomAnimator ());

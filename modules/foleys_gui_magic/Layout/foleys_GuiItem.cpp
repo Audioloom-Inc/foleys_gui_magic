@@ -540,9 +540,9 @@ void GuiItem::init()
     for (auto p : propertyNames)
     {
         if (p == foleys::IDs::parameter.toString ())
-        continue;
-        else
-            propertyChangedInternal (p);
+            continue;
+        
+        propertyChangedInternal (p);
     }
 
     animationHelper.setCustomAnimatorsEnabled (hasCustomAnimator ());

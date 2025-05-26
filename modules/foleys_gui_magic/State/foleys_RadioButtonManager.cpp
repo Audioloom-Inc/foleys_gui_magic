@@ -88,12 +88,17 @@ void RadioButtonHandler::buttonClicked (juce::Button* clickedButton)
 
 void RadioButtonHandler::parameterValueChanged (int parameterIndex, float newValue)
 {
+    
     juce::ignoreUnused (parameterIndex);
-
+    
     if (!parameter)
         return;
-
+    
     auto value = parameter->convertFrom0to1 (newValue);
+    
+    /** TODO: due to the calls below please make sure to continue on message thread */
+    JUCE_ASSERT_MESSAGE_THREAD
+
     // other than setToggleState this seems not to trigger circular updates
     button.getToggleStateValue() = juce::approximatelyEqual (value, static_cast<float> (radioButtonValue));
 }

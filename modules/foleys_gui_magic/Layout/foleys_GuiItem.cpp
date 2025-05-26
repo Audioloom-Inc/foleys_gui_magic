@@ -58,7 +58,12 @@ GuiItem::~GuiItem()
 std::vector<SettableProperty> GuiItem::getSettablePropertiesInit()
 {
     juce::ScopedValueSetter<bool> setter (initializing, true);
-    return getSettableProperties();
+    auto props = getSettableProperties ();
+
+    for (auto c : colourTranslation)
+        props.push_back (c.toSettableProperty (configNode));
+    
+    return props;
 }
 
 void GuiItem::setColourTranslation (std::vector<std::pair<juce::String, int>> mapping)

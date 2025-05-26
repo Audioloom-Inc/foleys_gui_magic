@@ -95,7 +95,7 @@ public:
     juce::String                                displayName {};
     juce::String                                hint {};
     int                                         flags { AllViews };
-    juce::var                                   customInfo {};
+    juce::var                                   command {};
     bool                                        settable{ true };
     
     /** when you need a custom function to set the property.
@@ -118,9 +118,10 @@ public:
     SettableProperty withHint (const juce::String& newHint);
     SettableProperty withFlags (int newFlags);
     SettableProperty withAdditionalFlags (int additionalFlags);
-    SettableProperty withCustomInfo (juce::var newInfo);
+    SettableProperty withCommand (juce::var newCommand);
     SettableProperty withCustomValueFunction (std::function<void(const juce::var& newValue)> newFunction, bool setValueBeforeCallingFunction = true, bool setValueAfterCallingFunction = false);
-
+    SettableProperty hidden () const;
+    
     juce::StringArray getChoicesFromLambda () const;
 
     bool isAvailableInNormalView () const;

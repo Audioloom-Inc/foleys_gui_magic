@@ -83,14 +83,19 @@ SettableProperty SettableProperty::withAdditionalFlags (int additionalFlags)
     return with (*this, &SettableProperty::flags, flags | additionalFlags);
 }
 
-SettableProperty SettableProperty::withCustomInfo (juce::var newInfo)
+SettableProperty SettableProperty::withCommand (juce::var newCommand)
 {
-    return with (*this, &SettableProperty::customInfo, newInfo);
+    return with (*this, &SettableProperty::command, newCommand);
 }
 
 SettableProperty SettableProperty::withCustomValueFunction (std::function<void (const juce::var& newValue)> newFunction, bool setValueBeforeCallingFunction, bool setValueAfterCallingFunction)
 {
     return with (*this, &SettableProperty::customValueFunction, CustomValueFunction { newFunction, setValueBeforeCallingFunction, setValueAfterCallingFunction });
+}
+
+SettableProperty SettableProperty::hidden () const
+{
+    return with (*this, &SettableProperty::flags, flags & ~SettableProperty::AllViews);
 }
 
 juce::StringArray SettableProperty::getChoicesFromLambda () const

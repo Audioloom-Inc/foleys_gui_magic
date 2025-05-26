@@ -290,9 +290,6 @@ std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (ju
         
         for (auto& other : props)
         {
-            if (other.name == IDs::parameter)
-                continue;
-                
             if (other.node.getType () == styleItem.getType ())
                 other.node = styleItem;
 

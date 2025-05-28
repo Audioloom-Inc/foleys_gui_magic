@@ -59,10 +59,10 @@ class MagicGUIState
         explicit ErasedObject(Ts &&... ts) : ToErase{std::forward<Ts>(ts)...} {}
     };
 
-    template <typename ReferencedType> class ReferencedObject : public ObjectBase {
+    template <typename ReferencedType> class ReferencedObject {
     public:
-        explicit ReferencedObject(ReferencedType &object) : object{object} {}
-        ReferencedType &object;
+        explicit ReferencedObject(ReferencedType& object) : object{object} {}
+        ReferencedType& object;
     };
 
     template <typename T, typename... Ts>
@@ -197,7 +197,7 @@ public:
     template <typename T>
     void addObject (const juce::Identifier& objectID, T* object)
     {
-        createAndAddObject<ReferencedObject> (objectID, *object);
+        createAndAddObject<ReferencedObject<T>> (objectID, *object);
     }
 
     void removeObject (const juce::Identifier& objectID)

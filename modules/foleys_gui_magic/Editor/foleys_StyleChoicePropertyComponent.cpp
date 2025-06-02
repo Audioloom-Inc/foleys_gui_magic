@@ -110,6 +110,9 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
                 // reopen popup
                 juce::MessageManager::callAsync ([weakThis] () { if (weakThis) weakThis->showPopup (); });
             });
+            
+            menu.setLookAndFeel (nullptr);
+
         }
     
     private:

@@ -234,6 +234,20 @@ public:
         return identifiers;
     }
 
+    /** */
+    template <typename ObjectType>
+    juce::Array<std::pair<juce::String, ObjectType*>> getObjectsByType() const
+    {
+        juce::Array<std::pair<juce::String, ObjectType*>> objects;
+        for (const auto& object : advertisedObjects)
+        {
+            if (auto type = getObject<ObjectType>(object.second.get()))
+                objects.add ({object.first.toString (), type});
+        }
+
+        return objects;
+    }
+
     /** 
      Returns all identifiers with names of all objects, that can be casted to the given type.
      

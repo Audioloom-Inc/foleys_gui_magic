@@ -662,7 +662,12 @@ void PropertiesEditor::finishPropertySetup()
             if (auto comp = builder.createStylePropertyComponent (p, p.node))
                 array.add (comp);
 
-        addSection (category, array);
+        // use for sorting a category name like this "A0:My Category"
+        
+        if (auto name = category.fromFirstOccurrenceOf (":", false, false); name.isNotEmpty ())
+            addSection (name, array);
+        else
+            addSection (category, array);
     }
 }
 

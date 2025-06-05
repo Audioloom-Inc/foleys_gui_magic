@@ -60,7 +60,7 @@ std::vector<SettableProperty> GuiItem::getSettablePropertiesInit()
     juce::ScopedValueSetter<bool> setter (initializing, true);
     auto props = getSettableProperties ();
 
-    for (auto c : colourTranslation)
+    for (auto c : colourTranslationMap)
         props.push_back (c.toSettableProperty (configNode));
     
     return props;
@@ -73,14 +73,15 @@ void GuiItem::setColourTranslation (std::vector<std::pair<juce::String, int>> ma
 
 void GuiItem::setColourTranslation (const juce::String& identifier, const int& colourId, const juce::Colour& defaultColour, const juce::String& displayName,  const juce::String& category)
 {
-    colourTranslation.getReference (identifier) = { identifier, colourId, displayName, defaultColour, category };
+    colourTranslationMap.getReference (identifier) = { identifier, colourId, displayName, defaultColour, category };
+    colourNames.add (identifier);
 }
 
 juce::StringArray GuiItem::getColourNames() const
 {
     juce::StringArray names;
 
-    for (const auto& pair : colourTranslation)
+    for (const auto& pair : colourTranslationMap)
         if (revealColourToUser (pair.identifier))
             names.addIfNotAlreadyThere (pair.identifier);
 
@@ -90,7 +91,7 @@ juce::StringArray GuiItem::getColourNames() const
 juce::StringArray GuiItem::getColourDisplayNames() const
 {
     juce::StringArray names;
-    for (auto colour : colourTranslation)
+    for (auto colour : colourTranslationMap)
         if (revealColourToUser (colour.identifier))
             names.add (getColourDisplayName (colour.identifier));
 
@@ -99,7 +100,7 @@ juce::StringArray GuiItem::getColourDisplayNames() const
 
 juce::String GuiItem::getColourDisplayName (const juce::String& colourId) const
 {
-    return colourTranslation[colourId].getDisplayName ();
+    return colourTranslationMap[colourId].getDisplayName ();
 }
 
 bool GuiItem::revealColourToUser (const juce::String& colourId) const
@@ -167,7 +168,7 @@ void GuiItem::updateColours()
     if (component == nullptr)
         return;
 
-    for (auto pair : colourTranslation)
+    for (auto pair : colourTranslationMap)
     {
         auto colour = magicBuilder.getStyleProperty (pair.identifier, configNode, inheritFromParents ()).toString();
         
@@ -351,6 +352,15 @@ juce::String GuiItem::getTabCaption (const juce::String& defaultName) const
 juce::Colour GuiItem::getTabColour() const
 {
     return decorator.getTabColour();
+}
+
+juce::Array<GuiItem::ColourTranslation> GuiItem::getColourTranslation()
+{
+    juce::Array<ColourTranslation> translations;
+    for (auto name : colourNames)
+        translations.add (colourTranslationMap[name]);
+
+    return translations;
 }
 
 void GuiItem::valueChanged (juce::Value& source)

@@ -297,7 +297,7 @@ public:
         }
     };
 
-    juce::HashMap<juce::String, ColourTranslation> & getColourTranslation () { return colourTranslation; }
+    juce::Array<ColourTranslation> getColourTranslation ();
 
     virtual juce::Rectangle<int> getDefaultSize () const { return { 100, 100 }; }
 
@@ -310,8 +310,9 @@ protected:
     juce::FlexItem  flexItem { juce::FlexItem (*this).withFlex (1.0f) };
 
 
-    juce::HashMap<juce::String, ColourTranslation> colourTranslation;
-
+    juce::HashMap<juce::String, ColourTranslation> colourTranslationMap;
+    juce::StringArray colourNames;
+    
     void valueChanged (juce::Value& source) override;
 
     void valueTreePropertyChanged (juce::ValueTree&, const juce::Identifier&) override;

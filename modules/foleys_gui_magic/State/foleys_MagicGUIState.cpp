@@ -256,6 +256,8 @@ void MagicGUIState::addPropertiesToMenu (const juce::ValueTree& tree, juce::Comb
 
 void MagicGUIState::prepareToPlay (double sampleRate, int samplesPerBlockExpected)
 {
+    juce::ScopedLock sl{ advertisedObjectsLock };
+    
     for (auto& plot : advertisedObjects)
         if (auto* source = dynamic_cast<MagicPlotSource*>(plot.second.get()))
             source->prepareToPlay (sampleRate, samplesPerBlockExpected);

@@ -176,6 +176,8 @@ public:
     template <typename T, typename... Ts>
     T* createAndAddObject (const juce::Identifier& objectID, Ts &&... t)
     {
+        juce::ScopedLock sl{ advertisedObjectsLock };
+        
         const auto& present = advertisedObjects.find (objectID);
         if (present != advertisedObjects.cend())
         {
@@ -202,6 +204,8 @@ public:
 
     void removeObject (const juce::Identifier& objectID)
     {
+        juce::ScopedLock sl{ advertisedObjectsLock };
+        
         if (auto * plot = dynamic_cast<MagicPlotSource*> (advertisedObjects[objectID].get()))
             visualiserThread.removeTimeSliceClient (plot->getBackgroundJob());
 
@@ -211,6 +215,8 @@ public:
     template <typename ObjectType>
     ObjectType* getObject (ObjectBase * object) const
     {
+        juce::ScopedLock sl{ advertisedObjectsLock };
+        
         if (auto o = dynamic_cast<ObjectType*>(object))
             return o;
 
@@ -226,6 +232,8 @@ public:
     template <typename ObjectType>
     juce::StringArray getObjectIDsByType() const
     {
+        juce::ScopedLock sl{ advertisedObjectsLock };
+        
         juce::StringArray identifiers;
         for (const auto& object : advertisedObjects)
             if (getObject<ObjectType> (object.second.get()))
@@ -238,6 +246,8 @@ public:
     template <typename ObjectType>
     juce::Array<std::pair<juce::String, ObjectType*>> getObjectsByType() const
     {
+        juce::ScopedLock sl{ advertisedObjectsLock };
+
         juce::Array<std::pair<juce::String, ObjectType*>> objects;
         for (const auto& object : advertisedObjects)
         {
@@ -256,6 +266,8 @@ public:
     template <typename ObjectType>
     juce::Array<std::pair<juce::String,juce::String>> getObjectIDsAndNamesByType () const
     {
+        juce::ScopedLock sl{ advertisedObjectsLock };
+        
         juce::Array<std::pair<juce::String,juce::String>> identifiers;
         for (const auto& object : advertisedObjects)
         {
@@ -280,6 +292,8 @@ public:
     template <typename ObjectType>
     ObjectType* getObjectWithType (juce::Identifier objectID)
     {
+        juce::ScopedLock sl{ advertisedObjectsLock };
+        
         const auto& object = advertisedObjects.find (objectID);
         if (object != advertisedObjects.cend())
             return getObject<ObjectType>(object->second.get ());
@@ -293,6 +307,8 @@ public:
      */
     void clearAllObjects()
     {
+        juce::ScopedLock sl{ advertisedObjectsLock };
+        
         visualiserThread.removeAllClients();
         advertisedObjects.clear();
     }
@@ -341,6 +357,7 @@ private:
 
     std::map<juce::Identifier, std::function<void()>>       triggers;
 
+    juce::CriticalSection advertisedObjectsLock;
     std::map<juce::Identifier, std::unique_ptr<ObjectBase>> advertisedObjects;
 
     juce::TimeSliceThread visualiserThread { "Visualiser Thread" };

@@ -70,6 +70,7 @@ public:
         ExpertView = 1 << 1,
         AllViews = NormalView | ExpertView,
         InheritFromParents = 1 << 2,
+        RefreshInspectorOnChange = 1 << 3,
         AllFlags = ~NoFlags
     };
 

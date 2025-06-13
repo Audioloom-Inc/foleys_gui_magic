@@ -645,6 +645,13 @@ void MagicGUIBuilder::updateSelectedNode(bool async)
         func ();
 }
 
+void MagicGUIBuilder::updateInspector (bool async) 
+{
+#if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
+    updateSelectedNode (async);
+#endif    
+}
+
 void MagicGUIBuilder::draggedItemOnto (juce::ValueTree dragged, juce::ValueTree target, juce::Point<int> targetPos, int index, bool startUndoTransaction)
 {
     if (dragged == target)

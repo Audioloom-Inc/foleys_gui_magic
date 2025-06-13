@@ -81,6 +81,8 @@ StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
     
     hint = propertyToUse.hint;
 
+    flags = propertyToUse.flags;
+    
     if (hint.isNotEmpty ())
         infoLabel.setTooltip (hint);
     
@@ -108,6 +110,9 @@ StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, j
         refresh ();
 
         removeClicked();
+
+        if ((flags & SettableProperty::Flags::RefreshInspectorOnChange) != 0)
+            builder.updateInspector (true);
     };
 
     node.addListener (this);

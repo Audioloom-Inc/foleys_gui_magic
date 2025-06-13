@@ -261,9 +261,9 @@ public:
      *  @see MagicGUIState::createAndAddObject ()
      **/
     template<typename ObjectType>
-    std::function<void (juce::ComboBox&)> createObjectsMenuWithNamesLambda () const
+    std::function<void (juce::ComboBox&)> createObjectsMenuWithNamesLambda (juce::StringArray excludedIds = {}) const
     {
-        return [this] (juce::ComboBox& combo)
+        return [this, excludedIds] (juce::ComboBox& combo)
         {
             int index = 0;
 
@@ -273,6 +273,9 @@ public:
                 auto name = pair.second;
                 auto identifier = pair.first;
 
+                if (excludedIds.contains (identifier))
+                    continue;
+                    
                 combo.getProperties ().set (juce::String ("ID_" + juce::String (itemId)), identifier);
                 combo.addItem (name, itemId);
             }
@@ -338,6 +341,8 @@ public:
     
     /** */
     void updateSelectedNode (bool async = false);
+    void updateInspector (bool async = false);
+    
     virtual void draggedItemOnto (juce::ValueTree dropped, juce::ValueTree target, juce::Point<int> targetPos = {}, int index = -1, bool startUndoTransaction = true);
     virtual bool canNodeBeDeleted (juce::ValueTree node);
     virtual bool isCopyingEnabled () { return true; }

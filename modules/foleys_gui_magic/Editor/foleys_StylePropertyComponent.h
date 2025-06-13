@@ -65,7 +65,8 @@ protected:
     juce::ValueTree     inheritedFrom;
     juce::String        hint;
     bool                inheritFromParents;
-    
+    int                 flags{ 0 }; // SettableProperty::Flags
+
     CustomValueFunction customValueFunction;
 
     std::unique_ptr<juce::Component> editor;

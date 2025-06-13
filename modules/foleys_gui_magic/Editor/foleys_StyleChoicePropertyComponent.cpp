@@ -160,7 +160,12 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
         }
 
         if (safeThis)
+        {
             refresh();
+
+            if ((flags & SettableProperty::Flags::RefreshInspectorOnChange) != 0)
+                builder.updateInspector (true);
+        }
     };
 
     setEditor (std::move (combo));
@@ -213,9 +218,9 @@ void StyleChoicePropertyComponent::valueChanged (juce::Value&)
     if (auto* combo = dynamic_cast<juce::ComboBox*>(editor.get()))
     {    
         if (auto selectedId = getIdToSelect (*combo, v); selectedId.first == true)
-            combo->setSelectedId (selectedId.second, juce::sendNotificationSync);
+            combo->setSelectedId (selectedId.second, juce::dontSendNotification);
         else if (combo->getText () != v)
-            combo->setText (v, juce::sendNotificationSync);
+            combo->setText (v, juce::dontSendNotification);
     }
 
     if (property == IDs::lookAndFeel)

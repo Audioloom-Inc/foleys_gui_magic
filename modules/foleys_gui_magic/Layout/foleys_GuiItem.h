@@ -398,29 +398,8 @@ private:
      */
     void configureComponent();
 
-    class ValueListener : public juce::Value::Listener
-    {
-    public:
-        ValueListener (juce::Value& v) : value (v)
-        {
-            value.addListener (this);
-        }
-
-        ~ValueListener() override
-        {
-            value.removeListener (this);
-        }
-
-        std::function<void(juce::Value&)> onValueChanged;
-
-        void valueChanged (juce::Value& value) override { if (onValueChanged) onValueChanged (value); }
-    
-    private:
-        juce::Value& value;
-    };
-
     juce::Value     visibility { true };
-    ValueListener   visibilityListener{ visibility };
+    ValueLambda     visibilityListener{ visibility };
 
     bool            visibleInFinalProduct{ true };
     bool            hidden{ false };

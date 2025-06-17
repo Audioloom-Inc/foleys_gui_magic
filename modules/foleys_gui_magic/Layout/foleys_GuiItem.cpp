@@ -43,7 +43,6 @@ GuiItem::GuiItem (MagicGUIBuilder& builder, juce::ValueTree node)
     setOpaque (false);
     setInterceptsMouseClicks (false, true);
 
-    visibility.addListener (this);
     configNode.addListener (this);
     magicBuilder.getStylesheet().addListener (this);
 
@@ -201,6 +200,10 @@ void GuiItem::configureComponent()
     component->setDescription (magicBuilder.getStyleProperty (IDs::accessibilityDescription, configNode).toString());
     component->setHelpText (magicBuilder.getStyleProperty (IDs::accessibilityHelpText, configNode).toString());
     component->setExplicitFocusOrder (magicBuilder.getStyleProperty (IDs::accessibilityFocusOrder, configNode));
+
+    visibilityListener.onValueChanged = [&](juce::Value&){
+        updateVisibility ();
+    };
 
     auto  visibilityNode = magicBuilder.getStyleProperty (IDs::visibility, configNode, true);
     if (! visibilityNode.isVoid() && visibilityNode.isString () && visibilityNode.toString ().isNotEmpty())
@@ -361,12 +364,6 @@ juce::Array<GuiItem::ColourTranslation> GuiItem::getColourTranslation()
         translations.add (colourTranslationMap[name]);
 
     return translations;
-}
-
-void GuiItem::valueChanged (juce::Value& source)
-{
-    if (source == visibility)
-        updateVisibility ();
 }
 
 void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const juce::Identifier& property)

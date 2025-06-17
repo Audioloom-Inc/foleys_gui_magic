@@ -67,6 +67,7 @@ enum class ScrollMode
  the layout strategy can be chosen.
  */
 class Container   : public GuiItem,
+                    private juce::Value::Listener,
                     private juce::ChangeListener,
                     private juce::Timer
 {

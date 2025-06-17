@@ -52,7 +52,6 @@ enum class LayoutType;
  to an AudioProcessorValueTreeState.
  */
 class GuiItem   : public juce::Component,
-                  public juce::Value::Listener,
                   public juce::ValueTree::Listener,
                   public juce::DragAndDropTarget,
                   public juce::AsyncUpdater
@@ -313,8 +312,6 @@ protected:
     juce::HashMap<juce::String, ColourTranslation> colourTranslationMap;
     juce::StringArray colourNames;
     
-    void valueChanged (juce::Value& source) override;
-
     void valueTreePropertyChanged (juce::ValueTree&, const juce::Identifier&) override;
 
     void valueTreeChildAdded (juce::ValueTree&, juce::ValueTree&) override;
@@ -401,7 +398,30 @@ private:
      */
     void configureComponent();
 
+    class ValueListener : public juce::Value::Listener
+    {
+    public:
+        ValueListener (juce::Value& v) : value (v)
+        {
+            value.addListener (this);
+        }
+
+        ~ValueListener() override
+        {
+            value.removeListener (this);
+        }
+
+        std::function<void(juce::Value&)> onValueChanged;
+
+        void valueChanged (juce::Value& value) override { if (onValueChanged) onValueChanged (value); }
+    
+    private:
+        juce::Value& value;
+    };
+
     juce::Value     visibility { true };
+    ValueListener   visibilityListener{ visibility };
+
     bool            visibleInFinalProduct{ true };
     bool            hidden{ false };
     bool            initializing{ false };

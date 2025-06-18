@@ -106,7 +106,10 @@ StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, j
     remove.setConnectedEdges (juce::TextButton::ConnectedOnLeft | juce::TextButton::ConnectedOnRight);
     remove.onClick = [&]
     {
-        node.removeProperty (property, &builder.getUndoManager());
+        customValueFunction.process (juce::var (), [&](){
+            node.removeProperty (property, &builder.getUndoManager());
+        });
+
         refresh ();
 
         removeClicked();
@@ -199,6 +202,17 @@ void StylePropertyComponent::addExtraEditor (std::unique_ptr<juce::Component> ne
 void StylePropertyComponent::lookAndFeelChanged()
 {
     remove.setColour (juce::TextButton::buttonColourId, findColour (ToolBox::removeButtonColourId, true));
+}
+
+void StylePropertyComponent::updateInspectorIfNeeded (bool async) 
+{
+    if (flags & SettableProperty::RefreshInspectorOnChange)
+    {
+        if (async)
+            builder.updateInspector (true);
+        else
+            builder.updateInspector (false);
+    }
 }
 
 void StylePropertyComponent::valueTreePropertyChanged (juce::ValueTree& tree, const juce::Identifier& changedProperty)

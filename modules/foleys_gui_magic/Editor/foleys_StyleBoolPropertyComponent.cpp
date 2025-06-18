@@ -62,6 +62,8 @@ StyleBoolPropertyComponent::StyleBoolPropertyComponent (MagicGUIBuilder& builder
                     node.setProperty (property, state, &builder.getUndoManager());
                 });
             }
+
+            updateInspectorIfNeeded ();
     
             refresh();
         };

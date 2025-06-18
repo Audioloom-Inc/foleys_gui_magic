@@ -86,6 +86,8 @@ protected:
     void lookAndFeelChanged () override;
     bool isRefreshing () { return refreshing; }
     
+    void updateInspectorIfNeeded (bool async = true);
+
 private:
     juce::Label infoLabel;
     bool showPropertyTooltips{ false };

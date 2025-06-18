@@ -121,6 +121,7 @@ public:
     SettableProperty withAdditionalFlags (int additionalFlags);
     SettableProperty withCommand (juce::var newCommand);
     SettableProperty withCustomValueFunction (std::function<void(const juce::var& newValue)> newFunction, bool setValueBeforeCallingFunction = true, bool setValueAfterCallingFunction = false);
+    SettableProperty withCustomValueFunction (CustomValueFunction newFunction);
     SettableProperty hidden () const;
     
     juce::StringArray getChoicesFromLambda () const;

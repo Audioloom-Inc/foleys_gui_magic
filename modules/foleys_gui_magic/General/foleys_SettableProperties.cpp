@@ -93,6 +93,11 @@ SettableProperty SettableProperty::withCustomValueFunction (std::function<void (
     return with (*this, &SettableProperty::customValueFunction, CustomValueFunction { newFunction, setValueBeforeCallingFunction, setValueAfterCallingFunction });
 }
 
+SettableProperty SettableProperty::withCustomValueFunction (CustomValueFunction newFunction)
+{
+    return with (*this, &SettableProperty::customValueFunction, newFunction);
+}
+
 SettableProperty SettableProperty::hidden () const
 {
     return with (*this, &SettableProperty::flags, flags & ~SettableProperty::AllViews);

@@ -191,7 +191,10 @@ public:
         advertisedObjects [objectID] = std::move (o);
 
         if (auto* plot = dynamic_cast<MagicPlotSource*>(pointerToReturn))
+        {
             addBackgroundProcessing (plot);
+            plot->prepareToPlay (getSampleRate(), getBlockSize());
+        }
 
         return pointerToReturn;
     }
@@ -331,6 +334,9 @@ public:
      */
     virtual juce::AudioProcessor* getProcessor() { return nullptr; }
 
+    double getSampleRate() const noexcept { return sampleRate.get(); }
+    int getBlockSize() const noexcept { return blockSize.get(); }
+
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     void setResourcesFolder (const juce::String& name);
     juce::File getResourcesFolder() const;
@@ -339,6 +345,7 @@ private:
     juce::File resourcesFolder;
 #endif
 
+    
 private:
 
     void addParametersToMenu (const juce::AudioProcessorParameterGroup& group, juce::PopupMenu& menu, int& index) const;
@@ -361,6 +368,9 @@ private:
     std::map<juce::Identifier, std::unique_ptr<ObjectBase>> advertisedObjects;
 
     juce::TimeSliceThread visualiserThread { "Visualiser Thread" };
+
+    juce::Atomic<double> sampleRate{ 0.0 };
+    juce::Atomic<int> blockSize{ 0 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MagicGUIState)
 };

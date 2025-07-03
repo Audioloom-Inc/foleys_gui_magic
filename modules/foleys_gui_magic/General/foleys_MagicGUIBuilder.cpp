@@ -351,7 +351,7 @@ void MagicGUIBuilder::registerFactory (juce::Identifier type, std::unique_ptr<Gu
     
     description.defaultProperties = temp->getSettablePropertiesInit();
     
-    if (auto tempNode = temp->getTemplateNode (); tempNode.isValid ())
+    if (auto tempNode = temp->getTemplateNode (type.toString()); tempNode.isValid ())
         description.templateXml = tempNode.toXmlString ();
 
     factoryDescriptions[type] = description;

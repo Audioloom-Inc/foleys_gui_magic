@@ -668,8 +668,6 @@ void GuiItem::updateVisibility()
     
     animationHelper.setEnabled (! isEditModeOn ());
 
-    setVisible (visible);
-
     if (isEditModeOn ())
     {
         setAlpha (visibleInFinalProduct && isEnabled () ? 1.f : 0.4f);
@@ -678,6 +676,8 @@ void GuiItem::updateVisibility()
     {
         setAlpha (! visibleInFinalProduct ? 0.f : isEnabled () ? 1.f : disappearingSet ? 0.f : (float)magicBuilder.getStyleProperty (IDs::alphaWhenDisabled, configNode, true));
     }
+
+    setVisible (visible && getAlpha () > 0.f);
 
     animationHelper.setDisappearingEnabled (disappearingEnabled);
 }

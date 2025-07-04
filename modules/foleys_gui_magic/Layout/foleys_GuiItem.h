@@ -92,7 +92,7 @@ public:
     std::vector<SettableProperty> getSettablePropertiesInit ();
 
     /** */
-    virtual juce::ValueTree getTemplateNode (const String& type) const { return {}; }
+    virtual juce::ValueTree getTemplateNode (const juce::String& type) const { return {}; }
 
     /**
      For each factory you can register a translation table, which will forward the colours from the
@@ -432,6 +432,11 @@ private:
     /** in non edit mode this only returns true for the client bounds */
     virtual bool hitTest (int x, int y) override;
     
+    /** this will be called when the mouse hovers another GuiItem. By default this returns true if the items node
+     *  has the same value for IDs::parameter as this item.
+    */
+    virtual bool fadeInForItem (GuiItem& other);
+
     friend class AnimationHelper;
     class AnimationHelper : public juce::MouseListener, public juce::Timer
     {

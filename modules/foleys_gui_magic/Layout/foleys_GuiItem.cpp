@@ -897,6 +897,14 @@ bool GuiItem::hitTest (int x, int y)
     return getClientBounds ().contains (x, y);
 }
 
+bool GuiItem::fadeInForItem (GuiItem& other)
+{
+    if (auto param = other.getNode ()[IDs::parameter].toString (); param.isNotEmpty ())
+        return param == getNode ()[IDs::parameter].toString ();
+
+    return false;
+}
+
 void GuiItem::AnimationHelper::attachOrDetachGlobalMouseListener() 
 {
     juce::Desktop::getInstance ().removeGlobalMouseListener (this);
@@ -957,8 +965,7 @@ bool GuiItem::AnimationHelper::checkComponent(Component *c, bool returnTrueForTh
     if (c != nullptr)
         if (auto parentItem = c->findParentComponentOfClass<GuiItem> ())
             if (returnTrueForThis || ! (c == &item || item.isParentOf (c)))
-                if (auto param = parentItem->getNode ()[IDs::parameter].toString (); param.isNotEmpty ())
-                    return param == item.getNode ()[IDs::parameter].toString ();
+                return item.fadeInForItem (*parentItem);
 
     return false;
 }

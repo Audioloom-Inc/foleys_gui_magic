@@ -92,7 +92,7 @@ public:
     std::vector<SettableProperty> getSettablePropertiesInit ();
 
     /** */
-    virtual juce::ValueTree getTemplateNode (const juce::String& type) const { return {}; }
+    virtual std::function<juce::ValueTree()> createTemplateNodeLambda (const juce::String& type) const { return {}; }
 
     /**
      For each factory you can register a translation table, which will forward the colours from the

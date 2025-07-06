@@ -349,8 +349,8 @@ public:
     GuiItem * getRootItem () const { return root.get(); }
     
     /** if registered and available this will return a new template ValueTree for the given type */
-    juce::ValueTree getTemplateNode (const juce::Identifier& type) const;
-    juce::String getTemplateNodeAsXmlString (const juce::Identifier& type) const;
+    juce::ValueTree createTemplateNode (const juce::Identifier& type) const;
+    juce::String createTemplateNodeXmlString (const juce::Identifier& type) const;
 
 protected:
     MagicGUIState& magicState;
@@ -383,7 +383,7 @@ protected:
         FactoryFunction factory{ nullptr };
         
         std::vector<SettableProperty> defaultProperties;
-        juce::String templateXml{ };
+        std::function<juce::ValueTree()> templateNodeLambda;
 
         juce::String getName () const { if (displayName.isNotEmpty()) return displayName; return identifier; }
     };

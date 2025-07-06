@@ -350,9 +350,7 @@ void MagicGUIBuilder::registerFactory (juce::Identifier type, std::unique_ptr<Gu
     jassert (temp);
     
     description.defaultProperties = temp->getSettablePropertiesInit();
-    
-    if (auto tempNode = temp->getTemplateNode (type.toString()); tempNode.isValid ())
-        description.templateXml = tempNode.toXmlString ();
+    description.templateNodeLambda = temp->createTemplateNodeLambda (type.toString());
 
     factoryDescriptions[type] = description;
 }
@@ -713,19 +711,19 @@ void MagicGUIBuilder::endSavePosition (juce::Component * saver)
     }
 }
 
-juce::ValueTree MagicGUIBuilder::getTemplateNode (const juce::Identifier& type) const
+juce::ValueTree MagicGUIBuilder::createTemplateNode (const juce::Identifier& type) const
 {
-    if (auto xml = getTemplateNodeAsXmlString (type); ! xml.isEmpty ())
-        return juce::ValueTree::fromXml (xml);
-
+    if (auto description = factoryDescriptions.find (type); description != factoryDescriptions.end ())
+        if (auto& templateNodeLambda = description->second.templateNodeLambda; templateNodeLambda)
+            return templateNodeLambda ();
+            
     return {};
 }
 
-juce::String MagicGUIBuilder::getTemplateNodeAsXmlString (const juce::Identifier& type) const
+juce::String MagicGUIBuilder::createTemplateNodeXmlString (const juce::Identifier& type) const
 {
-    if (auto description = factoryDescriptions.find (type); description != factoryDescriptions.end ())
-        if (auto xml = description->second.templateXml; ! xml.isEmpty ())
-            return xml;
+    if (auto node = createTemplateNode (type); node.isValid ())
+        return node.toXmlString();
             
     return {};
 }

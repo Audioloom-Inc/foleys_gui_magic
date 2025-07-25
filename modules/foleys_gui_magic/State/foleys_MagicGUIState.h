@@ -38,6 +38,8 @@
 #include "../Visualisers/foleys_MagicPlotSource.h"
 #include "../General/foleys_StringDefinitions.h"
 
+#include "foleys_MagicObjectBase.h"
+
 namespace foleys
 {
 
@@ -49,10 +51,11 @@ namespace foleys
  */
 class MagicGUIState
 {
-    struct ObjectBase {
-        virtual ~ObjectBase() noexcept = default;
-    };
 
+// public so you can derive from it and add objects that are not live time managed by the MagicGUIState
+public:
+
+private:
     template <typename ToErase> class ErasedObject : public ObjectBase, public ToErase {
     public:
         template <typename... Ts>
@@ -186,9 +189,9 @@ public:
             return nullptr;
         }
 
-        auto o = std::make_unique<ErasedObject<T>>(std::forward<Ts>(t)...);
-        auto* pointerToReturn = o.get();
-        advertisedObjects [objectID] = std::move (o);
+        auto o = new ErasedObject<T>(std::forward<Ts>(t)...);
+        auto* pointerToReturn = o;
+        advertisedObjects [objectID] = std::make_pair (o, true);
 
         if (auto* plot = dynamic_cast<MagicPlotSource*>(pointerToReturn))
         {
@@ -200,17 +203,43 @@ public:
     }
 
     template <typename T>
-    void addObject (const juce::Identifier& objectID, T* object)
+    bool addObject (const juce::Identifier& objectID, T* object)
     {
-        createAndAddObject<ReferencedObject<T>> (objectID, *object);
+        if (object == nullptr) 
+            return false;
+
+        const auto& present = advertisedObjects.find (objectID);
+        if (present != advertisedObjects.cend())
+        {
+            // You tried to add two objects with the same objectID
+            jassertfalse;
+            return false;
+        }
+        
+        if (dynamic_cast<ObjectBase*>(object) == nullptr)
+        {
+            // you cant add an object that is not derived from object base. you can 
+            // create a new instance of one one using createAndAddObject though
+            jassertfalse;
+            return false;
+        }
+        
+        advertisedObjects [objectID] = std::make_pair (object, false);
+        return true;
     }
 
     void removeObject (const juce::Identifier& objectID)
     {
         juce::ScopedLock sl{ advertisedObjectsLock };
         
-        if (auto * plot = dynamic_cast<MagicPlotSource*> (advertisedObjects[objectID].get()))
+        auto object = advertisedObjects[objectID].first;
+        auto owned = advertisedObjects[objectID].second;
+
+        if (auto * plot = dynamic_cast<MagicPlotSource*> (object))
             visualiserThread.removeTimeSliceClient (plot->getBackgroundJob());
+
+        if (owned && object)
+            delete object;
 
         advertisedObjects.erase (objectID);
     }
@@ -239,7 +268,7 @@ public:
         
         juce::StringArray identifiers;
         for (const auto& object : advertisedObjects)
-            if (getObject<ObjectType> (object.second.get()))
+            if (getObject<ObjectType> (object.second.first))
                 identifiers.add (object.first.toString());
 
         return identifiers;
@@ -254,7 +283,7 @@ public:
         juce::Array<std::pair<juce::String, ObjectType*>> objects;
         for (const auto& object : advertisedObjects)
         {
-            if (auto type = getObject<ObjectType>(object.second.get()))
+            if (auto type = getObject<ObjectType>(object.second.first))
                 objects.add ({object.first.toString (), type});
         }
 
@@ -274,7 +303,7 @@ public:
         juce::Array<std::pair<juce::String,juce::String>> identifiers;
         for (const auto& object : advertisedObjects)
         {
-            if (auto type = getObject<ObjectType>(object.second.get()))
+            if (auto type = getObject<ObjectType>(object.second.first))
             {
                 auto identifier = object.first.toString ();
                 auto name = type->getName ();
@@ -299,7 +328,7 @@ public:
         
         const auto& object = advertisedObjects.find (objectID);
         if (object != advertisedObjects.cend())
-            return getObject<ObjectType>(object->second.get ());
+            return getObject<ObjectType>(object->second.first);
 
         return nullptr;
     }
@@ -313,6 +342,15 @@ public:
         juce::ScopedLock sl{ advertisedObjectsLock };
         
         visualiserThread.removeAllClients();
+        
+        for (auto& entry : advertisedObjects)
+        {
+            auto owned = entry.second.second;
+            auto object = entry.second.first;
+            if (owned && object) 
+                delete object;
+        }
+
         advertisedObjects.clear();
     }
 
@@ -365,7 +403,7 @@ private:
     std::map<juce::Identifier, std::function<void()>>       triggers;
 
     juce::CriticalSection advertisedObjectsLock;
-    std::map<juce::Identifier, std::unique_ptr<ObjectBase>> advertisedObjects;
+    std::map<juce::Identifier, std::pair<ObjectBase*, bool>> advertisedObjects;
 
     juce::TimeSliceThread visualiserThread { "Visualiser Thread" };
 

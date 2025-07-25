@@ -43,6 +43,7 @@ MagicGUIState::MagicGUIState()
 MagicGUIState::~MagicGUIState()
 {
     visualiserThread.stopThread (1000);
+    clearAllObjects();
 }
 
 void MagicGUIState::addBackgroundProcessing (MagicPlotSource* source)
@@ -262,7 +263,7 @@ void MagicGUIState::prepareToPlay (double sampleRate, int samplesPerBlockExpecte
     juce::ScopedLock sl{ advertisedObjectsLock };
     
     for (auto& plot : advertisedObjects)
-        if (auto* source = dynamic_cast<MagicPlotSource*>(plot.second.get()))
+        if (auto* source = dynamic_cast<MagicPlotSource*>(plot.second.first))
             source->prepareToPlay (sampleRate, samplesPerBlockExpected);
 }
 

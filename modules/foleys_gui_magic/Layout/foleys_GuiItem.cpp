@@ -38,7 +38,8 @@ namespace foleys
 
 GuiItem::GuiItem (MagicGUIBuilder& builder, juce::ValueTree node)
   : magicBuilder (builder),
-    configNode (node)
+    configNode (node),
+    versionAdded ((int)node.getProperty (IDs::versionAdded, 0))
 {
     setOpaque (false);
     setInterceptsMouseClicks (false, true);

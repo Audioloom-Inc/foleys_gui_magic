@@ -240,6 +240,10 @@ public:
      */
     virtual void updateParameterConnection (const juce::String& paramID) {}
 
+    /** @returns the version number when the node of this item has been added to the state
+     */
+    int getVersionAdded () const { return versionAdded; }
+
     void setDraggable (bool selected);
 
     void mouseDown (const juce::MouseEvent& event) override;
@@ -397,6 +401,9 @@ private:
      of nodes if needed, to set specific properties for the wrapped component.
      */
     void configureComponent();
+
+    /** the version number when the node of this item has been added to the state, can be zero if you have older states loaded */
+    const int       versionAdded;
 
     juce::Value     visibility { true };
     ValueLambda     visibilityListener{ visibility };

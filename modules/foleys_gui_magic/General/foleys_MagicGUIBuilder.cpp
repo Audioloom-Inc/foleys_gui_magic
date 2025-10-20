@@ -718,18 +718,25 @@ void MagicGUIBuilder::endSavePosition (juce::Component * saver)
     }
 }
 
-juce::ValueTree MagicGUIBuilder::createTemplateNode (const juce::Identifier& type) const
+juce::ValueTree MagicGUIBuilder::createTemplateNode (const juce::Identifier& type, const int versionAdded) const
 {
-    if (auto description = factoryDescriptions.find (type); description != factoryDescriptions.end ())
-        if (auto& templateNodeLambda = description->second.templateNodeLambda; templateNodeLambda)
-            return templateNodeLambda ();
-            
-    return {};
+    auto valueTree = [&]() 
+    {
+        if (auto description = factoryDescriptions.find (type); description != factoryDescriptions.end ())
+            if (auto& templateNodeLambda = description->second.templateNodeLambda; templateNodeLambda)
+                return templateNodeLambda ();
+                
+        return juce::ValueTree (type);
+    }();
+
+    valueTree.setProperty (IDs::versionAdded, versionAdded, nullptr);
+    
+    return valueTree;
 }
 
-juce::String MagicGUIBuilder::createTemplateNodeXmlString (const juce::Identifier& type) const
+juce::String MagicGUIBuilder::createTemplateNodeXmlString (const juce::Identifier& type, const int versionAdded) const
 {
-    if (auto node = createTemplateNode (type); node.isValid ())
+    if (auto node = createTemplateNode (type, versionAdded); node.isValid ())
         return node.toXmlString();
             
     return {};

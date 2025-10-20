@@ -353,9 +353,16 @@ public:
     
     GuiItem * getRootItem () const { return root.get(); }
     
-    /** if registered and available this will return a new template ValueTree for the given type */
-    juce::ValueTree createTemplateNode (const juce::Identifier& type) const;
-    juce::String createTemplateNodeXmlString (const juce::Identifier& type) const;
+    /** 
+     * This will return a template node for the given type. if registered, this will call the corresponding
+     * templateNodeLambda from the factory description.
+     * 
+     * @param type the type of the node to create
+     * @param versionAdded the version when this node was added. Optional, default is 0.
+     * This value can be retrieved via GuiItem::getVersionAdded() or node[IDs::versionAdded]
+     * */
+    juce::ValueTree createTemplateNode (const juce::Identifier& type, const int versionAdded = 0) const;
+    juce::String createTemplateNodeXmlString (const juce::Identifier& type, const int versionAdded = 0) const;
 
 protected:
     MagicGUIState& magicState;

@@ -206,6 +206,9 @@ namespace IDs
     static juce::Identifier editModeEnabled { "edit-mode-enabled" };
 
     static juce::Identifier useSelectedItemIdInComboBoxLambda { "use-selected-item-id-in-combobox-lambda" };
+
+    // the version a valuetree has been added to the state
+    static juce::Identifier versionAdded { "version-added" };
 }
 
 } // namespace foleys

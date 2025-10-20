@@ -76,7 +76,7 @@ public:
 
     void paint (juce::Graphics& g) override
     {
-        if (filmStrip.isNull() || numImages == 0)
+        if (! hasFilmstrip())
         {
             juce::Slider::paint (g);
         }
@@ -189,6 +189,11 @@ public:
     bool isRotary () const
     {
         return ! isHorizontal() && ! isVertical();
+    }
+
+    bool hasFilmstrip() const
+    {
+        return ! filmStrip.isNull() && numImages > 0;
     }
 
 private:

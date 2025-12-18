@@ -729,8 +729,15 @@ juce::ValueTree MagicGUIBuilder::createTemplateNode (const juce::Identifier& typ
         return juce::ValueTree (type);
     }();
 
-    valueTree.setProperty (IDs::versionAdded, versionAdded, nullptr);
-    
+    std::function<void (juce::ValueTree, int)> updateVersionAdded = [&](juce::ValueTree parent, int version) mutable {
+        parent.setProperty (IDs::versionAdded, version, nullptr);
+        
+        for (auto child : parent)
+            updateVersionAdded (child, version);
+    };
+
+    updateVersionAdded (valueTree, versionAdded);
+
     return valueTree;
 }
 

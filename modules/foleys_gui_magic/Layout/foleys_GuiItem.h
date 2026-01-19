@@ -163,6 +163,9 @@ public:
      */
     virtual void updateLayout();
 
+    /** */
+    bool isVisibleInFinalProduct() const;
+
     /**
      Returns true when the component is visible and not hidden
     */

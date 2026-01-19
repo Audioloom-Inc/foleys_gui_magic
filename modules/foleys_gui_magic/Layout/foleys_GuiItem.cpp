@@ -334,6 +334,11 @@ void GuiItem::updateLayout()
     resized();
 }
 
+bool GuiItem::isVisibleInFinalProduct() const
+{
+    return visibleInFinalProduct;
+}
+
 bool GuiItem::shouldBeVisible()
 {
     return visibility.getValue() && (visibleInFinalProduct || isEditModeOn ());

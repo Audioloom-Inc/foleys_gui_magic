@@ -142,6 +142,9 @@ public:
      */
     void updateInternal();
 
+    /** */
+    virtual float getDisabledAlpha () const;
+
     void paint (juce::Graphics& g) override;
     void resized() override;
 

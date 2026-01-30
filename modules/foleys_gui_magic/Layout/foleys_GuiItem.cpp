@@ -306,6 +306,11 @@ juce::Rectangle<int> GuiItem::resolvePosition (juce::Rectangle<int> parent)
     );
 }
 
+float GuiItem::getDisabledAlpha() const
+{
+    return (float)magicBuilder.getStyleProperty (IDs::alphaWhenDisabled, configNode, true);
+}
+
 void GuiItem::paint (juce::Graphics& g)
 {
     decorator.drawDecorator (g, getLocalBounds());
@@ -677,7 +682,7 @@ void GuiItem::updateVisibility()
     }
     else
     {
-        setAlpha (! visibleInFinalProduct ? 0.f : isEnabled () ? 1.f : disappearingSet ? 0.f : (float)magicBuilder.getStyleProperty (IDs::alphaWhenDisabled, configNode, true));
+        setAlpha (! visibleInFinalProduct ? 0.f : isEnabled () ? 1.f : disappearingSet ? 0.f : getDisabledAlpha ());
     }
 
     setVisible (visible && getAlpha () > 0.f);

@@ -152,7 +152,7 @@ juce::ValueTree& MagicGUIState::getSettings()
     return settings->settings;
 }
 
-juce::Value MagicGUIState::getPropertyAsValue (const juce::String& pathToProperty)
+juce::Value MagicGUIState::getPropertyAsValue (const juce::String& pathToProperty, bool updateSynchronously)
 {
     auto path = juce::StringArray::fromTokens (pathToProperty, ":", "");
     path.removeEmptyStrings();
@@ -169,7 +169,7 @@ juce::Value MagicGUIState::getPropertyAsValue (const juce::String& pathToPropert
     if (!tree.hasProperty (propName))
         tree.setProperty (propName, {}, nullptr);
 
-    return tree.getPropertyAsValue (propName, nullptr);
+    return tree.getPropertyAsValue (propName, nullptr, updateSynchronously);
 }
 
 juce::StringArray MagicGUIState::getParameterNames() const

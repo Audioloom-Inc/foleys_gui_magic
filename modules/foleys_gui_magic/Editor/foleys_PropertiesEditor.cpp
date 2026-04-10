@@ -479,6 +479,26 @@ void PropertiesEditor::addContainerProperties()
 
 void PropertiesEditor::addSection (const juce::String& name, juce::Array<juce::PropertyComponent*> propertyComponents) 
 {
+    class SectionSpacerProperty final : public juce::PropertyComponent
+    {
+    public:
+        SectionSpacerProperty () : juce::PropertyComponent ("section-spacer", 8)
+        {
+            setPreferredHeight (8);
+            setEnabled (false);
+        }
+
+        void refresh () override {}
+
+        void paint (juce::Graphics& g) override
+        {
+            g.fillAll (findColour (ToolBox::backgroundColourId, true));
+        }
+    };
+
+    if (! propertyComponents.isEmpty ())
+        propertyComponents.add (new SectionSpacerProperty ());
+
     properties.addSection (name, propertyComponents, getDefaultOpennessState ());
 }
 
@@ -563,7 +583,11 @@ void PropertiesEditor::updatePopupMenu()
 
 void PropertiesEditor::paint (juce::Graphics& g)
 {
-    g.setColour (findColour (ToolBox::outlineColourId, true));
+    auto outline = findColour (ToolBox::outlineColourId, true);
+    if (outline.isOpaque ())
+        outline = outline.withAlpha (0.22f);
+
+    g.setColour (outline);
     g.drawRect (getLocalBounds(), 1);
 }
 
@@ -655,12 +679,18 @@ void PropertiesEditor::finishPropertySetup()
     for (auto category : sorted)
     {
         const auto& items = categories.getReference (category);
+
+        if (items.empty ())
+            continue;
         
         juce::Array<juce::PropertyComponent*> array;
 
         for (auto p : items)
             if (auto comp = builder.createStylePropertyComponent (p, p.node))
                 array.add (comp);
+
+        if (array.isEmpty ())
+            continue;
 
         // use for sorting a category name like this "A0:My Category"
         

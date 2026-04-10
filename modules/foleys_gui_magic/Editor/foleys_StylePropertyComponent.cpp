@@ -164,24 +164,35 @@ void StylePropertyComponent::paint (juce::Graphics& g)
     g.setColour (findColour (ToolBox::outlineColourId, true));
     g.drawHorizontalLine (0, 0.0f, static_cast<float>(getRight()));
     g.drawHorizontalLine (getBottom() - 1, 0.0f, static_cast<float>(getRight()));
-    g.setColour (node == inheritedFrom ? findColour (ToolBox::textColourId, true) : findColour (ToolBox::disabledTextColourId, true));
+
+    auto activeLabelColour = findColour (ToolBox::textColourId, true);
+    auto inactiveLabelColour = findColour (ToolBox::disabledTextColourId, true);
+    auto labelColour = (node == inheritedFrom) ? activeLabelColour : inactiveLabelColour;
+
+    if (auto* toggle = dynamic_cast<juce::ToggleButton*> (editor.get()))
+        labelColour = toggle->getToggleState() ? activeLabelColour : inactiveLabelColour;
+
+    g.setFont (juce::FontOptions (10.0f).withStyle ("Bold"));
+    g.setColour (labelColour);
     g.drawFittedText (displayName, b, juce::Justification::left, 1);
 }
 
 void StylePropertyComponent::resized()
 {
-    auto right = getLocalBounds ().reduced (1);
+    auto right = getLocalBounds ().reduced (1, 1);
     auto left = right.removeFromLeft (getWidth() / 2);
+    const auto controlPaddingY = 1;
+    const auto iconSize = juce::jlimit (14, 18, right.getHeight() - 2);
 
-    remove.setBounds (right.removeFromRight (getHeight()).reduced (1));
+    remove.setBounds (right.removeFromRight (iconSize).reduced (1));
     
     if (editor)
-        editor->setBounds (right);
+        editor->setBounds (right.reduced (0, controlPaddingY));
 
     for (auto e : extraEditors)
-        e->setBounds (left.removeFromRight (getHeight()).reduced (1));
+        e->setBounds (left.removeFromRight (iconSize).reduced (1));
 
-    infoLabel.setBounds (left);
+    infoLabel.setBounds (left.reduced (0, controlPaddingY));
 }
 
 juce::ValueTree StylePropertyComponent::getInheritedFrom() const

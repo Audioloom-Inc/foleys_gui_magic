@@ -34,6 +34,35 @@
 namespace foleys
 {
 
+namespace
+{
+juce::String normaliseHexColourString (juce::String text)
+{
+    text = text.trim();
+
+    if (text.isEmpty() || text.startsWithChar ('$'))
+        return text;
+
+    if (text.startsWithIgnoreCase ("0x"))
+        text = text.substring (2);
+
+    if (text.startsWithChar ('#'))
+        text = text.substring (1);
+
+    text = text.removeCharacters (" \t\n\r");
+
+    if (! text.containsOnly ("0123456789abcdefABCDEF"))
+        return text;
+
+    if (text.length() == 6)
+        text = "FF" + text;
+    else if (text.length() != 8)
+        return text;
+
+    return "#" + text.toUpperCase();
+}
+}
+
 
 StyleColourPropertyComponent::StyleColourPropertyComponent (MagicGUIBuilder& builderToUse,
                                                             SettableProperty propertyToUse,
@@ -42,6 +71,7 @@ StyleColourPropertyComponent::StyleColourPropertyComponent (MagicGUIBuilder& bui
 {
     auto label = std::make_unique<juce::Label>();
     label->setEditable (true);
+    label->setRepaintsOnMouseActivity (true);
 
     addAndMakeVisible (label.get());
 
@@ -55,7 +85,13 @@ StyleColourPropertyComponent::StyleColourPropertyComponent (MagicGUIBuilder& bui
             return;
 
         if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
-            node.setProperty (property, l->getText(), &builder.getUndoManager());
+        {
+            auto normalised = normaliseHexColourString (l->getText());
+            node.setProperty (property, normalised, &builder.getUndoManager());
+
+            if (normalised != l->getText())
+                l->setText (normalised, juce::dontSendNotification);
+        }
 
         refresh();
     };
@@ -75,6 +111,18 @@ StyleColourPropertyComponent::StyleColourPropertyComponent (MagicGUIBuilder& bui
     mouseEvents.onMouseDown = [this](const juce::MouseEvent&)
     {
         showColourPicker ();
+    };
+
+    mouseEvents.onMouseEnter = [this](const juce::MouseEvent&)
+    {
+        if (editor)
+            editor->repaint();
+    };
+
+    mouseEvents.onMouseExit = [this](const juce::MouseEvent&)
+    {
+        if (editor)
+            editor->repaint();
     };
 
     label->getTextValue().addListener (this);
@@ -110,6 +158,15 @@ void StyleColourPropertyComponent::update()
             label->getTextValue().referTo ({});
             label->setText (value.toString(), juce::dontSendNotification);
         }
+
+        auto colourText = label->getText().trim();
+
+        if (colourText.isEmpty())
+            colourText = value.toString().trim();
+
+        colourText = normaliseHexColourString (colourText);
+
+        setColourDisplay (builder.getStylesheet().getColour (colourText));
     }
 
     repaint();
@@ -150,7 +207,7 @@ void StyleColourPropertyComponent::showColourPicker()
     {
         if (l->getText().isNotEmpty())
         {
-            currentColour = builder.getStylesheet().getColour (l->getText());
+            currentColour = builder.getStylesheet().getColour (normaliseHexColourString (l->getText()));
         }
         else
         {
@@ -182,7 +239,7 @@ void StyleColourPropertyComponent::mouseDown (const juce::MouseEvent&)
 
 void StyleColourPropertyComponent::valueChanged (juce::Value& value)
 {
-    auto colour = builder.getStylesheet().getColour (value.getValue().toString());
+    auto colour = builder.getStylesheet().getColour (normaliseHexColourString (value.getValue().toString()));
     setColourDisplay (colour);
 }
 
@@ -197,12 +254,14 @@ void StyleColourPropertyComponent::changeListenerCallback (juce::ChangeBroadcast
 }
 void StyleColourPropertyComponent::resized()
 {
-    auto b = getLocalBounds().reduced (1).withLeft (getWidth() / 2);
-    remove.setBounds (b.removeFromRight (getHeight()));
+    auto b = getLocalBounds().reduced (1, 1).withLeft (getWidth() / 2);
+    const auto iconSize = juce::jlimit (14, 18, b.getHeight() - 2);
+
+    remove.setBounds (b.removeFromRight (iconSize).reduced (1));
     // variables.setBounds (b.removeFromRight (getHeight()));
 
     if (editor)
-        editor->setBounds (b);
+        editor->setBounds (b.reduced (0, 1));
 }
 
 //==============================================================================

@@ -79,6 +79,7 @@ void StyleTextPropertyComponent::init()
 {
     auto label = std::make_unique<juce::Label>();
     label->setEditable (true);
+    label->setRepaintsOnMouseActivity (true);
 
     addAndMakeVisible (label.get());
 

@@ -55,7 +55,10 @@ ToolBox::ToolBox (const Properties& props, MagicGUIBuilder& builderToControl)
     setColour (textColourId, juce::Colours::white);
     setColour (disabledTextColourId, juce::Colours::grey);
     setColour (removeButtonColourId, juce::Colours::darkred);
-    setColour (selectedBackgroundColourId, juce::Colours::darkorange);    
+    setColour (selectedBackgroundColourId, juce::Colours::darkorange);
+    setColour (sectionDividerColourId, juce::Colours::silver);
+    setColour (panelEdgeDividerColourId, juce::Colours::silver);
+    setColour (sectionDividerTransparentColorId, juce::Colours::white.withAlpha (0.35f));
 
     addContentComponent (new GUITreeEditor (builder), "Tree");
     addContentComponent (new PropertiesEditor (builder), "Inspector");

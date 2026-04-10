@@ -107,6 +107,7 @@ public:
 
     /** if displayName is not empty, this will return displayName otherwise name */
     juce::String getDisplayName () const;
+    static juce::String formatDisplayText (const juce::String& rawText);
     SettableProperty withNode (juce::ValueTree newNode) const;
     SettableProperty withName (juce::Identifier newName) const;
     SettableProperty withType (PropertyType newType) const;

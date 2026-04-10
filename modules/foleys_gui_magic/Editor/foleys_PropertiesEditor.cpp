@@ -43,6 +43,20 @@
 namespace foleys
 {
 
+namespace
+{
+    juce::Colour findInheritedToolBoxColour (const juce::Component& component,
+                                             int colourId,
+                                             juce::Colour fallback)
+    {
+        for (auto* current = &component; current != nullptr; current = current->getParentComponent())
+            if (current->isColourSpecified (colourId))
+                return current->findColour (colourId, false);
+
+        return fallback;
+    }
+}
+
 PropertiesEditor::PropertiesEditor (MagicGUIBuilder& builderToEdit)
   : builder (builderToEdit),
     undo (builder.getUndoManager())
@@ -482,9 +496,9 @@ void PropertiesEditor::addSection (const juce::String& name, juce::Array<juce::P
     class SectionSpacerProperty final : public juce::PropertyComponent
     {
     public:
-        SectionSpacerProperty () : juce::PropertyComponent ("section-spacer", 8)
+        SectionSpacerProperty () : juce::PropertyComponent ("section-spacer", 13)
         {
-            setPreferredHeight (8);
+            setPreferredHeight (13);
             setEnabled (false);
         }
 
@@ -492,12 +506,62 @@ void PropertiesEditor::addSection (const juce::String& name, juce::Array<juce::P
 
         void paint (juce::Graphics& g) override
         {
-            g.fillAll (findColour (ToolBox::backgroundColourId, true));
+            g.fillAll (findInheritedToolBoxColour (*this,
+                                                   ToolBox::backgroundColourId,
+                                                   juce::Colours::transparentBlack));
+
+            auto divider = findInheritedToolBoxColour (*this,
+                                                       ToolBox::sectionDividerColourId,
+                                                       juce::Colours::transparentBlack);
+            if (divider.isTransparent ())
+                divider = findInheritedToolBoxColour (*this,
+                                                      ToolBox::sectionDividerTransparentColorId,
+                                                      juce::Colours::white.withAlpha (0.35f));
+
+            const auto y = (float) getHeight () * 0.5f;
+            g.setColour (divider);
+            g.drawLine (0.0f, y, (float) getWidth (), y, 1.0f);
         }
     };
 
+    class SectionTopDividerProperty final : public juce::PropertyComponent
+    {
+    public:
+        SectionTopDividerProperty () : juce::PropertyComponent ("section-top-divider", 1)
+        {
+            setPreferredHeight (1);
+            setEnabled (false);
+        }
+
+        void refresh () override {}
+
+        void paint (juce::Graphics& g) override
+        {
+            g.fillAll (findInheritedToolBoxColour (*this,
+                                                   ToolBox::backgroundColourId,
+                                                   juce::Colours::transparentBlack));
+
+            auto divider = findInheritedToolBoxColour (*this,
+                                                       ToolBox::sectionDividerColourId,
+                                                       juce::Colours::transparentBlack);
+            if (divider.isTransparent ())
+                divider = findInheritedToolBoxColour (*this,
+                                                      ToolBox::sectionDividerTransparentColorId,
+                                                      juce::Colours::white.withAlpha (0.35f));
+
+            g.setColour (divider);
+            g.drawLine (0.0f, 0.5f, (float) getWidth (), 0.5f, 1.0f);
+        }
+    };
+
+    const auto isFirstSection = properties.getSectionNames ().isEmpty ();
     if (! propertyComponents.isEmpty ())
+    {
+        if (isFirstSection)
+            propertyComponents.insert (0, new SectionTopDividerProperty ());
+
         propertyComponents.add (new SectionSpacerProperty ());
+    }
 
     properties.addSection (name, propertyComponents, getDefaultOpennessState ());
 }
@@ -583,7 +647,9 @@ void PropertiesEditor::updatePopupMenu()
 
 void PropertiesEditor::paint (juce::Graphics& g)
 {
-    auto outline = findColour (ToolBox::outlineColourId, true);
+    auto outline = findInheritedToolBoxColour (*this,
+                                               ToolBox::outlineColourId,
+                                               juce::Colours::transparentBlack);
     if (outline.isOpaque ())
         outline = outline.withAlpha (0.22f);
 

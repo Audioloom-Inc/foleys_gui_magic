@@ -64,7 +64,7 @@ juce::PropertyComponent* StylePropertyComponent::createComponent (MagicGUIBuilde
         return new StyleColourPropertyComponent (builder, property, node);
         
     if (property.type == SettableProperty::MultiList)
-        return new MultiListPropertyComponent (node.getPropertyAsValue (property.name, nullptr), property.name.toString(), property.getChoicesFromLambda());
+        return new MultiListPropertyComponent (node.getPropertyAsValue (property.name, nullptr), property.getDisplayName(), property.getChoicesFromLambda());
 
     jassertfalse;
     return nullptr;
@@ -87,7 +87,7 @@ StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
         infoLabel.setTooltip (hint);
     
     addChildComponent (&infoLabel);
-    infoLabel.setText ("info", juce::dontSendNotification);
+    infoLabel.setText ("Info", juce::dontSendNotification);
     infoLabel.setFont (juce::FontOptions (12.f).withStyle ("italic"));
     infoLabel.setJustificationType (juce::Justification::centred);
     inheritFromParents = (propertyToUse.flags & SettableProperty::InheritFromParents) != 0;
@@ -99,7 +99,7 @@ StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, j
     property (propertyToUse),
     node (nodeToUse)
 {
-    displayName = property.toString();
+    displayName = SettableProperty::formatDisplayText (property.toString ());
     
     addAndMakeVisible (remove);
 

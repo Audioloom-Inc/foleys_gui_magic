@@ -87,7 +87,10 @@ public:
         textColourId               = 0x90000003,
         disabledTextColourId       = 0x90000004,
         removeButtonColourId       = 0x90000005,
-        selectedBackgroundColourId = 0x90000006
+        selectedBackgroundColourId = 0x90000006,
+        sectionDividerColourId     = 0x90000007,
+        panelEdgeDividerColourId   = 0x90000008,
+        sectionDividerTransparentColorId = 0x90000009
     };
 
     virtual void loadDialog();

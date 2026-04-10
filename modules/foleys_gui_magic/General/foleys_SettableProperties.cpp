@@ -2,6 +2,95 @@
 
 namespace foleys
 {
+namespace
+{
+    juce::String splitIdentifierWords (const juce::String& text)
+    {
+        juce::String result;
+        const auto source = text.replaceCharacters ("_-:./", "     ");
+
+        for (int i = 0; i < source.length (); ++i)
+        {
+            const auto current = source[i];
+            const auto previous = (i > 0) ? source[i - 1] : juce::juce_wchar (0);
+            const auto next = (i + 1 < source.length ()) ? source[i + 1] : juce::juce_wchar (0);
+
+            const auto isCurrentUpper = juce::CharacterFunctions::isUpperCase (current);
+            const auto isPreviousLower = juce::CharacterFunctions::isLowerCase (previous);
+            const auto isPreviousDigit = juce::CharacterFunctions::isDigit (previous);
+            const auto isPreviousUpper = juce::CharacterFunctions::isUpperCase (previous);
+            const auto isNextLower = juce::CharacterFunctions::isLowerCase (next);
+
+            const auto startsNewWord = isCurrentUpper
+                                       && (isPreviousLower
+                                           || isPreviousDigit
+                                           || (isPreviousUpper && isNextLower))
+                                       && previous != ' ';
+
+            if (startsNewWord)
+                result += ' ';
+
+            result += current;
+        }
+
+        while (result.contains ("  "))
+            result = result.replace ("  ", " ");
+
+        return result.trim ();
+    }
+
+    bool isUppercaseWord (const juce::String& word)
+    {
+        bool hasLetters = false;
+
+        for (int i = 0; i < word.length (); ++i)
+        {
+            const auto c = word[i];
+
+            if (! juce::CharacterFunctions::isLetter (c))
+                continue;
+
+            hasLetters = true;
+
+            if (! juce::CharacterFunctions::isUpperCase (c))
+                return false;
+        }
+
+        return hasLetters;
+    }
+
+    juce::String toTitleCaseWord (const juce::String& word)
+    {
+        if (word.isEmpty () || isUppercaseWord (word))
+            return word;
+
+        juce::String result;
+        bool firstLetterDone = false;
+
+        for (int i = 0; i < word.length (); ++i)
+        {
+            auto c = word[i];
+
+            if (juce::CharacterFunctions::isLetter (c))
+            {
+                if (! firstLetterDone)
+                {
+                    c = juce::CharacterFunctions::toUpperCase (c);
+                    firstLetterDone = true;
+                }
+                else
+                {
+                    c = juce::CharacterFunctions::toLowerCase (c);
+                }
+            }
+
+            result += c;
+        }
+
+        return result;
+    }
+}
+
 SettableProperty::SettableProperty (juce::ValueTree nodeToUse,
                                     juce::Identifier nameToUse,
                                     PropertyType typeToUse,
@@ -20,7 +109,23 @@ juce::String SettableProperty::getDisplayName () const
     if (displayName.isNotEmpty())
         return displayName;
 
-    return name.toString();
+    return formatDisplayText (name.toString ());
+}
+
+juce::String SettableProperty::formatDisplayText (const juce::String& rawText)
+{
+    auto text = splitIdentifierWords (rawText);
+    if (text.isEmpty ())
+        return text;
+
+    juce::StringArray words;
+    words.addTokens (text, " ", "");
+    words.removeEmptyStrings (true);
+
+    for (auto& word : words)
+        word = toTitleCaseWord (word);
+
+    return words.joinIntoString (" ");
 }
 
 SettableProperty SettableProperty::withNode (juce::ValueTree newNode) const

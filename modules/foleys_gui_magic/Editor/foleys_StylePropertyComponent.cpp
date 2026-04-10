@@ -158,7 +158,8 @@ juce::var StylePropertyComponent::lookupValue()
 
 void StylePropertyComponent::paint (juce::Graphics& g)
 {
-    auto b = getLocalBounds().reduced (1).withWidth (getWidth() / 2);
+    constexpr float labelWidthRatio = 0.56f;
+    auto b = getLocalBounds().reduced (1).withWidth (juce::roundToInt ((float) getWidth() * labelWidthRatio));
 
     g.fillAll (findColour (ToolBox::backgroundColourId, true));
 
@@ -176,8 +177,10 @@ void StylePropertyComponent::paint (juce::Graphics& g)
 
 void StylePropertyComponent::resized()
 {
+    constexpr float labelWidthRatio = 0.56f;
+
     auto right = getLocalBounds ().reduced (1, 1);
-    auto left = right.removeFromLeft (getWidth() / 2);
+    auto left = right.removeFromLeft (juce::roundToInt ((float) getWidth() * labelWidthRatio));
     const auto controlPaddingY = 1;
     const auto iconSize = juce::jlimit (14, 18, right.getHeight() - 2);
 
@@ -187,7 +190,14 @@ void StylePropertyComponent::resized()
         editor->setBounds (right.reduced (0, controlPaddingY));
 
     for (auto e : extraEditors)
-        e->setBounds (left.removeFromRight (iconSize).reduced (1));
+    {
+        auto extraEditorSize = iconSize;
+
+        if ((bool) e->getProperties().getWithDefault ("canvasLargeExtraEditor", false))
+            extraEditorSize = juce::roundToInt ((float) iconSize * 1.5f);
+
+        e->setBounds (left.removeFromRight (extraEditorSize).reduced (1));
+    }
 
     infoLabel.setBounds (left.reduced (0, controlPaddingY));
 }

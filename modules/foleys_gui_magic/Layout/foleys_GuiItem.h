@@ -335,6 +335,8 @@ protected:
     void enablementChanged () override;
     
     virtual void customResizeOperation (juce::Rectangle<int> delta) {}
+
+    juce::ResizableBorderComponent::Zone getCurrentResizeZone () const;
     
     /** override this to prevent a potential fade out, e.g. when a text editor is open or something like this. */
     virtual bool preventFadeout () const { return false; }

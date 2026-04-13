@@ -605,6 +605,14 @@ void GuiItem::setDraggable (bool selected)
     }
 }
 
+juce::ResizableBorderComponent::Zone GuiItem::getCurrentResizeZone () const
+{
+    if (borderDragger)
+        return borderDragger->getCurrentZone ();
+
+    return {};
+}
+
 void GuiItem::savePosition ()
 {
     // this way we can prevent so many unnecessary calls to update layout without breaking undo redo

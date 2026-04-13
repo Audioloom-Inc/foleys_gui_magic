@@ -360,7 +360,7 @@ juce::StringArray MagicGUIBuilder::getFactoryNames() const
     juce::StringArray names { IDs::view.toString() };
 
     for (auto& description : factoryDescriptions)
-        names.add (description.second.identifier);
+        names.addIfNotAlreadyThere (description.second.identifier);
 
     return names;
 }

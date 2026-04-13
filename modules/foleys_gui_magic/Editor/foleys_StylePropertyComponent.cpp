@@ -79,12 +79,16 @@ StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
     customValueFunction = propertyToUse.customValueFunction;
     displayName = propertyToUse.getDisplayName();
     
-    hint = propertyToUse.hint;
+    hint = propertyToUse.hint.isNotEmpty () ? propertyToUse.hint
+                                            : propertyToUse.description;
 
     flags = propertyToUse.flags;
     
     if (hint.isNotEmpty ())
+    {
+        setTooltip (hint);
         infoLabel.setTooltip (hint);
+    }
     
     addChildComponent (&infoLabel);
     infoLabel.setText ("Info", juce::dontSendNotification);

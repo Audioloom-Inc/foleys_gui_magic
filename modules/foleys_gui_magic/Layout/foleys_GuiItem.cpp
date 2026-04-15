@@ -705,9 +705,14 @@ void GuiItem::mouseDown (const juce::MouseEvent& event)
     if (event.mods.isRightButtonDown ())
         return;
 
+    const auto preserveExistingSelection = isEditModeOn ()
+                                        && ! event.mods.isShiftDown ()
+                                        && magicBuilder.isNodeSelected (configNode)
+                                        && magicBuilder.getSelectedNodes ().size () > 1;
+
     if (isEditModeOn () && event.mods.isShiftDown ())
         magicBuilder.toggleSelectedNode (configNode);
-    else
+    else if (! preserveExistingSelection)
         magicBuilder.setSelectedNode (configNode);
 
     if (componentDragger)

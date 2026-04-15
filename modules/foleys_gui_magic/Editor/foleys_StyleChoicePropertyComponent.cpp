@@ -156,7 +156,7 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
                         value = var;
 
             if (! value.isString () || value.toString ().isNotEmpty ())
-                node.setProperty (property, value, &builder.getUndoManager());
+                setPropertyOnTargetNodes (value);
         }
 
         if (safeThis)
@@ -179,7 +179,13 @@ void StyleChoicePropertyComponent::update()
 
     if (auto* combo = dynamic_cast<juce::ComboBox*>(editor.get()))
     {
-        if (node == inheritedFrom)
+        if (hasMixedValue ())
+        {
+            proxy.referTo ({});
+            combo->setSelectedId (0, juce::dontSendNotification);
+            combo->setText (getMixedValueText (), juce::dontSendNotification);
+        }
+        else if (getTargetNodes ().size () == 1 && node == inheritedFrom)
         {
             proxy.referTo (node.getPropertyAsValue (property, &builder.getUndoManager()));
         }

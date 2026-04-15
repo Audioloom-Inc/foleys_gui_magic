@@ -64,7 +64,12 @@ juce::PropertyComponent* StylePropertyComponent::createComponent (MagicGUIBuilde
         return new StyleColourPropertyComponent (builder, property, node);
         
     if (property.type == SettableProperty::MultiList)
+    {
+        if (property.targetNodes.size () > 1)
+            return new StyleTextPropertyComponent (builder, property, node);
+
         return new MultiListPropertyComponent (node.getPropertyAsValue (property.name, nullptr), property.getDisplayName(), property.getChoicesFromLambda());
+    }
 
     jassertfalse;
     return nullptr;
@@ -95,6 +100,9 @@ StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
     infoLabel.setFont (juce::FontOptions (12.f).withStyle ("italic"));
     infoLabel.setJustificationType (juce::Justification::centred);
     inheritFromParents = (propertyToUse.flags & SettableProperty::InheritFromParents) != 0;
+
+    if (! propertyToUse.targetNodes.isEmpty ())
+        setTargetNodesInternal (propertyToUse.targetNodes);
 }
 
 StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, juce::Identifier propertyToUse, juce::ValueTree& nodeToUse)
@@ -111,7 +119,7 @@ StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, j
     remove.onClick = [&]
     {
         customValueFunction.process (juce::var (), [&](){
-            node.removeProperty (property, &builder.getUndoManager());
+            removePropertyFromTargetNodes ();
         });
 
         refresh ();
@@ -122,42 +130,97 @@ StylePropertyComponent::StylePropertyComponent (MagicGUIBuilder& builderToUse, j
             builder.updateInspector (true);
     };
 
-    node.addListener (this);
+    juce::Array<juce::ValueTree> initialTargets;
+    initialTargets.add (nodeToUse);
+    setTargetNodesInternal (initialTargets);
 }
 
 StylePropertyComponent::~StylePropertyComponent()
 {
-    node.removeListener (this);
+    for (auto target : targetNodes)
+        target.removeListener (this);
 }
 
 juce::var StylePropertyComponent::lookupValue()
 {
-    const auto value = builder.getStylesheet().getStyleProperty (property, node, inheritFromParents, &inheritedFrom);
+    const auto& stylesheet = builder.getStylesheet();
 
-    const auto& s = builder.getStylesheet();
+    mixedValue = false;
+    hasAnyExplicitValue = false;
+    allNodesExplicitValue = true;
+    inheritedFrom = {};
+
+    juce::var firstValue;
+    auto hasFirstValue = false;
+
+    auto validTargets = 0;
+
+    for (auto targetNode : targetNodes)
+    {
+        if (! targetNode.isValid ())
+            continue;
+
+        ++validTargets;
+
+        const auto hasExplicitValue = targetNode.hasProperty (property);
+        hasAnyExplicitValue = hasAnyExplicitValue || hasExplicitValue;
+        allNodesExplicitValue = allNodesExplicitValue && hasExplicitValue;
+
+        juce::ValueTree inherited;
+        auto value = stylesheet.getStyleProperty (property, targetNode, inheritFromParents, &inherited);
+
+        if (value.isVoid ())
+            value = builder.getPropertyDefaultValue (property, targetNode.getType ());
+
+        if (! hasFirstValue)
+        {
+            firstValue = value;
+            inheritedFrom = inherited;
+            hasFirstValue = true;
+            continue;
+        }
+
+        if (! areValuesEqual (firstValue, value))
+            mixedValue = true;
+    }
+
+    if (validTargets == 0)
+    {
+        allNodesExplicitValue = false;
+        remove.setEnabled (false);
+        return builder.getPropertyDefaultValue (property);
+    }
+
+    remove.setEnabled (hasAnyExplicitValue);
 
     if (showPropertyTooltips)
     {
-        if (node == inheritedFrom)
-            setTooltip ({});
-        else if (inheritedFrom.isValid() == false)
-            setTooltip ("default");
-        else if (s.isClassNode (inheritedFrom))
-            setTooltip ("Class: " + inheritedFrom.getType().toString() + " (double-click)");
-        else if (s.isTypeNode (inheritedFrom))
-            setTooltip ("Type: " + inheritedFrom.getType().toString() + " (double-click)");
-        else if (s.isIdNode (inheritedFrom))
-            setTooltip ("Node: " + inheritedFrom.getType().toString() + " (double-click)");
+        if (mixedValue)
+        {
+            setTooltip ("Mixed values");
+        }
+        else if (targetNodes.size () <= 1)
+        {
+            if (node == inheritedFrom)
+                setTooltip ({});
+            else if (inheritedFrom.isValid() == false)
+                setTooltip ("default");
+            else if (stylesheet.isClassNode (inheritedFrom))
+                setTooltip ("Class: " + inheritedFrom.getType().toString() + " (double-click)");
+            else if (stylesheet.isTypeNode (inheritedFrom))
+                setTooltip ("Type: " + inheritedFrom.getType().toString() + " (double-click)");
+            else if (stylesheet.isIdNode (inheritedFrom))
+                setTooltip ("Node: " + inheritedFrom.getType().toString() + " (double-click)");
+            else
+                setTooltip (inheritedFrom.getType().toString() + " (double-click)");
+        }
         else
-            setTooltip (inheritedFrom.getType().toString() + " (double-click)");
+        {
+            setTooltip ({});
+        }
     }
 
-    remove.setEnabled (node == inheritedFrom);
-
-    if (value.isVoid())
-        return builder.getPropertyDefaultValue (property);
-
-    return value;
+    return hasFirstValue ? firstValue : builder.getPropertyDefaultValue (property);
 }
 
 void StylePropertyComponent::paint (juce::Graphics& g)
@@ -169,7 +232,10 @@ void StylePropertyComponent::paint (juce::Graphics& g)
 
     auto activeLabelColour = findColour (ToolBox::textColourId, true);
     auto inactiveLabelColour = findColour (ToolBox::disabledTextColourId, true);
-    auto labelColour = (node == inheritedFrom) ? activeLabelColour : inactiveLabelColour;
+    auto labelColour = allNodesExplicitValue ? activeLabelColour : inactiveLabelColour;
+
+    if (targetNodes.size () <= 1)
+        labelColour = (node == inheritedFrom) ? activeLabelColour : inactiveLabelColour;
 
     if (auto* toggle = dynamic_cast<juce::ToggleButton*> (editor.get()))
         labelColour = toggle->getToggleState() ? activeLabelColour : inactiveLabelColour;
@@ -211,6 +277,22 @@ juce::ValueTree StylePropertyComponent::getInheritedFrom() const
     return inheritedFrom;
 }
 
+const juce::Array<juce::ValueTree>& StylePropertyComponent::getTargetNodes () const
+{
+    return targetNodes;
+}
+
+bool StylePropertyComponent::hasMixedValue () const
+{
+    return mixedValue;
+}
+
+const juce::String& StylePropertyComponent::getMixedValueText ()
+{
+    static const juce::String mixedText { "Mixed" };
+    return mixedText;
+}
+
 void StylePropertyComponent::setEditor (std::unique_ptr<juce::Component> newEditor) 
 {
     editor = std::move (newEditor);
@@ -242,7 +324,7 @@ void StylePropertyComponent::valueTreePropertyChanged (juce::ValueTree& tree, co
     if (builder.getUndoManager().isPerformingUndoRedo())
         return;
 
-    if (tree == node && property == changedProperty)
+    if (property == changedProperty && targetNodes.contains (tree))
         refresh ();
 }
 
@@ -258,6 +340,68 @@ void StylePropertyComponent::refresh ()
         editor->setVisible (! showHint ());
 
     infoLabel.setVisible (showHint ());    
+}
+
+void StylePropertyComponent::setPropertyOnTargetNodes (const juce::var& value)
+{
+    if (targetNodes.isEmpty ())
+    {
+        if (node.isValid ())
+            node.setProperty (property, value, &builder.getUndoManager());
+
+        return;
+    }
+
+    for (auto target : targetNodes)
+        if (target.isValid ())
+            target.setProperty (property, value, &builder.getUndoManager());
+}
+
+void StylePropertyComponent::removePropertyFromTargetNodes ()
+{
+    if (targetNodes.isEmpty ())
+    {
+        if (node.isValid ())
+            node.removeProperty (property, &builder.getUndoManager());
+
+        return;
+    }
+
+    for (auto target : targetNodes)
+        if (target.isValid ())
+            target.removeProperty (property, &builder.getUndoManager());
+}
+
+void StylePropertyComponent::setTargetNodesInternal (const juce::Array<juce::ValueTree>& nodes)
+{
+    for (auto target : targetNodes)
+        target.removeListener (this);
+
+    targetNodes.clearQuick ();
+
+    for (auto target : nodes)
+        if (target.isValid ())
+            targetNodes.addIfNotAlreadyThere (target);
+
+    if (targetNodes.isEmpty ())
+    {
+        if (node.isValid ())
+            targetNodes.add (node);
+    }
+
+    if (! targetNodes.isEmpty ())
+        node = targetNodes.getReference (0);
+
+    for (auto target : targetNodes)
+        target.addListener (this);
+}
+
+bool StylePropertyComponent::areValuesEqual (const juce::var& lhs, const juce::var& rhs) const
+{
+    if (lhs == rhs)
+        return true;
+
+    return lhs.toString() == rhs.toString();
 }
 
 } // namespace foleys

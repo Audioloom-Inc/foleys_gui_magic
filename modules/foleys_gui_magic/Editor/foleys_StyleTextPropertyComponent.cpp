@@ -61,7 +61,12 @@ void StyleTextPropertyComponent::update()
 
     if (auto* label = dynamic_cast<juce::Label*>(editor.get()))
     {
-        if (node == inheritedFrom)
+        if (hasMixedValue ())
+        {
+            label->getTextValue().referTo ({});
+            label->setText (getMixedValueText (), juce::dontSendNotification);
+        }
+        else if (getTargetNodes ().size () == 1 && node == inheritedFrom)
         {
             label->getTextValue().referTo (node.getPropertyAsValue (property, &builder.getUndoManager()));
         }
@@ -89,7 +94,7 @@ void StyleTextPropertyComponent::init()
             return;
 
         if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
-            node.setProperty (property, l->getText(), &builder.getUndoManager());
+            setPropertyOnTargetNodes (l->getText());
 
         refresh();
     };

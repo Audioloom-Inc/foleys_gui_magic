@@ -87,7 +87,7 @@ StyleColourPropertyComponent::StyleColourPropertyComponent (MagicGUIBuilder& bui
         if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
         {
             auto normalised = normaliseHexColourString (l->getText());
-            node.setProperty (property, normalised, &builder.getUndoManager());
+            setPropertyOnTargetNodes (normalised);
 
             if (normalised != l->getText())
                 l->setText (normalised, juce::dontSendNotification);
@@ -144,7 +144,16 @@ void StyleColourPropertyComponent::update()
 
     if (auto* label = dynamic_cast<juce::Label*>(editor.get()))
     {
-        if (node == inheritedFrom)
+        if (hasMixedValue ())
+        {
+            label->getTextValue().referTo ({});
+            label->setText (getMixedValueText (), juce::dontSendNotification);
+            setColourDisplay (findColour (ToolBox::backgroundColourId, true));
+            repaint();
+            return;
+        }
+
+        if (getTargetNodes ().size () == 1 && node == inheritedFrom)
         {
             label->getTextValue().referTo (node.getPropertyAsValue (property, &builder.getUndoManager()));
         }
@@ -248,7 +257,7 @@ void StyleColourPropertyComponent::changeListenerCallback (juce::ChangeBroadcast
     if (auto* selector = dynamic_cast<juce::ColourSelector*>(sender))
     {
         const auto newColour = selector->getCurrentColour().toDisplayString (true);
-        node.setProperty (property, newColour, &builder.getUndoManager());
+        setPropertyOnTargetNodes (newColour);
         refresh();
     }
 }

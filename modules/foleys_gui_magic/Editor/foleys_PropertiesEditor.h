@@ -125,6 +125,7 @@ protected:
     bool isTypeNode () const;
     bool isIdNode () const;
     bool isContainer () const;
+    const juce::Array<juce::ValueTree>& getSelectedNodesToEdit () const { return selectedNodesToEdit; }
     
     MagicGUIBuilder&    builder;
     juce::UndoManager&  undo;
@@ -138,6 +139,7 @@ protected:
 
     juce::ValueTree     style;
     juce::ValueTree     styleItem;
+    juce::Array<juce::ValueTree> selectedNodesToEdit;
 
     juce::HashMap<juce::String, std::vector<SettableProperty>> categories;
     juce::StringArray categoryOrder;

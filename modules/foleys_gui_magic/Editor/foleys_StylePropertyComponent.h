@@ -51,6 +51,9 @@ public:
     void resized() override;
 
     juce::ValueTree getInheritedFrom () const;
+    const juce::Array<juce::ValueTree>& getTargetNodes () const;
+    bool hasMixedValue () const;
+    static const juce::String& getMixedValueText ();
 
     static juce::PropertyComponent* createComponent (MagicGUIBuilder& builder, SettableProperty& property, juce::ValueTree& node);
 
@@ -62,10 +65,14 @@ protected:
     juce::Identifier    property;
     juce::String        displayName;
     juce::ValueTree     node;
+    juce::Array<juce::ValueTree> targetNodes;
     juce::ValueTree     inheritedFrom;
     juce::String        hint;
-    bool                inheritFromParents;
+    bool                inheritFromParents { false };
     int                 flags{ 0 }; // SettableProperty::Flags
+    bool                mixedValue { false };
+    bool                hasAnyExplicitValue { false };
+    bool                allNodesExplicitValue { false };
 
     CustomValueFunction customValueFunction;
 
@@ -85,6 +92,9 @@ protected:
 
     void lookAndFeelChanged () override;
     bool isRefreshing () { return refreshing; }
+
+    void setPropertyOnTargetNodes (const juce::var& value);
+    void removePropertyFromTargetNodes ();
     
     void updateInspectorIfNeeded (bool async = true);
 
@@ -97,7 +107,10 @@ private:
     
     // true during call to refresh
     bool refreshing{ false };
-    
+
+    void setTargetNodesInternal (const juce::Array<juce::ValueTree>& nodes);
+    bool areValuesEqual (const juce::var& lhs, const juce::var& rhs) const;
+     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StylePropertyComponent)
 };
 

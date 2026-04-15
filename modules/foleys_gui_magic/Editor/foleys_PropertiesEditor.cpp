@@ -127,7 +127,25 @@ void PropertiesEditor::setSelectedNode (const juce::ValueTree& node)
 {
     const auto openness = properties.getOpennessState();
 
-    styleItem = node;
+    selectedNodesToEdit.clear ();
+
+    if (node.isValid ())
+    {
+        const auto guiRoot = builder.getGuiRootNode();
+        const auto isGuiNode = node == guiRoot || node.isAChildOf (guiRoot);
+
+        if (isGuiNode)
+        {
+            for (auto selected : builder.getSelectedNodes ())
+                if (selected.isValid ())
+                    selectedNodesToEdit.addIfNotAlreadyThere (selected);
+        }
+
+        if (selectedNodesToEdit.isEmpty ())
+            selectedNodesToEdit.add (node);
+    }
+
+    styleItem = selectedNodesToEdit.isEmpty () ? juce::ValueTree() : selectedNodesToEdit.getReference (0);
     updatePopupMenu();
 
     const auto& stylesheet = builder.getStylesheet();
@@ -217,26 +235,45 @@ void PropertiesEditor::deleteClass (const juce::String& name)
 void PropertiesEditor::setupProperties ()
 {
     auto& stylesheet = builder.getStylesheet ();
-    
-    if (stylesheet.isClassNode (styleItem))
-        addProperties (createClassProperties ());
-    else
-        addProperties (createNodeProperties ());
 
-    addProperties (createFlexItemProperties());
+    const auto originalStyleItem = styleItem;
 
-    if (stylesheet.isClassNode (styleItem))
+    auto addPropertiesForNode = [this, &stylesheet] (juce::ValueTree nodeToEdit)
     {
-        for (auto factoryName : builder.getFactoryNames())
-            addProperties (createTypeProperties (juce::ValueTree (factoryName)), factoryName);
+        styleItem = nodeToEdit;
+
+        if (stylesheet.isClassNode (styleItem))
+            addProperties (createClassProperties ());
+        else
+            addProperties (createNodeProperties ());
+
+        addProperties (createFlexItemProperties());
+
+        if (stylesheet.isClassNode (styleItem))
+        {
+            for (auto factoryName : builder.getFactoryNames())
+                addProperties (createTypeProperties (juce::ValueTree (factoryName)), factoryName);
+        }
+        else
+        {
+            addProperties (createTypeProperties (styleItem));
+        }
+
+        if (styleItem.getType() == IDs::view || stylesheet.isClassNode (styleItem))
+            addProperties (createContainerProperties ());
+    };
+
+    if (selectedNodesToEdit.isEmpty ())
+    {
+        addPropertiesForNode (styleItem);
     }
     else
     {
-        addProperties (createTypeProperties (styleItem));
+        for (auto nodeToEdit : selectedNodesToEdit)
+            addPropertiesForNode (nodeToEdit);
     }
 
-    if (styleItem.getType() == IDs::view || stylesheet.isClassNode (styleItem))
-        addProperties (createContainerProperties ());
+    styleItem = originalStyleItem;
 }
 
 void PropertiesEditor::addNodeProperties()
@@ -695,13 +732,20 @@ void PropertiesEditor::valueTreeChildRemoved (juce::ValueTree&,
                                               juce::ValueTree& childWhichHasBeenRemoved,
                                               int)
 {
-    if (childWhichHasBeenRemoved == styleItem)
+    if (selectedNodesToEdit.contains (childWhichHasBeenRemoved)
+        || childWhichHasBeenRemoved == styleItem)
         setSelectedNode ({});
 }
 
 void PropertiesEditor::updateNodeSelect() 
 {
     auto& stylesheet = builder.getStylesheet();
+
+    if (selectedNodesToEdit.size () > 1)
+    {
+        nodeSelect.setText (TRANS ("Editing ") + juce::String (selectedNodesToEdit.size ()) + TRANS (" nodes"), juce::dontSendNotification);
+        return;
+    }
 
     if (stylesheet.isClassNode (styleItem))
         nodeSelect.setText (TRANS ("Class: ") + styleItem.getType().toString(), juce::dontSendNotification);
@@ -724,7 +768,37 @@ void PropertiesEditor::addProperties (std::vector<SettableProperty> props, const
 void PropertiesEditor::addProperty (const SettableProperty& property, const juce::String& parentCategory) 
 {
     const auto category = property.category.isEmpty() ? "---" : property.category;
-    categories.getReference (category).push_back (property);
+
+    auto mergedProperty = property;
+
+    if (mergedProperty.targetNodes.isEmpty ())
+    {
+        if (mergedProperty.node.isValid ())
+            mergedProperty.targetNodes.add (mergedProperty.node);
+    }
+
+    auto& categoryProperties = categories.getReference (category);
+
+    const auto canMerge = [] (const SettableProperty& lhs, const SettableProperty& rhs)
+    {
+        return lhs.name == rhs.name
+            && lhs.type == rhs.type
+            && lhs.getDisplayName() == rhs.getDisplayName()
+            && lhs.command.toString() == rhs.command.toString();
+    };
+
+    for (auto& existing : categoryProperties)
+    {
+        if (! canMerge (existing, mergedProperty))
+            continue;
+
+        for (auto target : mergedProperty.targetNodes)
+            existing.targetNodes.addIfNotAlreadyThere (target);
+
+        return;
+    }
+
+    categoryProperties.push_back (std::move (mergedProperty));
 }
 
 void PropertiesEditor::finishPropertySetup()

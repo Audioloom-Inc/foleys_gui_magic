@@ -86,6 +86,7 @@ public:
     
     
     juce::ValueTree                             node {};
+    juce::Array<juce::ValueTree>                targetNodes {};
     juce::Identifier                            name {};
     PropertyType                                type {};
     juce::var                                   defaultValue {};
@@ -109,6 +110,7 @@ public:
     juce::String getDisplayName () const;
     static juce::String formatDisplayText (const juce::String& rawText);
     SettableProperty withNode (juce::ValueTree newNode) const;
+    SettableProperty withNodes (juce::Array<juce::ValueTree> newNodes) const;
     SettableProperty withName (juce::Identifier newName) const;
     SettableProperty withType (PropertyType newType) const;
     SettableProperty withDefaultValue (juce::var newDefault) const;

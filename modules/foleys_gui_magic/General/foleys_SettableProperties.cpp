@@ -133,6 +133,11 @@ SettableProperty SettableProperty::withNode (juce::ValueTree newNode) const
     return with (*this, &SettableProperty::node, newNode);
 }
 
+SettableProperty SettableProperty::withNodes (juce::Array<juce::ValueTree> newNodes) const
+{
+    return with (*this, &SettableProperty::targetNodes, std::move (newNodes));
+}
+
 SettableProperty SettableProperty::withName (juce::Identifier newName) const
 {
     return with (*this, &SettableProperty::name, newName);

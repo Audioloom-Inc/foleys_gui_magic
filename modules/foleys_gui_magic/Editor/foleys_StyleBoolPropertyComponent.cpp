@@ -59,7 +59,7 @@ StyleBoolPropertyComponent::StyleBoolPropertyComponent (MagicGUIBuilder& builder
                 const auto state = t->getToggleState();
 
                 customValueFunction.process (state, [&, state](){
-                    node.setProperty (property, state, &builder.getUndoManager());
+                    setPropertyOnTargetNodes (state);
                 });
             }
 
@@ -82,14 +82,22 @@ void StyleBoolPropertyComponent::update()
 
     if (auto* toggle = dynamic_cast<juce::ToggleButton*>(editor.get()))
     {
-        if (node == inheritedFrom)
+        if (hasMixedValue ())
+        {
+            toggle->getToggleStateValue().referTo ({});
+            toggle->setToggleState (false, juce::dontSendNotification);
+            toggle->setButtonText (getMixedValueText ());
+        }
+        else if (getTargetNodes ().size () == 1 && node == inheritedFrom)
         {
             toggle->getToggleStateValue().referTo (node.getPropertyAsValue (property, &builder.getUndoManager()));
+            toggle->setButtonText ({});
         }
         else
         {
             toggle->getToggleStateValue().referTo ({});
             toggle->setToggleState (value, juce::dontSendNotification);
+            toggle->setButtonText ({});
         }
     }
 

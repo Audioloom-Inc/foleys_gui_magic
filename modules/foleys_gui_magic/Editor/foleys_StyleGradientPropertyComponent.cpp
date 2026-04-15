@@ -51,7 +51,7 @@ StyleGradientPropertyComponent::StyleGradientPropertyComponent (MagicGUIBuilder&
     label->onTextChange = [&]
     {
         if (auto* l = dynamic_cast<juce::Label*>(editor.get()))
-            node.setProperty (property, l->getText(), &builder.getUndoManager());
+            setPropertyOnTargetNodes (l->getText());
 
         refresh();
     };
@@ -88,7 +88,12 @@ void StyleGradientPropertyComponent::update()
 
     if (auto* label = dynamic_cast<juce::Label*>(editor.get()))
     {
-        if (node == inheritedFrom)
+        if (hasMixedValue ())
+        {
+            label->getTextValue().referTo ({});
+            label->setText (getMixedValueText (), juce::dontSendNotification);
+        }
+        else if (getTargetNodes ().size () == 1 && node == inheritedFrom)
         {
             label->getTextValue().referTo (node.getPropertyAsValue (property, &builder.getUndoManager()));
         }
@@ -112,7 +117,7 @@ void StyleGradientPropertyComponent::changeListenerCallback (juce::ChangeBroadca
     if (colourPanel)
         colourPanel->colourWasChanged();
 
-    node.setProperty (property, gradient.toString(), &builder.getUndoManager());
+    setPropertyOnTargetNodes (gradient.toString());
     refresh();
 }
 

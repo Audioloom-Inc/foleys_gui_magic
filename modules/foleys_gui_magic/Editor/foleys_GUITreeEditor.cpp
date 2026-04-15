@@ -41,7 +41,7 @@ GUITreeEditor::GUITreeEditor (MagicGUIBuilder& builderToEdit)
     undo (builder.getUndoManager())
 {
     treeView.setRootItemVisible (true);
-    treeView.setMultiSelectEnabled (false);
+    treeView.setMultiSelectEnabled (true);
 
     setValueTree (tree);
 
@@ -93,32 +93,35 @@ void GUITreeEditor::updateTree()
 
 void GUITreeEditor::setSelectedNode (const juce::ValueTree& node)
 {
-    if (rootItem.get() == nullptr || (node != tree && node.isAChildOf (tree) == false))
+    juce::ignoreUnused (node);
+
+    if (rootItem.get() == nullptr)
         return;
 
-    std::stack<int> path;
-    auto probe = node;
-    while (probe != tree)
+    const auto& selectedNodes = builder.getSelectedNodes ();
+
+    juce::ScopedValueSetter<bool> selectionGuard (syncingTreeSelection, true);
+
+    treeView.clearSelectedItems ();
+
+    juce::TreeViewItem* itemToScrollTo = nullptr;
+
+    for (auto selected : selectedNodes)
     {
-        auto parent = probe.getParent();
-        path.push (parent.indexOf (probe));
-        probe = parent;
+        if (selected != tree && ! selected.isAChildOf (tree))
+            continue;
+
+        if (auto* itemToSelect = findItemForNode (selected))
+        {
+            itemToSelect->setSelected (true, false, juce::dontSendNotification);
+
+            if (itemToScrollTo == nullptr)
+                itemToScrollTo = itemToSelect;
+        }
     }
 
-    juce::TreeViewItem* itemToSelect = rootItem.get();
-    while (path.empty() ==  false)
-    {
-        itemToSelect->setOpen (true);
-        auto* childItem = itemToSelect->getSubItem (path.top());
-        path.pop();
-        itemToSelect = childItem;
-    }
-
-    if (itemToSelect)
-    {
-        itemToSelect->setSelected (true, true, juce::dontSendNotification);
-        treeView.scrollToKeepItemVisible (itemToSelect);        
-    }
+    if (itemToScrollTo != nullptr)
+        treeView.scrollToKeepItemVisible (itemToScrollTo);
 }
 
 void GUITreeEditor::stateWasReloaded()
@@ -153,7 +156,7 @@ void GUITreeEditor::valueTreeParentChanged (juce::ValueTree&)
 
 //==============================================================================
 
-GUITreeEditor::GuiTreeItem::GuiTreeItem (Component& owner, MagicGUIBuilder& builderToUse, juce::ValueTree& refValueTree)
+GUITreeEditor::GuiTreeItem::GuiTreeItem (GUITreeEditor& owner, MagicGUIBuilder& builderToUse, juce::ValueTree& refValueTree)
   : owner (owner),
     builder (builderToUse),
     itemNode (refValueTree)
@@ -228,8 +231,10 @@ void GUITreeEditor::GuiTreeItem::itemOpennessChanged (bool isNowOpen)
 
 void GUITreeEditor::GuiTreeItem::itemSelectionChanged (bool isNowSelected)
 {
-    if (isNowSelected)
-        builder.setSelectedNode (itemNode);
+    juce::ignoreUnused (isNowSelected);
+
+    if (! owner.syncingTreeSelection)
+        owner.pushSelectionFromTree ();
 }
 
 juce::var GUITreeEditor::GuiTreeItem::getDragSourceDescription()
@@ -264,6 +269,62 @@ void GUITreeEditor::GuiTreeItem::paintOpenCloseButton (juce::Graphics& g, const 
 {
     if (! alwaysOpen)
         return juce::TreeViewItem::paintOpenCloseButton (g, area, backgroundColour, isMouseOver);
+}
+
+juce::TreeViewItem* GUITreeEditor::findItemForNode (const juce::ValueTree& node)
+{
+    if (rootItem.get() == nullptr || ! node.isValid ())
+        return nullptr;
+
+    if (node == tree)
+        return rootItem.get();
+
+    if (! node.isAChildOf (tree))
+        return nullptr;
+
+    std::stack<int> path;
+    auto probe = node;
+
+    while (probe != tree)
+    {
+        auto parent = probe.getParent();
+        path.push (parent.indexOf (probe));
+        probe = parent;
+    }
+
+    juce::TreeViewItem* item = rootItem.get();
+
+    while (! path.empty() && item != nullptr)
+    {
+        item->setOpen (true);
+        item = item->getSubItem (path.top());
+        path.pop();
+    }
+
+    return item;
+}
+
+void GUITreeEditor::collectSelectedNodes (juce::TreeViewItem* item, juce::Array<juce::ValueTree>& selected) const
+{
+    if (item == nullptr)
+        return;
+
+    if (item->isSelected())
+        if (auto* guiTreeItem = dynamic_cast<GuiTreeItem*> (item))
+            selected.add (guiTreeItem->getTree());
+
+    for (int i = 0; i < item->getNumSubItems(); ++i)
+        collectSelectedNodes (item->getSubItem (i), selected);
+}
+
+void GUITreeEditor::pushSelectionFromTree ()
+{
+    if (syncingTreeSelection)
+        return;
+
+    juce::Array<juce::ValueTree> selected;
+    collectSelectedNodes (rootItem.get(), selected);
+    builder.setSelectedNodes (selected);
 }
 
 

@@ -66,7 +66,7 @@ private:
     class GuiTreeItem : public juce::TreeViewItem
     {
     public:
-        GuiTreeItem (Component& owner, MagicGUIBuilder& builder, juce::ValueTree& refValueTree);
+        GuiTreeItem (GUITreeEditor& owner, MagicGUIBuilder& builder, juce::ValueTree& refValueTree);
 
         juce::String getUniqueName() const override;
 
@@ -82,12 +82,12 @@ private:
         bool isInterestedInDragSource (const juce::DragAndDropTarget::SourceDetails &dragSourceDetails) override;
         void itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSourceDetails, int index) override;
 
-        juce::ValueTree& getTree () { return itemNode; }
+        const juce::ValueTree& getTree () const { return itemNode; }
 
         void paintOpenCloseButton (juce::Graphics&, const juce::Rectangle<float>& area, juce::Colour backgroundColour, bool isMouseOver) override;
 
     private:
-        Component& owner;
+        GUITreeEditor& owner;
         MagicGUIBuilder& builder;
         juce::ValueTree  itemNode;
 
@@ -111,11 +111,16 @@ private:
 
     void valueTreeParentChanged (juce::ValueTree& treeWhoseParentHasChanged) override;
 
+    juce::TreeViewItem* findItemForNode (const juce::ValueTree& node);
+    void collectSelectedNodes (juce::TreeViewItem* item, juce::Array<juce::ValueTree>& selected) const;
+    void pushSelectionFromTree ();
+
 
     MagicGUIBuilder&             builder;
     juce::UndoManager&           undo;
 
     juce::ValueTree              tree;
+    bool                         syncingTreeSelection { false };
 
     std::unique_ptr<GuiTreeItem> rootItem;
     juce::TreeView               treeView;

@@ -336,8 +336,18 @@ public:
     void setEditMode (bool shouldEdit);
     bool isEditModeOn() const;
 
-    void                   setSelectedNode (const juce::ValueTree& node);
+    void setSelectedNode (const juce::ValueTree& node);
     const juce::ValueTree& getSelectedNode() const;
+
+    void setSelectedNodes (const juce::Array<juce::ValueTree>& nodes);
+    void clearSelectedNodes (); 
+    void addSelectedNode (const juce::ValueTree& node);
+    void removeSelectedNode (const juce::ValueTree& node);
+    void toggleSelectedNode (const juce::ValueTree& node);
+
+    const juce::Array<juce::ValueTree>& getSelectedNodes () const;
+    bool isNodeSelected (const juce::ValueTree& node) const;
+    juce::uint64 getSelectionVersion () const noexcept;
     
     /** */
     void updateSelectedNode (bool async = false);
@@ -404,9 +414,14 @@ protected:
     
     juce::ListenerList<Listener> listeners;
     bool                         editMode = false;
-    juce::ValueTree              selectedNode;
+    juce::Array<juce::ValueTree> selectedNodes;
+    juce::ValueTree              primarySelectedNode;
+    juce::uint64                 selectionVersion { 0 };
     bool                         blockSelectedNodeUpdates{ false };
-    
+
+    static juce::Array<juce::ValueTree> deduplicateSelection (const juce::Array<juce::ValueTree>& nodes);
+    void updateDraggableSelectionState (const juce::Array<juce::ValueTree>& previousSelection);
+
 #if FOLEYS_SHOW_GUI_EDITOR_PALLETTE
     std::unique_ptr<ToolBox> magicToolBox;
 #endif

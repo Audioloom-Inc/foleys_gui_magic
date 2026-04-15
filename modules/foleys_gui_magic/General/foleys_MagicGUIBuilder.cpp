@@ -188,9 +188,9 @@ void MagicGUIBuilder::updateComponents()
 {
     juce::ScopedValueSetter svs{ currentlyUpdatingComponents, true };
 
-    // deselect the current node to avoid dangling pointers
-    auto selected = getSelectedNode();
-    setSelectedNode ({});
+    // deselect the current node(s) to avoid dangling pointers
+    const auto selected = getSelectedNodes();
+    clearSelectedNodes ();
 
     if (parent == nullptr)
         return;
@@ -210,8 +210,8 @@ void MagicGUIBuilder::updateComponents()
 
     listeners.call ([&] (Listener& l) { l.stateWasReloaded(); });
 
-    if (selectedNode.isValid ())
-        setSelectedNode (selectedNode);
+    if (! selected.isEmpty ())
+        setSelectedNodes (selected);
 }
 
 bool MagicGUIBuilder::isCurrentlyUpdatingComponents() const
@@ -593,7 +593,7 @@ void MagicGUIBuilder::setEditMode (bool shouldEdit)
         root->setEditMode (shouldEdit);
 
     if (shouldEdit == false)
-        setSelectedNode (juce::ValueTree());
+        clearSelectedNodes ();
 
     listeners.call (&Listener::editModeToggled, editMode);
     
@@ -609,27 +609,134 @@ bool MagicGUIBuilder::isEditModeOn() const
 
 void MagicGUIBuilder::setSelectedNode (const juce::ValueTree& node)
 {
-    if (selectedNode != node)    {
-
-        if (auto* item = findGuiItem (selectedNode))
-            item->setDraggable (false);
-
-        selectedNode = node;
-
-        listeners.call ([node] (Listener& l) { l.selectedItem (node); });
-
-        if (isEditModeOn ())
-            if (auto* item = findGuiItem (selectedNode); item && ! item->isRoot ())
-                item->setDraggable (true);
-
-        if (parent != nullptr)
-            parent->repaint();
-    }
+    if (node.isValid ())
+        setSelectedNodes ({ node });
+    else
+        clearSelectedNodes ();
 }
 
 const juce::ValueTree& MagicGUIBuilder::getSelectedNode() const
 {
-    return selectedNode;
+    return primarySelectedNode;
+}
+
+void MagicGUIBuilder::setSelectedNodes (const juce::Array<juce::ValueTree>& nodes)
+{
+    auto newSelection = deduplicateSelection (nodes);
+
+    if (newSelection.size () == selectedNodes.size ())
+    {
+        auto unchanged = true;
+
+        for (int i = 0; i < newSelection.size (); ++i)
+        {
+            if (newSelection.getReference (i) != selectedNodes.getReference (i))
+            {
+                unchanged = false;
+                break;
+            }
+        }
+
+        if (unchanged)
+            return;
+    }
+
+    const auto previousSelection = selectedNodes;
+    selectedNodes = std::move (newSelection);
+    primarySelectedNode = selectedNodes.isEmpty () ? juce::ValueTree() : selectedNodes.getReference (0);
+    ++selectionVersion;
+
+    updateDraggableSelectionState (previousSelection);
+
+    listeners.call ([this] (Listener& l) { l.selectedItem (primarySelectedNode); });
+
+    if (parent != nullptr)
+        parent->repaint();
+}
+
+void MagicGUIBuilder::clearSelectedNodes ()
+{
+    setSelectedNodes ({});
+}
+
+void MagicGUIBuilder::addSelectedNode (const juce::ValueTree& node)
+{
+    if (! node.isValid ())
+        return;
+
+    auto newSelection = selectedNodes;
+    newSelection.addIfNotAlreadyThere (node);
+    setSelectedNodes (newSelection);
+}
+
+void MagicGUIBuilder::removeSelectedNode (const juce::ValueTree& node)
+{
+    if (! node.isValid ())
+        return;
+
+    auto newSelection = selectedNodes;
+    newSelection.removeAllInstancesOf (node);
+    setSelectedNodes (newSelection);
+}
+
+void MagicGUIBuilder::toggleSelectedNode (const juce::ValueTree& node)
+{
+    if (! node.isValid ())
+        return;
+
+    auto newSelection = selectedNodes;
+
+    if (newSelection.contains (node))
+        newSelection.removeAllInstancesOf (node);
+    else
+        newSelection.add (node);
+
+    setSelectedNodes (newSelection);
+}
+
+const juce::Array<juce::ValueTree>& MagicGUIBuilder::getSelectedNodes () const
+{
+    return selectedNodes;
+}
+
+bool MagicGUIBuilder::isNodeSelected (const juce::ValueTree& node) const
+{
+    return node.isValid () && selectedNodes.contains (node);
+}
+
+juce::uint64 MagicGUIBuilder::getSelectionVersion () const noexcept
+{
+    return selectionVersion;
+}
+
+juce::Array<juce::ValueTree> MagicGUIBuilder::deduplicateSelection (const juce::Array<juce::ValueTree>& nodes)
+{
+    juce::Array<juce::ValueTree> result;
+
+    for (auto node : nodes)
+        if (node.isValid ())
+            result.addIfNotAlreadyThere (node);
+
+    return result;
+}
+
+void MagicGUIBuilder::updateDraggableSelectionState (const juce::Array<juce::ValueTree>& previousSelection)
+{
+    for (auto node : previousSelection)
+    {
+        if (selectedNodes.contains (node))
+            continue;
+
+        if (auto* item = findGuiItem (node))
+            item->setDraggable (false);
+    }
+
+    if (! isEditModeOn ())
+        return;
+
+    for (auto node : selectedNodes)
+        if (auto* item = findGuiItem (node); item != nullptr && ! item->isRoot ())
+            item->setDraggable (true);
 }
 
 void MagicGUIBuilder::updateSelectedNode(bool async) 
@@ -637,7 +744,13 @@ void MagicGUIBuilder::updateSelectedNode(bool async)
     if (blockSelectedNodeUpdates)
         return;
     
-    const auto func = [&, weak = juce::WeakReference (this)] () { if (! weak) return; listeners.call ([&] (Listener& l) { l.selectedItem (selectedNode); }); };
+    const auto func = [&, weak = juce::WeakReference (this)] ()
+    {
+        if (! weak)
+            return;
+
+        listeners.call ([&] (Listener& l) { l.selectedItem (primarySelectedNode); });
+    };
     
     if (async)
         juce::MessageManager::callAsync (func);

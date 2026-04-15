@@ -510,7 +510,7 @@ juce::Array<GuiItem*> GuiItem::findGuiItemsOfType (const juce::Identifier& type)
 
 void GuiItem::paintOverChildren (juce::Graphics& g)
 {
-    if (magicBuilder.isEditModeOn() && magicBuilder.getSelectedNode() == configNode)
+    if (magicBuilder.isEditModeOn() && magicBuilder.isNodeSelected (configNode))
     {
         g.setColour (juce::Colours::orange.withAlpha (0.5f));
         g.fillRoundedRectangle (getLocalBounds().toFloat(), 5.0f);
@@ -704,8 +704,11 @@ void GuiItem::mouseDown (const juce::MouseEvent& event)
 {
     if (event.mods.isRightButtonDown ())
         return;
-        
-    magicBuilder.setSelectedNode (configNode);
+
+    if (isEditModeOn () && event.mods.isShiftDown ())
+        magicBuilder.toggleSelectedNode (configNode);
+    else
+        magicBuilder.setSelectedNode (configNode);
 
     if (componentDragger)
     {
@@ -786,7 +789,7 @@ void GuiItem::itemDropped (const juce::DragAndDropTarget::SourceDetails &dragSou
 
 bool GuiItem::isSelected() const
 {
-    return magicBuilder.getSelectedNode() == configNode;
+    return magicBuilder.isNodeSelected (configNode);
 }
 
 bool GuiItem::isInitializing() const

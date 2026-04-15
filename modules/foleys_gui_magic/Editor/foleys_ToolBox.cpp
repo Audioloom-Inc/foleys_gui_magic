@@ -457,13 +457,50 @@ bool ToolBox::keyPressed (const juce::KeyPress& key)
 {
     if (key.isKeyCode (juce::KeyPress::backspaceKey) || key.isKeyCode (juce::KeyPress::deleteKey))
     {
-        auto selected = builder.getSelectedNode();
+        juce::Array<juce::ValueTree> selectedRoots;
+        auto selectedNodes = builder.getSelectedNodes();
 
-        if (selected.isValid())
-            if (auto p = selected.getParent(); p.isValid())
-                if (auto guiItem = builder.findGuiItem (selected))
-                    if (guiItem->canBeDeleted ())
-                        deleteItem (guiItem);
+        if (selectedNodes.isEmpty ())
+        {
+            if (auto selected = builder.getSelectedNode(); selected.isValid ())
+                selectedNodes.add (selected);
+        }
+
+        for (auto selected : selectedNodes)
+        {
+            if (! selected.isValid ())
+                continue;
+
+            auto isChildOfOtherSelection = false;
+
+            for (auto other : selectedNodes)
+            {
+                if (other == selected || ! other.isValid ())
+                    continue;
+
+                if (selected.isAChildOf (other))
+                {
+                    isChildOfOtherSelection = true;
+                    break;
+                }
+            }
+
+            if (! isChildOfOtherSelection)
+                selectedRoots.addIfNotAlreadyThere (selected);
+        }
+
+        if (! selectedRoots.isEmpty ())
+        {
+            undo.beginNewTransaction (selectedRoots.size () > 1 ? "Delete items" : "Delete item");
+
+            const juce::ScopedValueSetter<bool> deleteBatchSetter (batchDeletingItems, true);
+
+            for (auto selected : selectedRoots)
+                if (auto parent = selected.getParent(); parent.isValid())
+                    if (auto guiItem = builder.findGuiItem (selected))
+                        if (guiItem->canBeDeleted ())
+                            deleteItem (guiItem);
+        }
 
         return true;
     }
@@ -659,7 +696,9 @@ void ToolBox::deleteItem (foleys::GuiItem* guiItem)
     auto item = guiItem->getNode();
     auto parent = item.getParent();
 
-    undo.beginNewTransaction ("Delete " + item.getType().toString());
+    if (! batchDeletingItems)
+        undo.beginNewTransaction ("Delete " + item.getType().toString());
+
     parent.removeChild (item, &undo);
 }
 

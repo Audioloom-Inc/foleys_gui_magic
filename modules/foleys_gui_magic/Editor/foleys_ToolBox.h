@@ -181,6 +181,7 @@ protected:
     juce::ComponentDragger         componentDragger;
 
     bool layoutIsUpdating { false };
+    bool batchDeletingItems { false };
     void updateLayout ();
 
     void mouseDown (const juce::MouseEvent& e) override;

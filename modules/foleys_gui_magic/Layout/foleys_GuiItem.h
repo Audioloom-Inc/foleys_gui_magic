@@ -378,6 +378,8 @@ private:
             if (onDragEnd) onDragEnd();
         }
 
+        void paint (juce::Graphics&) override {}
+
         juce::Rectangle<int> getDeltaBounds ()
         {
             if (c)

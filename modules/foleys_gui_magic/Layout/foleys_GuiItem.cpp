@@ -510,12 +510,6 @@ juce::Array<GuiItem*> GuiItem::findGuiItemsOfType (const juce::Identifier& type)
 
 void GuiItem::paintOverChildren (juce::Graphics& g)
 {
-    if (magicBuilder.isEditModeOn() && magicBuilder.isNodeSelected (configNode))
-    {
-        g.setColour (juce::Colours::orange.withAlpha (0.5f));
-        g.fillRoundedRectangle (getLocalBounds().toFloat(), 5.0f);
-    }
-
     if (highlight.isNotEmpty())
     {
         g.setColour (juce::Colours::red);

@@ -61,6 +61,20 @@ juce::String normaliseHexColourString (juce::String text)
 
     return "#" + text.toUpperCase();
 }
+
+juce::Colour findToolBoxBackgroundColourSafely (const juce::Component& component)
+{
+    constexpr auto colourId = ToolBox::backgroundColourId;
+
+    for (auto* current = &component; current != nullptr; current = current->getParentComponent())
+        if (current->isColourSpecified (colourId))
+            return current->findColour (colourId, false);
+
+    if (component.getLookAndFeel().isColourSpecified (colourId))
+        return component.getLookAndFeel().findColour (colourId);
+
+    return juce::Colours::transparentBlack;
+}
 }
 
 
@@ -148,7 +162,7 @@ void StyleColourPropertyComponent::update()
         {
             label->getTextValue().referTo ({});
             label->setText (getMixedValueText (), juce::dontSendNotification);
-            setColourDisplay (findColour (ToolBox::backgroundColourId, true));
+            setColourDisplay (findToolBoxBackgroundColourSafely (*this));
             repaint();
             return;
         }

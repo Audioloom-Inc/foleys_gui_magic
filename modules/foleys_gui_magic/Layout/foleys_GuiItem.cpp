@@ -504,6 +504,8 @@ juce::Array<GuiItem*> GuiItem::findGuiItemsOfType (const juce::Identifier& type)
 {
     if (configNode.getType () == type)
         return { this };
+
+    return {};
 }
 
 void GuiItem::paintOverChildren (juce::Graphics& g)

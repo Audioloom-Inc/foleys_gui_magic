@@ -61,6 +61,8 @@ private:
     juce::Value                     proxy;
     bool                            updating = false;
     bool                            multiChoice = false;
+
+    JUCE_DECLARE_WEAK_REFERENCEABLE (StyleChoicePropertyComponent)
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StyleChoicePropertyComponent)
 };
 

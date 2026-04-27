@@ -142,7 +142,7 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
 
     addAndMakeVisible (combo.get());
 
-    auto safeThis = juce::Component::SafePointer<StyleChoicePropertyComponent> (this);
+    auto safeThis = juce::WeakReference (this);
     combo->onChange = [&, safeThis]
     {
         if (isRefreshing ())

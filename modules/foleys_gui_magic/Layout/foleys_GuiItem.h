@@ -87,6 +87,11 @@ public:
      */
     virtual std::vector<SettableProperty> getSettableProperties() const { return {}; }
 
+    /**
+     Default category name used when a settable property has no explicit category.
+     */
+    virtual juce::String getDefaultCategoryName() const;
+
     /** */
     std::vector<SettableProperty> getSettablePropertiesInit ();
 

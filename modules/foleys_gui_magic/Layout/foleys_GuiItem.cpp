@@ -55,6 +55,11 @@ GuiItem::~GuiItem()
     magicBuilder.getStylesheet().removeListener (this);
 }
 
+juce::String GuiItem::getDefaultCategoryName() const
+{
+    return configNode.getType().toString();
+}
+
 std::vector<SettableProperty> GuiItem::getSettablePropertiesInit()
 {
     juce::ScopedValueSetter<bool> setter (initializing, true);

@@ -345,7 +345,7 @@ std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (ju
                 other.node = styleItem;
 
             if (other.category.isEmpty())
-                other.category = node.getType ().toString();
+                other.category = item->getDefaultCategoryName();
 
             properties.push_back (other);
         }
@@ -356,6 +356,9 @@ std::vector<foleys::SettableProperty> PropertiesEditor::createTypeProperties (ju
             {
                 auto prop = colour.toSettableProperty (styleItem);
                 prop.displayName = item->getColourDisplayName (colour.identifier);
+
+                if (prop.category.isEmpty())
+                    prop.category = item->getDefaultCategoryName();
 
                 properties.push_back (prop);
             }

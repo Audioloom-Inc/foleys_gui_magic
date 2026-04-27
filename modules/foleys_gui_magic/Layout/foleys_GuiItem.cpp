@@ -379,6 +379,15 @@ juce::Array<GuiItem::ColourTranslation> GuiItem::getColourTranslation()
 
 void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const juce::Identifier& property)
 {
+    const auto isPositionProperty = property == IDs::posX
+                                 || property == IDs::posY
+                                 || property == IDs::posWidth
+                                 || property == IDs::posHeight;
+
+    const auto skipLayoutRefreshWhileSavingPosition = treeThatChanged == configNode
+                                                   && isPositionProperty
+                                                   && magicBuilder.isSavingPositions ();
+
     // replace ongoing calls to updateInternal with single calls – WIP
     if (property == foleys::IDs::styleClass)
         init ();
@@ -396,6 +405,9 @@ void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const 
     // ongoing calls here ...
     if (treeThatChanged == configNode)
     {
+        if (skipLayoutRefreshWhileSavingPosition)
+            return;
+
         if (auto* parent = findParentComponentOfClass<GuiItem>())
             parent->updateInternal();
         else

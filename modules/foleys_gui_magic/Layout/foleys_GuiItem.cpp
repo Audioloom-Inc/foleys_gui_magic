@@ -682,7 +682,7 @@ void GuiItem::updateVisibility()
 
     if (isEditModeOn ())
     {
-        setAlpha (visibleInFinalProduct && isEnabled () ? 1.f : 0.4f);
+        setAlpha (! visibleInFinalProduct ? 0.f : isEnabled () ? 1.f : 0.4f);
     }
     else
     {

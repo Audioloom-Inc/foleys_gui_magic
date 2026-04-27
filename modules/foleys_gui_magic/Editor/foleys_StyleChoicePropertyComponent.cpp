@@ -145,6 +145,9 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
     auto safeThis = juce::Component::SafePointer<StyleChoicePropertyComponent> (this);
     combo->onChange = [&, safeThis]
     {
+        if (isRefreshing ())
+            return;
+
         if (auto* c = dynamic_cast<juce::ComboBox*>(editor.get()))
         {
             const auto useSelectedItemId = (bool)c->getProperties ()[IDs::useSelectedItemIdInComboBoxLambda];
@@ -196,7 +199,7 @@ void StyleChoicePropertyComponent::update()
             auto vString = value.toString ();
 
             if (auto selectedId = getIdToSelect (*combo, vString); selectedId.first == true)
-                combo->setSelectedId (selectedId.second);
+                combo->setSelectedId (selectedId.second, juce::dontSendNotification);
             else
                 combo->setText (vString, juce::dontSendNotification);
         }

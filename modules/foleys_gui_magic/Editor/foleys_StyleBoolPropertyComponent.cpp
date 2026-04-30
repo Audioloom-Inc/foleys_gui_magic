@@ -114,8 +114,12 @@ StylePropertyComponent (builderToUse, propertyToUse, nodeToUse)
 
     auto button = std::make_unique<juce::TextButton> (propertyToUse.getDisplayName ());
     addAndMakeVisible (button.get());
-    button->onClick = [&](){
+    button->onClick = [&]()
+    {
         customValueFunction.process (true, 0);
+
+        updateInspectorIfNeeded (false);
+        refresh ();
     };
 
     editor = std::move (button);

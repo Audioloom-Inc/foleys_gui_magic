@@ -51,6 +51,9 @@ juce::PropertyComponent* StylePropertyComponent::createComponent (MagicGUIBuilde
     if (property.type == SettableProperty::Toggle)
         return new StyleBoolPropertyComponent (builder, property, node);
 
+    if (property.type == SettableProperty::Action)
+        return new StyleActionPropertyComponent (builder, property, node);
+
     if (property.type == SettableProperty::Choice)
         return new StyleChoicePropertyComponent (builder, property, node, property.menuCreationLambda);
 

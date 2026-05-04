@@ -586,36 +586,38 @@ void GuiItem::init()
 
 void GuiItem::setDraggable (bool selected)
 {
-    if (selected &&
-        getParentsLayoutType() == LayoutType::Contents &&
-        configNode != magicBuilder.getGuiRootNode())
-    {
-        // toFront (false);
-        borderDragger = std::make_unique<BorderDragger>(this, nullptr);
-        componentDragger = std::make_unique<juce::ComponentDragger>();
+    borderDragger.reset();
+    componentDragger.reset();
 
-        borderDragger->onDragStart = [&]
-        {
-            magicBuilder.getUndoManager().beginNewTransaction ("Drag component position");
-        };
-        borderDragger->onDragging = [&]
-        {
-            customResizeOperation (borderDragger->getDeltaBounds ());
-            // triggerAsyncUpdate ();
-        };
-        borderDragger->onDragEnd = [&]
-        {
-            triggerAsyncUpdate ();
-        };
+    if (! selected ||
+        getParentsLayoutType() != LayoutType::Contents ||
+        configNode == magicBuilder.getGuiRootNode())
+        return;
 
-        borderDragger->setBounds (getLocalBounds());
-        addAndMakeVisible (*borderDragger);
-    }
-    else
+    // toFront (false);
+    componentDragger = std::make_unique<juce::ComponentDragger>();
+
+    if (! canResizeInEditMode())
+        return;
+
+    borderDragger = std::make_unique<BorderDragger>(this, nullptr);
+
+    borderDragger->onDragStart = [&]
     {
-        borderDragger.reset();
-        componentDragger.reset();
-    }
+        magicBuilder.getUndoManager().beginNewTransaction ("Drag component position");
+    };
+    borderDragger->onDragging = [&]
+    {
+        customResizeOperation (borderDragger->getDeltaBounds ());
+        // triggerAsyncUpdate ();
+    };
+    borderDragger->onDragEnd = [&]
+    {
+        triggerAsyncUpdate ();
+    };
+
+    borderDragger->setBounds (getLocalBounds());
+    addAndMakeVisible (*borderDragger);
 }
 
 juce::ResizableBorderComponent::Zone GuiItem::getCurrentResizeZone () const

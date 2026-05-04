@@ -340,6 +340,7 @@ protected:
     void enablementChanged () override;
     
     virtual void customResizeOperation (juce::Rectangle<int> delta) {}
+    virtual bool canResizeInEditMode () const { return true; }
 
     juce::ResizableBorderComponent::Zone getCurrentResizeZone () const;
     

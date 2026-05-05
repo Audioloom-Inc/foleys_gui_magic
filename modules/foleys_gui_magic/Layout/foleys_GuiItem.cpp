@@ -411,7 +411,10 @@ void GuiItem::valueTreePropertyChanged (juce::ValueTree& treeThatChanged, const 
     if (treeThatChanged == configNode)
     {
         if (skipLayoutRefreshWhileSavingPosition)
+        {
+            configurePosition (configNode);
             return;
+        }
 
         if (auto* parent = findParentComponentOfClass<GuiItem>())
             parent->updateInternal();

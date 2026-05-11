@@ -96,7 +96,8 @@ protected:
     void setPropertyOnTargetNodes (const juce::var& value);
     void removePropertyFromTargetNodes ();
     
-    void updateInspectorIfNeeded (bool async = true);
+    /** @returns true if the inspector was updated, false otherwise */
+    bool updateInspectorIfNeeded (bool async = true);
 
 private:
     juce::Label infoLabel;

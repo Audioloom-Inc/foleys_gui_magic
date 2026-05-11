@@ -114,12 +114,17 @@ StylePropertyComponent (builderToUse, propertyToUse, nodeToUse)
 
     auto button = std::make_unique<juce::TextButton> (propertyToUse.getDisplayName ());
     addAndMakeVisible (button.get());
-    button->onClick = [&]()
+    auto weakThis = juce::WeakReference (this);
+    button->onClick = [weakThis]()
     {
-        customValueFunction.process (true, 0);
+        if (auto* self = weakThis.get())
+        {
+            self->customValueFunction.process (true, 0);
 
-        updateInspectorIfNeeded (false);
-        refresh ();
+            // if inspector is completely recreated, we don't need to call refresh, otherwise we do
+            if (! self->updateInspectorIfNeeded (false))
+                self->refresh ();
+        }
     };
 
     editor = std::move (button);

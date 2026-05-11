@@ -311,7 +311,7 @@ void StylePropertyComponent::lookAndFeelChanged()
     remove.setColour (juce::TextButton::buttonColourId, findColour (ToolBox::removeButtonColourId, true));
 }
 
-void StylePropertyComponent::updateInspectorIfNeeded (bool async) 
+bool StylePropertyComponent::updateInspectorIfNeeded (bool async) 
 {
     if (flags & SettableProperty::RefreshInspectorOnChange)
     {
@@ -319,7 +319,10 @@ void StylePropertyComponent::updateInspectorIfNeeded (bool async)
             builder.updateInspector (true);
         else
             builder.updateInspector (false);
+        
+        return true;
     }
+    return false;
 }
 
 void StylePropertyComponent::valueTreePropertyChanged (juce::ValueTree& tree, const juce::Identifier& changedProperty)

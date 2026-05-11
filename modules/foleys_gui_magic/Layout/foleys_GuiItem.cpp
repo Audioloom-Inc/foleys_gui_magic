@@ -633,6 +633,16 @@ juce::ResizableBorderComponent::Zone GuiItem::getCurrentResizeZone () const
 
 void GuiItem::savePosition ()
 {
+    savePosition (&magicBuilder.getUndoManager());
+}
+
+void GuiItem::savePositionWithoutUndo ()
+{
+    savePosition (nullptr);
+}
+
+void GuiItem::savePosition (juce::UndoManager* undoManager)
+{
     // this way we can prevent so many unnecessary calls to update layout without breaking undo redo
     magicBuilder.beginSavePosition (this);
     
@@ -645,7 +655,6 @@ void GuiItem::savePosition ()
         return static_cast<GuiItem*> (nullptr);
     };
 
-    auto* undo = &magicBuilder.getUndoManager();
     auto container = findContainer ();
 
 
@@ -656,10 +665,10 @@ void GuiItem::savePosition ()
         auto pw = juce::String (getWidth());
         auto ph = juce::String (getHeight());
         
-        configNode.setProperty (IDs::posX, 0, undo);
-        configNode.setProperty (IDs::posY, 0, undo);
-        configNode.setProperty (IDs::posWidth, pw, undo);
-        configNode.setProperty (IDs::posHeight, ph, undo);
+        configNode.setProperty (IDs::posX, 0, undoManager);
+        configNode.setProperty (IDs::posY, 0, undoManager);
+        configNode.setProperty (IDs::posWidth, pw, undoManager);
+        configNode.setProperty (IDs::posHeight, ph, undoManager);
     }
     else
     {
@@ -670,10 +679,10 @@ void GuiItem::savePosition ()
         auto pw = posWidth.absolute ? juce::String (getWidth()) : juce::String (100.0 * getWidth() / parent.getWidth()) + "%";
         auto ph = posHeight.absolute ? juce::String (getHeight()) : juce::String (100.0 * getHeight() / parent.getHeight()) + "%";
 
-        configNode.setProperty (IDs::posX, px, undo);
-        configNode.setProperty (IDs::posY, py, undo);
-        configNode.setProperty (IDs::posWidth, pw, undo);
-        configNode.setProperty (IDs::posHeight, ph, undo);
+        configNode.setProperty (IDs::posX, px, undoManager);
+        configNode.setProperty (IDs::posY, py, undoManager);
+        configNode.setProperty (IDs::posWidth, pw, undoManager);
+        configNode.setProperty (IDs::posHeight, ph, undoManager);
     }
 
     // this way we can prevent so many unnecessary calls to update layout without breaking undo redo

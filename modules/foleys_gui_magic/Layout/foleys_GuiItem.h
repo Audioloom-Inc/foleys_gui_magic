@@ -76,6 +76,7 @@ public:
      store size and position in configNode
      */
     virtual void savePosition ();
+    void savePositionWithoutUndo ();
 
     /**
      Set colours in the wrapped Component to the value from the stylesheet and palette.
@@ -438,6 +439,7 @@ private:
     Position posX, posY, posWidth, posHeight;
 
     void configurePosition (const juce::var& v, Position& p, double d);
+    void savePosition (juce::UndoManager* undoManager);
     void handleAsyncUpdate () override;
     
     void updateTooltip ();

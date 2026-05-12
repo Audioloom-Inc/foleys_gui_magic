@@ -350,6 +350,14 @@ void StylePropertyComponent::refresh ()
 
 void StylePropertyComponent::setPropertyOnTargetNodes (const juce::var& value)
 {
+    if (builder.getUndoManager ().isPerformingUndoRedo ())
+        return;
+
+    if (! needsSetPropertyOnTargetNodes (value))
+        return;
+
+    beginNewUndoTransaction ("Edit");
+
     if (targetNodes.isEmpty ())
     {
         if (node.isValid ())
@@ -365,6 +373,14 @@ void StylePropertyComponent::setPropertyOnTargetNodes (const juce::var& value)
 
 void StylePropertyComponent::removePropertyFromTargetNodes ()
 {
+    if (builder.getUndoManager ().isPerformingUndoRedo ())
+        return;
+
+    if (! needsRemovePropertyFromTargetNodes ())
+        return;
+
+    beginNewUndoTransaction ("Remove");
+
     if (targetNodes.isEmpty ())
     {
         if (node.isValid ())
@@ -376,6 +392,18 @@ void StylePropertyComponent::removePropertyFromTargetNodes ()
     for (auto target : targetNodes)
         if (target.isValid ())
             target.removeProperty (property, &builder.getUndoManager());
+}
+
+void StylePropertyComponent::beginNewUndoTransaction (const juce::String& verb)
+{
+    auto transactionName = verb;
+    auto propertyName = displayName.isNotEmpty () ? displayName
+                                                  : SettableProperty::formatDisplayText (property.toString ());
+
+    if (propertyName.isNotEmpty ())
+        transactionName << " " << propertyName;
+
+    builder.getUndoManager ().beginNewTransaction (transactionName);
 }
 
 void StylePropertyComponent::setTargetNodesInternal (const juce::Array<juce::ValueTree>& nodes)
@@ -408,6 +436,46 @@ bool StylePropertyComponent::areValuesEqual (const juce::var& lhs, const juce::v
         return true;
 
     return lhs.toString() == rhs.toString();
+}
+
+bool StylePropertyComponent::needsSetPropertyOnTargetNodes (const juce::var& value) const
+{
+    const auto needsSet = [this, &value] (const juce::ValueTree& target)
+    {
+        if (! target.isValid ())
+            return false;
+
+        if (! target.hasProperty (property))
+            return true;
+
+        return ! areValuesEqual (target.getProperty (property), value);
+    };
+
+    if (targetNodes.isEmpty ())
+        return needsSet (node);
+
+    for (auto target : targetNodes)
+        if (needsSet (target))
+            return true;
+
+    return false;
+}
+
+bool StylePropertyComponent::needsRemovePropertyFromTargetNodes () const
+{
+    const auto needsRemove = [this] (const juce::ValueTree& target)
+    {
+        return target.isValid () && target.hasProperty (property);
+    };
+
+    if (targetNodes.isEmpty ())
+        return needsRemove (node);
+
+    for (auto target : targetNodes)
+        if (needsRemove (target))
+            return true;
+
+    return false;
 }
 
 } // namespace foleys

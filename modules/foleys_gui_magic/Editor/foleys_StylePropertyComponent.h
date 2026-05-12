@@ -95,6 +95,7 @@ protected:
 
     void setPropertyOnTargetNodes (const juce::var& value);
     void removePropertyFromTargetNodes ();
+    void beginNewUndoTransaction (const juce::String& verb);
     
     /** @returns true if the inspector was updated, false otherwise */
     bool updateInspectorIfNeeded (bool async = true);
@@ -111,6 +112,8 @@ private:
 
     void setTargetNodesInternal (const juce::Array<juce::ValueTree>& nodes);
     bool areValuesEqual (const juce::var& lhs, const juce::var& rhs) const;
+    bool needsSetPropertyOnTargetNodes (const juce::var& value) const;
+    bool needsRemovePropertyFromTargetNodes () const;
      
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StylePropertyComponent)
 };

@@ -88,11 +88,6 @@ void StyleBoolPropertyComponent::update()
             toggle->setToggleState (false, juce::dontSendNotification);
             toggle->setButtonText (getMixedValueText ());
         }
-        else if (getTargetNodes ().size () == 1 && node == inheritedFrom)
-        {
-            toggle->getToggleStateValue().referTo (node.getPropertyAsValue (property, &builder.getUndoManager()));
-            toggle->setButtonText ({});
-        }
         else
         {
             toggle->getToggleStateValue().referTo ({});

@@ -66,10 +66,6 @@ void StyleTextPropertyComponent::update()
             label->getTextValue().referTo ({});
             label->setText (getMixedValueText (), juce::dontSendNotification);
         }
-        else if (getTargetNodes ().size () == 1 && node == inheritedFrom)
-        {
-            label->getTextValue().referTo (node.getPropertyAsValue (property, &builder.getUndoManager()));
-        }
         else
         {
             label->getTextValue().referTo ({});

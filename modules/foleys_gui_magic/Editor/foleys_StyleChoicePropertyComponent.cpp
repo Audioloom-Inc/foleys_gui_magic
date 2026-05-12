@@ -188,13 +188,9 @@ void StyleChoicePropertyComponent::update()
             combo->setSelectedId (0, juce::dontSendNotification);
             combo->setText (getMixedValueText (), juce::dontSendNotification);
         }
-        else if (getTargetNodes ().size () == 1 && node == inheritedFrom)
-        {
-            proxy.referTo (node.getPropertyAsValue (property, &builder.getUndoManager()));
-        }
         else
         {
-            proxy.referTo (proxy);
+            proxy.referTo ({});
 
             auto vString = value.toString ();
 

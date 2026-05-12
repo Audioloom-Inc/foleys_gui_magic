@@ -167,20 +167,13 @@ void StyleColourPropertyComponent::update()
             return;
         }
 
-        if (getTargetNodes ().size () == 1 && node == inheritedFrom)
-        {
-            label->getTextValue().referTo (node.getPropertyAsValue (property, &builder.getUndoManager()));
-        }
-        else
-        {
-            if (value.isVoid())
-                getLookAndFeelColourFallback();
+        if (value.isVoid())
+            getLookAndFeelColourFallback();
 
-            juce::ScopedValueSetter<bool> setter (blockTextChange, true);
+        juce::ScopedValueSetter<bool> setter (blockTextChange, true);
 
-            label->getTextValue().referTo ({});
-            label->setText (value.toString(), juce::dontSendNotification);
-        }
+        label->getTextValue().referTo ({});
+        label->setText (value.toString(), juce::dontSendNotification);
 
         auto colourText = label->getText().trim();
 

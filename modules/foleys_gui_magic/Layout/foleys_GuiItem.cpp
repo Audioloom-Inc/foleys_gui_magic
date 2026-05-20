@@ -53,6 +53,7 @@ GuiItem::GuiItem (MagicGUIBuilder& builder, juce::ValueTree node)
 GuiItem::~GuiItem()
 {
     magicBuilder.getStylesheet().removeListener (this);
+    configNode.removeListener (this);
 }
 
 juce::String GuiItem::getDefaultCategoryName() const

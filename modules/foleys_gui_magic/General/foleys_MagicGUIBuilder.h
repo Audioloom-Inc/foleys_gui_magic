@@ -81,16 +81,16 @@ public:
     /**
      Grants access to the main XML, that holds all information.
      */
-    juce::ValueTree& getGuiTree();
+    virtual juce::ValueTree& getGuiTree();
 
     /**
      */
-    juce::ValueTree& getEditorTree ();
+    virtual juce::ValueTree& getEditorTree ();
     
     /**
      Grants access to the GUI root node.
      */
-    juce::ValueTree getGuiRootNode();
+    virtual juce::ValueTree getGuiRootNode();
 
     /**
      Lookup a Component through the tree. It will return the first with that id regardless if there is another one.

@@ -113,9 +113,10 @@ StylePropertyComponent (builderToUse, propertyToUse, nodeToUse)
     button->onClick = [weakThis]()
     {
         if (auto* self = weakThis.get())
-        {
             self->customValueFunction.process (true, 0);
 
+        if (auto* self = weakThis.get())
+        {
             // if inspector is completely recreated, we don't need to call refresh, otherwise we do
             if (! self->updateInspectorIfNeeded (false))
                 self->refresh ();

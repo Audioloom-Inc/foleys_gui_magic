@@ -55,10 +55,13 @@ void Decorator::drawDecorator (juce::Graphics& g, juce::Rectangle<int> bounds)
         {
             g.setColour (backgroundColour);
 
+            if (border > 0.0f)
+                boundsf = boundsf.reduced (border / 2.0f);
+
             if (radius > 0.0f)
                 g.fillRoundedRectangle (boundsf, radius);
             else
-                g.fillRect (bounds);
+                g.fillRect (boundsf);
         }
     }
 
@@ -76,7 +79,7 @@ void Decorator::drawDecorator (juce::Graphics& g, juce::Rectangle<int> bounds)
         if (radius > 0.0f)
             g.drawRoundedRectangle (boundsf, radius, border);
         else
-            g.drawRect (bounds, juce::roundToInt (border));
+            g.drawRect (boundsf, juce::roundToInt (border));
     }
 
     if (caption.isNotEmpty())

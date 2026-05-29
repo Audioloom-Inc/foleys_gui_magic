@@ -80,6 +80,7 @@ protected:
     juce::OwnedArray<juce::Component> extraEditors;
 
     juce::TextButton    remove { "X" };
+    bool                showRemoveButton { true };
 
     virtual void removeClicked () {}
     virtual bool showHint () const { return false; }

@@ -86,6 +86,8 @@ StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
 {
     customValueFunction = propertyToUse.customValueFunction;
     displayName = propertyToUse.getDisplayName();
+    showRemoveButton = propertyToUse.type != SettableProperty::Action;
+    remove.setVisible (showRemoveButton);
     
     hint = propertyToUse.hint.isNotEmpty () ? propertyToUse.hint
                                             : propertyToUse.description;
@@ -257,7 +259,10 @@ void StylePropertyComponent::resized()
     const auto controlPaddingY = 1;
     const auto iconSize = juce::jlimit (14, 18, right.getHeight() - 2);
 
-    remove.setBounds (right.removeFromRight (iconSize).reduced (1));
+    if (showRemoveButton)
+        remove.setBounds (right.removeFromRight (iconSize).reduced (1));
+    else
+        remove.setBounds ({});
     
     if (editor)
         editor->setBounds (right.reduced (0, controlPaddingY));

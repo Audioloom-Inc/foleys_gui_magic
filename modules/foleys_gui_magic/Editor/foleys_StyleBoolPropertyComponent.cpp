@@ -109,18 +109,25 @@ StylePropertyComponent (builderToUse, propertyToUse, nodeToUse)
 
     auto button = std::make_unique<juce::TextButton> (propertyToUse.getDisplayName ());
     addAndMakeVisible (button.get());
-    auto weakThis = juce::WeakReference (this);
-    button->onClick = [weakThis]()
+    auto safeThis = juce::Component::SafePointer<StyleActionPropertyComponent> (this);
+    button->onClick = [safeThis]()
     {
-        if (auto* self = weakThis.get())
-            self->customValueFunction.process (true, 0);
+        auto safeSelf = safeThis;
 
-        if (auto* self = weakThis.get())
+        if (safeSelf == nullptr)
+            return;
+
+        const auto action = safeSelf->customValueFunction;
+        action.process (true, nullptr);
+
+        juce::MessageManager::callAsync ([safeSelf]()
         {
-            // if inspector is completely recreated, we don't need to call refresh, otherwise we do
-            if (! self->updateInspectorIfNeeded (false))
-                self->refresh ();
-        }
+            if (safeSelf == nullptr)
+                return;
+
+            if (! safeSelf->updateInspectorIfNeeded (false))
+                safeSelf->refresh ();
+        });
     };
 
     editor = std::move (button);

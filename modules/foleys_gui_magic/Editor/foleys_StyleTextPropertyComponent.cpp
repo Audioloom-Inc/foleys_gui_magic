@@ -79,7 +79,8 @@ void StyleTextPropertyComponent::update()
 void StyleTextPropertyComponent::init() 
 {
     auto label = std::make_unique<juce::Label>();
-    label->setEditable (true);
+    label->setEditable (isPropertySettable ());
+    label->setEnabled (isPropertySettable ());
     label->setRepaintsOnMouseActivity (true);
 
     addAndMakeVisible (label.get());
@@ -87,6 +88,9 @@ void StyleTextPropertyComponent::init()
     label->onTextChange = [&]
     {
         if (isRefreshing ())
+            return;
+
+        if (! isPropertySettable ())
             return;
 
         if (auto* l = dynamic_cast<juce::Label*>(editor.get()))

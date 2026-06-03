@@ -93,6 +93,7 @@ StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
                                             : propertyToUse.description;
 
     flags = propertyToUse.flags;
+    propertySettable = propertyToUse.settable;
     
     if (hint.isNotEmpty ())
     {
@@ -196,7 +197,7 @@ juce::var StylePropertyComponent::lookupValue()
         return builder.getPropertyDefaultValue (property);
     }
 
-    remove.setEnabled (hasAnyExplicitValue);
+    remove.setEnabled (propertySettable && hasAnyExplicitValue);
 
     if (showPropertyTooltips)
     {
@@ -244,6 +245,9 @@ void StylePropertyComponent::paint (juce::Graphics& g)
 
     if (auto* toggle = dynamic_cast<juce::ToggleButton*> (editor.get()))
         labelColour = toggle->getToggleState() ? activeLabelColour : inactiveLabelColour;
+
+    if (! propertySettable)
+        labelColour = inactiveLabelColour;
 
     g.setFont (juce::FontOptions (10.0f).withStyle ("Bold"));
     g.setColour (labelColour);
@@ -358,6 +362,9 @@ void StylePropertyComponent::setPropertyOnTargetNodes (const juce::var& value)
     if (builder.getUndoManager ().isPerformingUndoRedo ())
         return;
 
+    if (! propertySettable)
+        return;
+
     if (! needsSetPropertyOnTargetNodes (value))
         return;
 
@@ -379,6 +386,9 @@ void StylePropertyComponent::setPropertyOnTargetNodes (const juce::var& value)
 void StylePropertyComponent::removePropertyFromTargetNodes ()
 {
     if (builder.getUndoManager ().isPerformingUndoRedo ())
+        return;
+
+    if (! propertySettable)
         return;
 
     if (! needsRemovePropertyFromTargetNodes ())

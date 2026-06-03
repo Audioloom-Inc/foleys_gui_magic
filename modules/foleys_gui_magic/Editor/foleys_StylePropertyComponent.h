@@ -70,6 +70,7 @@ protected:
     juce::String        hint;
     bool                inheritFromParents { false };
     int                 flags{ 0 }; // SettableProperty::Flags
+    bool                propertySettable { true };
     bool                mixedValue { false };
     bool                hasAnyExplicitValue { false };
     bool                allNodesExplicitValue { false };
@@ -93,6 +94,7 @@ protected:
 
     void lookAndFeelChanged () override;
     bool isRefreshing () { return refreshing; }
+    bool isPropertySettable () const { return propertySettable; }
 
     void setPropertyOnTargetNodes (const juce::var& value);
     void removePropertyFromTargetNodes ();

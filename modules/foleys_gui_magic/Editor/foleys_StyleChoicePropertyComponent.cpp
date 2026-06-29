@@ -97,7 +97,7 @@ void StyleChoicePropertyComponent::initialiseComboBox (bool editable)
 
             auto& lf = getLookAndFeel ();
             menu.setLookAndFeel (&lf);
-            menu.showMenuAsync (juce::PopupMenu::Options ().withTargetComponent (this).withItemThatMustBeVisible (lastClicked), [&, weakThis = juce::WeakReference (this)](int clicked){
+            menu.showMenuAsync (juce::PopupMenu::Options ().withTargetComponent (this).withInitiallySelectedItem (lastClicked), [&, weakThis = juce::WeakReference (this)](int clicked){
                 if (! weakThis)
                     return;
 

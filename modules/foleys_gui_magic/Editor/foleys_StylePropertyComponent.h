@@ -68,6 +68,7 @@ protected:
     juce::Array<juce::ValueTree> targetNodes;
     juce::ValueTree     inheritedFrom;
     juce::String        hint;
+    juce::var           propertyDefaultValue;
     bool                inheritFromParents { false };
     int                 flags{ 0 }; // SettableProperty::Flags
     bool                propertySettable { true };

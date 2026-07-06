@@ -91,6 +91,7 @@ StylePropertyComponent (builderToUse, propertyToUse.name, nodeToUse)
     
     hint = propertyToUse.hint.isNotEmpty () ? propertyToUse.hint
                                             : propertyToUse.description;
+    propertyDefaultValue = propertyToUse.defaultValue;
 
     flags = propertyToUse.flags;
     propertySettable = propertyToUse.settable;
@@ -150,6 +151,16 @@ StylePropertyComponent::~StylePropertyComponent()
 juce::var StylePropertyComponent::lookupValue()
 {
     const auto& stylesheet = builder.getStylesheet();
+    const auto getDefaultValue = [this]
+    {
+        return propertyDefaultValue.isVoid () ? builder.getPropertyDefaultValue (property)
+                                              : propertyDefaultValue;
+    };
+    const auto getDefaultValueForType = [this, &getDefaultValue] (juce::Identifier type)
+    {
+        return propertyDefaultValue.isVoid () ? builder.getPropertyDefaultValue (property, type)
+                                              : getDefaultValue ();
+    };
 
     mixedValue = false;
     hasAnyExplicitValue = false;
@@ -176,7 +187,7 @@ juce::var StylePropertyComponent::lookupValue()
         auto value = stylesheet.getStyleProperty (property, targetNode, inheritFromParents, &inherited);
 
         if (value.isVoid ())
-            value = builder.getPropertyDefaultValue (property, targetNode.getType ());
+            value = getDefaultValueForType (targetNode.getType ());
 
         if (! hasFirstValue)
         {
@@ -194,7 +205,7 @@ juce::var StylePropertyComponent::lookupValue()
     {
         allNodesExplicitValue = false;
         remove.setEnabled (false);
-        return builder.getPropertyDefaultValue (property);
+        return getDefaultValue ();
     }
 
     remove.setEnabled (propertySettable && hasAnyExplicitValue);
@@ -226,7 +237,7 @@ juce::var StylePropertyComponent::lookupValue()
         }
     }
 
-    return hasFirstValue ? firstValue : builder.getPropertyDefaultValue (property);
+    return hasFirstValue ? firstValue : getDefaultValue ();
 }
 
 void StylePropertyComponent::paint (juce::Graphics& g)

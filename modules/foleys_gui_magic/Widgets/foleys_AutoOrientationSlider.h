@@ -94,13 +94,13 @@ public:
             {
                 auto w = filmStrip.getWidth() / numImages;
                 auto clipped = filmStrip.getClippedImage ({ index * w, 0, w, filmStrip.getHeight() });
-                g.drawImage (clipped, knobArea.toFloat (), juce::RectanglePlacement::centred);
+                drawFilmstripFrame (g, clipped, knobArea.toFloat ());
             }
             else
             {
                 auto h = filmStrip.getHeight() / numImages;
                 auto clipped = filmStrip.getClippedImage ({ 0, index * h, filmStrip.getWidth(), h });
-                g.drawImage (clipped, knobArea.toFloat (), juce::RectanglePlacement::centred);
+                drawFilmstripFrame (g, clipped, knobArea.toFloat ());
             }
         }
     }
@@ -134,6 +134,12 @@ public:
     {
         filmStrip = image;
         this->flipped = flipped;
+    }
+
+    void setFilmStripTransform (bool flipHorizontal, bool flipVertical)
+    {
+        flipFilmstripHorizontal = flipHorizontal;
+        flipFilmstripVertical = flipVertical;
     }
 
     void setNumImages (int num, bool horizontal)
@@ -198,12 +204,36 @@ public:
 
 private:
 
+    void drawFilmstripFrame (juce::Graphics& g, const juce::Image& frame, juce::Rectangle<float> area) const
+    {
+        if (! (flipFilmstripHorizontal || flipFilmstripVertical))
+        {
+            g.drawImage (frame, area, juce::RectanglePlacement::centred);
+            return;
+        }
+
+        auto frameTransform = juce::AffineTransform {};
+
+        if (flipFilmstripHorizontal)
+            frameTransform = frameTransform.followedBy (juce::AffineTransform::scale (-1.0f, 1.0f).translated ((float) frame.getWidth (), 0.0f));
+
+        if (flipFilmstripVertical)
+            frameTransform = frameTransform.followedBy (juce::AffineTransform::scale (1.0f, -1.0f).translated (0.0f, (float) frame.getHeight ()));
+
+        const auto placementTransform = juce::RectanglePlacement (juce::RectanglePlacement::centred)
+            .getTransformToFit (frame.getBounds ().toFloat (), area);
+
+        g.drawImageTransformed (frame, frameTransform.followedBy (placementTransform), false);
+    }
+
     bool autoOrientation = true;
 
     juce::Image filmStrip;
     int         numImages = 0;
     bool        horizontalFilmStrip = false;
     bool        flipped = false;
+    bool        flipFilmstripHorizontal = false;
+    bool        flipFilmstripVertical = false;
 
     juce::ListenerList<StyleListener> layoutListeners;
 

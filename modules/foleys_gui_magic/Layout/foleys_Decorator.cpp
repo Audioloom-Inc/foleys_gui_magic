@@ -38,14 +38,23 @@ namespace foleys
 
 void Decorator::drawDecorator (juce::Graphics& g, juce::Rectangle<int> bounds)
 {
+    if (! hasVisibleDecoration())
+        return;
+
     juce::Graphics::ScopedSaveState stateSave (g);
 
     auto boundsf = margin.reducedRect (bounds.toFloat());
+    const auto hasBackgroundGradient = ! backgroundGradient.isEmpty();
+    const auto hasBackgroundColour = backgroundColour.getAlpha() > 0;
 
+    if (! hasBackgroundGradient && border > 0.0f)
+        boundsf = boundsf.reduced (border / 2.0f);
+
+    if (hasBackgroundGradient || hasBackgroundColour)
     {
         juce::Graphics::ScopedSaveState save (g);
 
-        if (! backgroundGradient.isEmpty())
+        if (hasBackgroundGradient)
         {
             juce::Path p;
             p.addRoundedRectangle (boundsf, radius);
@@ -55,9 +64,6 @@ void Decorator::drawDecorator (juce::Graphics& g, juce::Rectangle<int> bounds)
         {
             g.setColour (backgroundColour);
 
-            if (border > 0.0f)
-                boundsf = boundsf.reduced (border / 2.0f);
-
             if (radius > 0.0f)
                 g.fillRoundedRectangle (boundsf, radius);
             else
@@ -65,14 +71,14 @@ void Decorator::drawDecorator (juce::Graphics& g, juce::Rectangle<int> bounds)
         }
     }
 
-    if (! backgroundImage.isNull())
+    if (! backgroundImage.isNull() && backgroundAlpha > 0.0f)
     {
         juce::Graphics::ScopedSaveState save (g);
         g.setOpacity (backgroundAlpha);
         g.drawImage (backgroundImage, boundsf, backgroundPlacement);
     }
 
-    if (border > 0.0f)
+    if (border > 0.0f && borderColour.getAlpha() > 0)
     {
         g.setColour (borderColour);
 
@@ -82,7 +88,7 @@ void Decorator::drawDecorator (juce::Graphics& g, juce::Rectangle<int> bounds)
             g.drawRect (boundsf, juce::roundToInt (border));
     }
 
-    if (caption.isNotEmpty())
+    if (caption.isNotEmpty() && captionColour.getAlpha() > 0)
     {
         auto clientBounds = getClientBounds (bounds);
 
@@ -91,6 +97,15 @@ void Decorator::drawDecorator (juce::Graphics& g, juce::Rectangle<int> bounds)
         g.setFont (captionSize * 0.8f);
         g.drawFittedText (caption, clientBounds.caption, justification.getOnlyHorizontalFlags(), 1);
     }
+}
+
+bool Decorator::hasVisibleDecoration() const
+{
+    return ! backgroundGradient.isEmpty()
+        || backgroundColour.getAlpha() > 0
+        || (! backgroundImage.isNull() && backgroundAlpha > 0.0f)
+        || (border > 0.0f && borderColour.getAlpha() > 0)
+        || (caption.isNotEmpty() && captionColour.getAlpha() > 0);
 }
 
 juce::String Decorator::getTabCaption (const juce::String& defaultName) const

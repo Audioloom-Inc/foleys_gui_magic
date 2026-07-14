@@ -57,6 +57,8 @@ public:
 
     void drawDecorator (juce::Graphics& g, juce::Rectangle<int> bounds);
 
+    bool hasVisibleDecoration() const;
+
     struct ClientBounds
     {
         juce::Rectangle<int> client;

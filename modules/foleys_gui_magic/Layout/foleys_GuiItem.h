@@ -178,7 +178,7 @@ public:
     /**
      Returns true when the component is visible and not hidden
     */
-    bool shouldBeVisible ();
+    virtual bool shouldBeVisible ();
 
     /**
      Returns true when the component is shown in final product

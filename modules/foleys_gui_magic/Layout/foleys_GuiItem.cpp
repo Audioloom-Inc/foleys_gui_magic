@@ -721,7 +721,7 @@ void GuiItem::updateVisibility()
         setAlpha (! visibleInFinalProduct ? 0.f : isEnabled () ? 1.f : disappearingSet ? 0.f : getDisabledAlpha ());
     }
 
-    setVisible (visible && getAlpha () > 0.f);
+    setVisible (shouldBeVisible () && getAlpha () > 0.f);
 
     animationHelper.setDisappearingEnabled (disappearingEnabled);
 }
